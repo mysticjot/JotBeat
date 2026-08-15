@@ -13,6 +13,7 @@ from __future__ import annotations
 import datetime
 import json
 import webbrowser
+from contextlib import suppress
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -29,14 +30,12 @@ def _log(root: Path, line: str) -> None:
     """Append one line to state/ui-debug.log. NEVER log key values —
     only timestamps, routes, and outcome/error text (which carries names
     and char counts at most). Best-effort: logging must never break a request."""
-    try:
+    with suppress(OSError):
         log_path = Path(root) / "state" / "ui-debug.log"
         log_path.parent.mkdir(parents=True, exist_ok=True)
         stamp = datetime.datetime.now().isoformat(timespec="seconds")
         with log_path.open("a", encoding="utf-8") as f:
             f.write(f"{stamp} {line}\n")
-    except OSError:
-        pass
 
 
 def is_loopback(addr: str) -> bool:
@@ -520,17 +519,14 @@ def serve(root: Path) -> None:
         httpd = make_server(root, 0)
     url = f"http://127.0.0.1:{httpd.server_address[1]}"
     _log(root, f"server start build={BUILD} root={Path(root).resolve()} url={url}")
-    try:  # pythonw (double-click launcher) may have no stdout at all
+    # pythonw (double-click launcher) may have no stdout at all
+    with suppress(Exception):
         print(f"JotBeat settings -> {url}  (loopback only; Ctrl+C to stop)")
-    except Exception:
-        pass
     webbrowser.open(url)
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        try:
+        with suppress(Exception):
             print("\nsettings UI stopped")
-        except Exception:
-            pass
     finally:
         httpd.server_close()

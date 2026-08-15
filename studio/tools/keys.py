@@ -15,6 +15,7 @@ import os
 import re
 import subprocess
 import tempfile
+from contextlib import suppress
 from pathlib import Path
 
 KEY_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
@@ -59,10 +60,9 @@ def _atomic_write(root: Path, lines: list[str]) -> None:
             f.write("\n".join(lines) + "\n")
         os.replace(tmp, path)
     except BaseException:
-        try:
+        # best-effort temp cleanup; the original exception always wins
+        with suppress(OSError):
             os.unlink(tmp)
-        except OSError:
-            pass
         raise
 
 
