@@ -7,6 +7,8 @@ export class Boot extends Scene
         super('Boot');
     }
 
+    //  Phaser scene lifecycle — invoked by the Scene Manager, no direct call site.
+    //  fallow-ignore-next-line unused-class-member
     preload ()
     {
         //  Greybox assets only — real art arrives in Phase 5 behind the manifest.
@@ -15,6 +17,8 @@ export class Boot extends Scene
         this.load.tilemapTiledJSON('dungeon', 'maps/dungeon.json');
     }
 
+    //  Phaser scene lifecycle — invoked by the Scene Manager, no direct call site.
+    //  fallow-ignore-next-line unused-class-member
     create ()
     {
         this.scene.start('Title');

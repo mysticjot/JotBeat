@@ -8,6 +8,8 @@ export class Title extends Scene
         super('Title');
     }
 
+    //  Phaser scene lifecycle — invoked by the Scene Manager, no direct call site.
+    //  fallow-ignore-next-line unused-class-member
     create ()
     {
         setScene('Title');

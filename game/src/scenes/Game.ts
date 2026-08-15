@@ -11,6 +11,8 @@ export class Game extends Scene
         super('Game');
     }
 
+    //  Phaser scene lifecycle — invoked by the Scene Manager, no direct call site.
+    //  fallow-ignore-next-line unused-class-member
     create ()
     {
         setScene('Game');
@@ -29,6 +31,8 @@ export class Game extends Scene
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     }
 
+    //  Phaser scene lifecycle — invoked by the Scene Manager, no direct call site.
+    //  fallow-ignore-next-line unused-class-member
     update (): void
     {
         this.player.update();

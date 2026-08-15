@@ -1,0 +1,24 @@
+{
+  // This file is JSONC: fallow reads these comments; generic JSON tools may not.
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  // Our TS/JS lives under game/ (Phaser 4 + Vite); studio/ is Python (aislop covers it).
+  "entry": [
+    "game/index.html",
+    "game/src/main.ts"
+  ],
+  // vite configs set publicDir: 'game/assets', so /style.css resolves to
+  // game/assets/style.css at runtime and lands in dist/. Fallow can't see the
+  // publicDir mapping — suppress the false-positive pair.
+  "ignoreUnresolvedImports": ["/style.css"],
+  "ignoreFindings": ["game/assets/style.css"],
+  // DebugState is the pinned Phase-4 QA contract (ADR-0001): consumed by the
+  // Playwright harness via window.__game.state, not by TS imports. Keep exported.
+  "ignoreExports": [
+    { "file": "game/src/debug.ts", "exports": ["DebugState"] }
+  ],
+  "duplicates": {
+    // Hide pair-only clones; focus on widespread copy-paste worth refactoring.
+    "minOccurrences": 3
+  },
+  "rules": {}
+}
