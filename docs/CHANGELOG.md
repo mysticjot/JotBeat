@@ -18,6 +18,7 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 - Optional per-provider `headers` object merged into requests; `$ENV_VAR` values resolve from the environment so secret headers stay out of the repo. `provider add --header KEY=VALUE` (repeatable); UNIVERSAL COMPATIBILITY RULE (non-OpenAI API → local LiteLLM proxy, never per-vendor code) documented in `--help`.
 
 ### Fixed
+- Settings UI: Save/Test/Remove clicks could fail silently when the settings server was unreachable (dead pythonw instance) — `fetch` errors are now caught and surfaced as an explicit message ("cannot reach the settings server — relaunch JotBeat Studio.bat"). Save success confirms inline ("NAME set (N chars)", field clears, row flips to "set · N chars", dot goes green). Browser click-tested end-to-end via Playwright on both the CLI and .bat launch paths.
 - Windows cp1252 decode crash in `tools/shell.py` / `tools/browser.py` subprocess reads (now UTF-8 with `errors="replace"`).
 - `orchestrator.py patch()` KeyError when reached from build/QA failure without an audit record.
 

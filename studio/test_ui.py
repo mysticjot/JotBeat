@@ -83,6 +83,8 @@ def main() -> int:
 
         status, html = get("/")
         check("page serves", status == 200 and "JotBeat Studio" in html)
+        check("onclick handlers well-formed (no terminated-string regression)",
+              "saveKey(''" not in html and "saveKey(" in html)
 
         print("=== endpoint round-trip ===")
         r = post("/api/keys/set", {"name": "DUMMY_UI_KEY", "value": SECRET})

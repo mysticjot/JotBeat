@@ -89,10 +89,14 @@ and add it here as family "openai" pointing at http://localhost:4000/v1.</p>
 let STATE = null;
 
 async function api(path, body) {
-  const r = await fetch(path, {method: body ? 'POST' : 'GET',
-    headers: {'Content-Type': 'application/json'},
-    body: body ? JSON.stringify(body) : undefined});
-  return r.json();
+  try {
+    const r = await fetch(path, {method: body ? 'POST' : 'GET',
+      headers: {'Content-Type': 'application/json'},
+      body: body ? JSON.stringify(body) : undefined});
+    return await r.json();
+  } catch (e) {
+    return {ok: false, error: 'cannot reach the settings server — is "jotbeat ui" still running? Close and relaunch JotBeat Studio.bat.'};
+  }
 }
 
 function msg(text, cls) {
