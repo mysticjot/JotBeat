@@ -15,6 +15,16 @@
 
 ---
 
+## ADR-0002: No Phaser runtime global in ESM builds — always explicit imports
+
+- Status: accepted
+- Date: 2026-08-15
+- Context: The Phaser 4 npm package (`phaser.esm.js`) exports named modules only — there is no `window.Phaser` global at runtime. But the shipped type definitions declare a UMD global namespace, so `extends Phaser.Physics.Arcade.Sprite` (or any runtime `Phaser.*` value reference) **compiles clean under `tsc` and then dies at runtime** with `Phaser is not defined`. Type-position uses like `Phaser.Types.Core.GameConfig` are safe; value-position uses are not. This trap cost a real debugging cycle in Phase 1 and will recur, because Phaser 3 examples rely on the global everywhere.
+- Decision: In `game/`, every Phaser class used at runtime is imported explicitly from `'phaser'` (e.g. `import { Physics, Scene } from 'phaser'`). Bare `Phaser.*` is allowed only in type positions. Any new runtime `Phaser.*` reference in a diff is a review rejection, same class as v3 API patterns.
+- Consequences: Slightly more verbose imports. The compiler can no longer "validate" broken code, so a green `tsc` is trustworthy again. The Coder role must read this entry before writing scene code.
+
+---
+
 ## ADR-0001: The QA debug hook is load-bearing — do not remove it
 
 - Status: accepted
