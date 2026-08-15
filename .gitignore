@@ -29,3 +29,4 @@ playwright-report/
 
 # Orchestrator runtime state
 state/graph-checkpoints.db
+state/ui-debug.log
