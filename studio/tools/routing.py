@@ -28,6 +28,7 @@ PRESETS: dict[str, dict] = {
         "tier": "free",
         "free": True,
         "keyless": True,
+        "models": [],  # live from the local server
     },
     "litellm": {
         "base_url": "http://localhost:4000/v1",
@@ -36,6 +37,7 @@ PRESETS: dict[str, dict] = {
         "tier": "free",
         "free": True,
         "keyless": True,
+        "models": [],
     },
     "openrouter": {
         "base_url": "https://openrouter.ai/api/v1",
@@ -43,6 +45,12 @@ PRESETS: dict[str, dict] = {
         "family": "openai",
         "tier": "free",
         "free": True,
+        "models": [
+            "cohere/north-mini-code:free",
+            "nvidia/nemotron-3-super-120b-a12b:free",
+            "google/gemma-4-31b-it:free",
+            "openai/gpt-oss-20b:free",
+        ],
     },
     "groq": {
         "base_url": "https://api.groq.com/openai/v1",
@@ -50,6 +58,7 @@ PRESETS: dict[str, dict] = {
         "family": "openai",
         "tier": "free",
         "free": True,
+        "models": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"],
     },
     "deepseek": {
         "base_url": "https://api.deepseek.com/v1",
@@ -59,18 +68,24 @@ PRESETS: dict[str, dict] = {
         "price_in": 0.14,
         "price_out": 0.28,
         "price_cached_in": 0.0028,
+        "models": ["deepseek-v4-flash", "deepseek-v4-pro"],
     },
     "zai": {
         "base_url": "https://api.z.ai/api/paas/v4",
         "env_key": "ZAI_API_KEY",
         "family": "openai",
         "tier": "bulk",
+        "models": [
+            "glm-4.7-flash", "glm-4.6v-flash", "glm-4.7", "glm-4.6v",
+            "glm-5", "glm-5-turbo", "glm-5.1", "glm-5.2", "glm-5.3",
+        ],
     },
     "kimi": {
         "base_url": "https://api.moonshot.ai/v1",
         "env_key": "KIMI_API_KEY",
         "family": "openai",
         "tier": "bulk",
+        "models": ["kimi-k2.6"],
     },
     "mistral": {
         "base_url": "https://api.mistral.ai/v1",
@@ -78,6 +93,7 @@ PRESETS: dict[str, dict] = {
         "family": "openai",
         "tier": "free",
         "free": True,
+        "models": ["mistral-small-latest"],
     },
     "cerebras": {
         "base_url": "https://api.cerebras.ai/v1",
@@ -85,6 +101,7 @@ PRESETS: dict[str, dict] = {
         "family": "openai",
         "tier": "free",
         "free": True,
+        "models": ["llama-3.3-70b"],
     },
     "gemini": {
         "base_url": None,
@@ -92,6 +109,7 @@ PRESETS: dict[str, dict] = {
         "family": "google",
         "tier": "free",
         "free": True,
+        "models": ["gemini-3.5-flash"],
     },
     "github-models": {
         "base_url": "https://models.github.ai/inference",
@@ -99,6 +117,7 @@ PRESETS: dict[str, dict] = {
         "family": "openai",
         "tier": "free",
         "free": True,
+        "models": [],
     },
     "opencode": {
         # OpenCode Zen — OpenAI-compatible curated gateway (opencode.ai/docs/zen)
@@ -107,6 +126,7 @@ PRESETS: dict[str, dict] = {
         "family": "openai",
         "tier": "free",
         "free": True,
+        "models": ["deepseek-v4-flash"],
     },
 }
 PRESET_ALIASES = {

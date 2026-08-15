@@ -140,15 +140,24 @@ and add it here as family "openai" pointing at http://localhost:4000/v1.</p>
 <th>Tier</th><th>$/M in</th><th>$/M out</th><th></th></tr></thead><tbody></tbody></table>
 <p><button class="sec" onclick="document.getElementById('addform').style.display='block'">+ Add provider</button></p>
 <div id="addform" style="display:none; border:1px solid #2a313a; padding:12px; border-radius:6px;">
-  <p><select id="ppreset">
-     <option value="">— quick add (auto-fills everything) —</option>
+  <p>1 · <select id="ppreset" onchange="presetFill()">
+     <option value="">pick a provider…</option>
      <option>ollama</option><option>litellm</option><option>openrouter</option>
      <option>groq</option><option>deepseek</option><option>zai</option>
      <option>kimi</option><option>mistral</option><option>cerebras</option>
      <option>gemini</option><option>github-models</option><option>opencode</option>
+     <option value="__custom">other (manual)</option>
      </select>
-     <button class="sec" onclick="presetFill()">Auto-fill</button>
-     <span class="muted">ollama/litellm are keyless local servers — no key needed.</span></p>
+     <span id="pnote" class="muted"></span></p>
+  <p id="pmodelrow" style="display:none">2 · model:
+     <select id="pmodelsel" onchange="modelPicked()"></select>
+     <input id="pmodelother" placeholder="model id" style="display:none"></p>
+  <p id="pkeyrow" style="display:none">3 ·
+     <input type="password" id="pkey" placeholder="paste API key (or save it later in §1)" size="42"
+            autocomplete="new-password" data-1p-ignore data-lpignore="true"></p>
+  <p id="paddrow" style="display:none"><button onclick="addProvider()">Add provider</button></p>
+  <p><button class="sec" onclick="const a=document.getElementById('padv'); a.style.display = a.style.display==='none'?'block':'none'">advanced…</button></p>
+  <div id="padv" style="display:none">
   <p><input id="pname" placeholder="name"> <input id="pmodel" placeholder="model">
      <input id="pbase" placeholder="base URL" size="30"></p>
   <p><input id="penv" placeholder="env var NAME (e.g. MYPROVIDER_API_KEY)" size="34">
@@ -162,7 +171,7 @@ and add it here as family "openai" pointing at http://localhost:4000/v1.</p>
      placeholder="custom headers, one KEY=VALUE per line (optional)&#10;e.g. api-key=$MY_HEADER_KEY — $NAME reads from .env"></textarea></p>
   <p class="muted">Family: almost everything is "openai". For anything that
   isn't, run LiteLLM locally and point here at http://localhost:4000/v1.</p>
-  <p><button onclick="addProvider()">Add</button></p>
+  </div>
 </div>
 </section>
 
@@ -261,27 +270,55 @@ function renderProviders() {
 
 async function presetFill() {
   const preset = v('ppreset');
-  if (!preset) { msg('pick a preset first', 'fail'); return; }
+  for (const i of ['pmodelrow', 'pkeyrow', 'paddrow'])
+    document.getElementById(i).style.display = 'none';
+  document.getElementById('pnote').textContent = '';
+  if (!preset) return;
+  if (preset === '__custom') {
+    document.getElementById('padv').style.display = 'block';
+    document.getElementById('paddrow').style.display = 'block';
+    document.getElementById('pnote').textContent =
+      'manual entry — fill the advanced fields, then Add';
+    return;
+  }
   const r = await api('/api/providers/preset?name=' + encodeURIComponent(preset));
   if (!r.ok) { msg(r.error, 'fail'); return; }
   const f = r.fields;
+  // fill the hidden advanced fields so Add sends complete data
   document.getElementById('pname').value = r.name;
   document.getElementById('pbase').value = f.base_url || '';
   document.getElementById('penv').value = f.env_key || '';
   document.getElementById('pfamily').value = f.family;
   document.getElementById('ptier').value = f.tier;
   document.getElementById('pfree').checked = !!f.free;
-  if (f.price_in != null) document.getElementById('ppin').value = f.price_in;
-  if (f.price_out != null) document.getElementById('ppout').value = f.price_out;
-  if (f.price_cached_in != null) document.getElementById('ppcached').value = f.price_cached_in;
-  if (r.models && r.models.length) {
-    document.getElementById('pmodel').value = r.models[0];
-    msg('auto-filled — installed models: ' + r.models.join(', '), 'ok');
-  } else if (r.warning) {
-    msg('auto-filled, but: ' + r.warning, 'fail');
-  } else {
-    msg('auto-filled — enter the model id, then Add', 'ok');
+  document.getElementById('ppin').value = f.price_in != null ? f.price_in : '';
+  document.getElementById('ppout').value = f.price_out != null ? f.price_out : '';
+  document.getElementById('ppcached').value = f.price_cached_in != null ? f.price_cached_in : '';
+  if (r.warning) { msg(r.warning, 'fail'); return; }
+  const models = (r.models && r.models.length) ? r.models : (f.models || []);
+  const sel = document.getElementById('pmodelsel');
+  sel.innerHTML = '';
+  for (const m of models) {
+    const o = document.createElement('option'); o.textContent = m; sel.appendChild(o);
   }
+  const other = document.createElement('option');
+  other.value = '__other'; other.textContent = 'other (type it)…';
+  sel.appendChild(other);
+  document.getElementById('pmodelrow').style.display = 'block';
+  if (!f.keyless) {
+    document.getElementById('pkeyrow').style.display = 'block';
+  } else {
+    document.getElementById('pnote').textContent = 'keyless local server — no API key needed';
+  }
+  document.getElementById('paddrow').style.display = 'block';
+  modelPicked();
+}
+
+function modelPicked() {
+  const sel = document.getElementById('pmodelsel');
+  const isOther = sel.value === '__other';
+  document.getElementById('pmodelother').style.display = isOther ? 'inline-block' : 'none';
+  document.getElementById('pmodel').value = isOther ? '' : sel.value;
 }
 
 async function addProvider() {
@@ -292,16 +329,29 @@ async function addProvider() {
       headers[line.slice(0, i).trim()] = line.slice(i + 1).trim();
     }
   }
+  const other = document.getElementById('pmodelother');
+  const model = (other.style.display !== 'none' && other.value.trim())
+    ? other.value.trim() : v('pmodel');
+  const preset = v('ppreset');
   const r = await api('/api/providers/add', {
-    preset: v('ppreset'),
-    name: v('pname'), model: v('pmodel'), base_url: v('pbase'), env_key: v('penv'),
+    preset: preset === '__custom' ? '' : preset,
+    name: v('pname'), model: model, base_url: v('pbase'), env_key: v('penv'),
     family: v('pfamily'), tier: v('ptier'), free: document.getElementById('pfree').checked,
     price_in: parseFloat(v('ppin') || '0'), price_out: parseFloat(v('ppout') || '0'),
     price_cached_in: v('ppcached') ? parseFloat(v('ppcached')) : null,
     headers: headers,
   });
-  if (r.ok) { msg('provider added — now save its key above, Test, then route it', 'ok'); refresh(); }
-  else msg(r.error, 'fail');
+  if (!r.ok) { msg(r.error, 'fail'); return; }
+  const key = document.getElementById('pkey').value.trim();
+  if (key && document.getElementById('pkeyrow').style.display !== 'none') {
+    const k = await api('/api/keys/set', {name: v('penv'), value: key});
+    document.getElementById('pkey').value = '';
+    if (k.ok) msg('provider added + key saved (' + k.chars + ' chars) — Test it in §1, then route it in §3', 'ok');
+    else msg('provider added, but key save failed: ' + k.error + ' — save it in §1', 'fail');
+  } else {
+    msg('provider added — Test it, then route it in §3', 'ok');
+  }
+  refresh();
 }
 
 async function removeProvider(name) {
