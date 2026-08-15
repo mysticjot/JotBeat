@@ -318,27 +318,27 @@ def _state(root: Path) -> dict:
     routing = models.load_routing()
     providers = []
     for name, p in routing["providers"].items():
-        providers.append({
-            "name": name,
-            "model": p.get("model"),
-            "tier": p.get("tier"),
-            "family": p.get("family"),
-            "base_url": p.get("base_url"),
-            "env_key": p.get("env_key"),
-            "free": p.get("free", False),
-            "price_in": p.get("price_in"),
-            "price_out": p.get("price_out"),
-            "verified": bool(p.get("verified")),
-            "header_keys": sorted((p.get("headers") or {}).keys()),
-            "roles": roles_using(routing, name),
-        })
-    roles = [
-        {"name": r, "chain": cfg["chain"]}
-        for r, cfg in routing["roles"].items()
-    ]
+        providers.append(
+            {
+                "name": name,
+                "model": p.get("model"),
+                "tier": p.get("tier"),
+                "family": p.get("family"),
+                "base_url": p.get("base_url"),
+                "env_key": p.get("env_key"),
+                "free": p.get("free", False),
+                "price_in": p.get("price_in"),
+                "price_out": p.get("price_out"),
+                "verified": bool(p.get("verified")),
+                "header_keys": sorted((p.get("headers") or {}).keys()),
+                "roles": roles_using(routing, name),
+            }
+        )
+    roles = [{"name": r, "chain": cfg["chain"]} for r, cfg in routing["roles"].items()]
     # root_ok=False means the server was launched in the wrong folder —
     # every key write would be refused. The page shows a red banner.
     from tools.keys import assert_env_gitignored
+
     try:
         assert_env_gitignored(root)
         root_ok = True
@@ -429,13 +429,17 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
                 elif self.path == "/api/providers/add":
                     routing = models.load_routing()
                     entry = routing_mod.build_entry(
-                        name=body.get("name", ""), env_key=body.get("env_key", ""),
+                        name=body.get("name", ""),
+                        env_key=body.get("env_key", ""),
                         base_url=body.get("base_url") or None,
-                        model=body.get("model", ""), family=body.get("family", ""),
+                        model=body.get("model", ""),
+                        family=body.get("family", ""),
                         tier=body.get("tier", ""),
-                        price_in=body.get("price_in"), price_out=body.get("price_out"),
+                        price_in=body.get("price_in"),
+                        price_out=body.get("price_out"),
                         price_cached_in=body.get("price_cached_in"),
-                        free=body.get("free", False), headers=body.get("headers"),
+                        free=body.get("free", False),
+                        headers=body.get("headers"),
                     )
                     routing_mod.add_provider(routing, entry)
                     routing_mod.save(routing, models.PROVIDERS_FILE)
@@ -456,14 +460,17 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
                     self._respond(result)
 
                 elif self.path == "/api/route/set":
-                    chain = [c for c in (body.get("primary"), body.get("fallback")) if c]
+                    chain = [
+                        c for c in (body.get("primary"), body.get("fallback")) if c
+                    ]
                     # de-dup preserving order (primary == fallback is pointless)
                     chain = list(dict.fromkeys(chain))
                     if not chain:
                         raise routing_mod.RoutingError("pick at least a primary")
                     routing = models.load_routing()
                     warnings = routing_mod.set_role_chain(
-                        routing, body.get("role", ""), chain)
+                        routing, body.get("role", ""), chain
+                    )
                     routing_mod.save(routing, models.PROVIDERS_FILE)
                     self._respond({"ok": True, "warnings": warnings})
 
@@ -487,6 +494,7 @@ def _probe_existing(port: int) -> bool:
     Recognized by the /api/state shape (providers + roles) — works for
     older builds too, so reuse survives version skew."""
     import urllib.request
+
     try:
         with urllib.request.urlopen(
             f"http://127.0.0.1:{port}/api/state", timeout=2
@@ -505,6 +513,7 @@ def serve(root: Path) -> None:
     from stale ports. If the port is taken by something else, fall back to
     a random free port."""
     from cli import load_env  # populates os.environ from .env for provider tests
+
     load_env()
 
     fixed_url = f"http://127.0.0.1:{DEFAULT_PORT}"

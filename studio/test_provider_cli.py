@@ -26,13 +26,20 @@ FAILED = []
 def run(*args: str) -> subprocess.CompletedProcess:
     return subprocess.run(
         [sys.executable, str(CLI), *args],
-        cwd=ROOT, capture_output=True, text=True,
-        encoding="utf-8", errors="replace", timeout=60,
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=60,
     )
 
 
 def check(label: str, cond: bool, detail: str = "") -> None:
-    print(f"  {'PASS' if cond else 'FAIL'}  {label}" + (f"  ({detail})" if detail and not cond else ""))
+    print(
+        f"  {'PASS' if cond else 'FAIL'}  {label}"
+        + (f"  ({detail})" if detail and not cond else "")
+    )
     if not cond:
         FAILED.append(label)
 
@@ -44,46 +51,94 @@ def main() -> int:
 
         r = run("provider", "list")
         check("provider list exits 0", r.returncode == 0, r.stderr[-300:])
-        check("list prints key presence only",
-              "set" in r.stdout or "MISSING" in r.stdout)
+        check(
+            "list prints key presence only", "set" in r.stdout or "MISSING" in r.stdout
+        )
 
-        r = run("provider", "add", "--name", "dummy-local",
-                "--env-key", "DUMMY_LOCAL_KEY",
-                "--base-url", "http://localhost:9999/v1",
-                "--model", "dummy-7b", "--family", "openai",
-                "--tier", "free", "--price-in", "0", "--price-out", "0",
-                "--free")
+        r = run(
+            "provider",
+            "add",
+            "--name",
+            "dummy-local",
+            "--env-key",
+            "DUMMY_LOCAL_KEY",
+            "--base-url",
+            "http://localhost:9999/v1",
+            "--model",
+            "dummy-7b",
+            "--family",
+            "openai",
+            "--tier",
+            "free",
+            "--price-in",
+            "0",
+            "--price-out",
+            "0",
+            "--free",
+        )
         check("provider add exits 0", r.returncode == 0, r.stderr[-300:])
-        entry = json.loads(PROVIDERS.read_text(encoding="utf-8"))["providers"].get("dummy-local")
-        check("entry persisted with family", entry is not None and entry.get("family") == "openai")
+        entry = json.loads(PROVIDERS.read_text(encoding="utf-8"))["providers"].get(
+            "dummy-local"
+        )
+        check(
+            "entry persisted with family",
+            entry is not None and entry.get("family") == "openai",
+        )
 
-        r = run("provider", "add", "--name", "dummy-local",
-                "--env-key", "DUMMY_LOCAL_KEY",
-                "--base-url", "http://localhost:9999/v1",
-                "--model", "dummy-7b", "--family", "openai",
-                "--tier", "free", "--price-in", "0", "--price-out", "0")
-        check("duplicate add refused", r.returncode != 0 and "already exists" in r.stdout)
+        r = run(
+            "provider",
+            "add",
+            "--name",
+            "dummy-local",
+            "--env-key",
+            "DUMMY_LOCAL_KEY",
+            "--base-url",
+            "http://localhost:9999/v1",
+            "--model",
+            "dummy-7b",
+            "--family",
+            "openai",
+            "--tier",
+            "free",
+            "--price-in",
+            "0",
+            "--price-out",
+            "0",
+        )
+        check(
+            "duplicate add refused", r.returncode != 0 and "already exists" in r.stdout
+        )
 
         r = run("provider", "test", "dummy-local")
-        check("test w/o key fails clean (exit 1, no crash)",
-              r.returncode == 1 and "FAIL" in r.stdout and "Traceback" not in r.stderr,
-              (r.stdout + r.stderr)[-300:])
+        check(
+            "test w/o key fails clean (exit 1, no crash)",
+            r.returncode == 1 and "FAIL" in r.stdout and "Traceback" not in r.stderr,
+            (r.stdout + r.stderr)[-300:],
+        )
 
         r = run("route", "set", "triage", "dummy-local")
         check("route set exits 0", r.returncode == 0, r.stderr[-300:])
-        chain = json.loads(PROVIDERS.read_text(encoding="utf-8"))["roles"]["triage"]["chain"]
+        chain = json.loads(PROVIDERS.read_text(encoding="utf-8"))["roles"]["triage"][
+            "chain"
+        ]
         check("chain replaced", chain == ["dummy-local"])
 
         r = run("provider", "remove", "dummy-local")
-        check("remove refused while chained",
-              r.returncode != 0 and "triage" in r.stdout, r.stdout[-200:])
+        check(
+            "remove refused while chained",
+            r.returncode != 0 and "triage" in r.stdout,
+            r.stdout[-200:],
+        )
 
         r = run("route", "set", "triage", "groq-free-8b")
         check("route restored", r.returncode == 0)
 
         r = run("provider", "remove", "dummy-local")
         check("remove succeeds after unroute", r.returncode == 0, r.stdout[-200:])
-        gone = "dummy-local" not in json.loads(PROVIDERS.read_text(encoding="utf-8"))["providers"]
+        gone = (
+            "dummy-local"
+            not in json.loads(PROVIDERS.read_text(encoding="utf-8"))["providers"]
+        )
         check("entry gone", gone)
 
         r = run("route", "set", "triage", "no-such-provider")

@@ -33,18 +33,19 @@ MAX_ESCALATIONS_BEFORE_HUMAN = 2
 
 class StudioState(TypedDict, total=False):
     task: dict
-    instructions: str           # what the role was asked to do
-    artifacts: list[str]        # files the role produced
-    role_notes: str             # the role's own notes (never shown to auditor)
-    build_result: dict          # deterministic BVT output
-    qa_result: dict             # Playwright suite output
-    audit: dict                 # auditor verdict: MET | FAILED | UNVERIFIED | SKIPPED
+    instructions: str  # what the role was asked to do
+    artifacts: list[str]  # files the role produced
+    role_notes: str  # the role's own notes (never shown to auditor)
+    build_result: dict  # deterministic BVT output
+    qa_result: dict  # Playwright suite output
+    audit: dict  # auditor verdict: MET | FAILED | UNVERIFIED | SKIPPED
     attempts: int
     escalations: int
     done: bool
 
 
 # ---------------------------------------------------------------- nodes
+
 
 def select_task(state: StudioState) -> dict:
     task = get_next_ready_task()
@@ -59,6 +60,7 @@ def execute_role(state: StudioState) -> dict:
     """Dispatch to the role module. Roles live in studio/roles/ and each
     receives ONLY its context slice (BUDGET.md context budgets)."""
     from roles import dispatch  # roles/director.py, coder.py, qa.py, ...
+
     result = dispatch(state["task"], escalation_level=state.get("escalations", 0))
     return {
         "artifacts": result["artifacts"],
@@ -71,6 +73,7 @@ def build_verify(state: StudioState) -> dict:
     """Deterministic BVT: install, compile, lint, bundle, asset validation.
     Pure subprocess. Zero model calls. Failure here short-circuits QA."""
     from tools.shell import run_bvt
+
     result = run_bvt()
     log_event("bvt", task=state["task"]["id"], passed=result["passed"])
     return {"build_result": result}
@@ -80,6 +83,7 @@ def scripted_qa(state: StudioState) -> dict:
     """Playwright suite for this task's acceptance criteria.
     Fake input + window.__game.state assertions + screenshots. $0 infra."""
     from tools.browser import run_ac_suite
+
     result = run_ac_suite(state["task"].get("acceptance_ids", []))
     log_event("qa_run", task=state["task"]["id"], passed=result["passed"])
     return {"qa_result": result}
@@ -89,6 +93,7 @@ def cert_audit(state: StudioState) -> dict:
     """Adversarial audit. Inputs: AC + build/qa EVIDENCE DIGESTS only.
     Explicitly excluded: role_notes (the coder's self-assessment)."""
     from roles.auditor import audit
+
     verdict = audit(
         task=state["task"],
         build=state["build_result"],
@@ -100,6 +105,7 @@ def cert_audit(state: StudioState) -> dict:
 
 def commit(state: StudioState) -> dict:
     from tools.git import commit_changes
+
     commit_changes(state["task"], state["artifacts"])
     set_task_status(state["task"]["id"], "DONE")
     log_event("task_verified", task=state["task"]["id"])
@@ -112,8 +118,11 @@ def patch(state: StudioState) -> dict:
     Note: patch is also reached from build/QA gate failures, before any audit
     exists — hence the defensive .get on state["audit"]."""
     attempts = state.get("attempts", 0) + 1
-    set_task_status(state["task"]["id"], "KICKED_BACK",
-                    reason=state.get("audit", {}).get("patch_instructions", ""))
+    set_task_status(
+        state["task"]["id"],
+        "KICKED_BACK",
+        reason=state.get("audit", {}).get("patch_instructions", ""),
+    )
     log_event("kickback", task=state["task"]["id"], attempt=attempts)
     return {"attempts": attempts}
 
@@ -130,12 +139,12 @@ def human_ticket(state: StudioState) -> dict:
     """The budget ceiling. The machine stops and asks a human.
     It never, ever retries past this point on its own."""
     set_task_status(state["task"]["id"], "BLOCKED_HUMAN")
-    log_event("human_ticket", task=state["task"]["id"],
-              audit=state.get("audit", {}))
+    log_event("human_ticket", task=state["task"]["id"], audit=state.get("audit", {}))
     return {"done": True}
 
 
 # ---------------------------------------------------------------- edges
+
 
 def after_select(state: StudioState) -> str:
     return END if state.get("done") else "execute_role"
@@ -169,6 +178,7 @@ def after_commit(state: StudioState) -> str:
 
 # ---------------------------------------------------------------- graph
 
+
 def build_graph(checkpointer=None):
     g = StateGraph(StudioState)
     g.add_node("select_task", select_task)
@@ -182,16 +192,30 @@ def build_graph(checkpointer=None):
     g.add_node("human_ticket", human_ticket)
 
     g.add_edge(START, "select_task")
-    g.add_conditional_edges("select_task", after_select, {END: END, "execute_role": "execute_role"})
+    g.add_conditional_edges(
+        "select_task", after_select, {END: END, "execute_role": "execute_role"}
+    )
     g.add_edge("execute_role", "build_verify")
-    g.add_conditional_edges("build_verify", after_build, {"scripted_qa": "scripted_qa", "patch": "patch"})
-    g.add_conditional_edges("scripted_qa", after_qa, {"cert_audit": "cert_audit", "patch": "patch"})
-    g.add_conditional_edges("cert_audit", after_audit, {
-        "commit": "commit", "patch": "patch",
-        "escalate": "escalate", "human_ticket": "human_ticket",
-    })
-    g.add_edge("patch", "build_verify")      # retry re-enters at the gate, not the model
-    g.add_edge("escalate", "execute_role")   # escalation re-runs the role with shrunk context
+    g.add_conditional_edges(
+        "build_verify", after_build, {"scripted_qa": "scripted_qa", "patch": "patch"}
+    )
+    g.add_conditional_edges(
+        "scripted_qa", after_qa, {"cert_audit": "cert_audit", "patch": "patch"}
+    )
+    g.add_conditional_edges(
+        "cert_audit",
+        after_audit,
+        {
+            "commit": "commit",
+            "patch": "patch",
+            "escalate": "escalate",
+            "human_ticket": "human_ticket",
+        },
+    )
+    g.add_edge("patch", "build_verify")  # retry re-enters at the gate, not the model
+    g.add_edge(
+        "escalate", "execute_role"
+    )  # escalation re-runs the role with shrunk context
     g.add_conditional_edges("commit", after_commit, {"select_task": "select_task"})
     g.add_edge("human_ticket", END)
 
@@ -200,6 +224,7 @@ def build_graph(checkpointer=None):
 
 def run() -> None:
     from langgraph.checkpoint.sqlite import SqliteSaver
+
     # from_conn_string returns a context manager in langgraph-checkpoint-sqlite 3.x
     with SqliteSaver.from_conn_string("state/graph-checkpoints.db") as checkpointer:
         checkpointer.setup()

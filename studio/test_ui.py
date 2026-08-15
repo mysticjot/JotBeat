@@ -29,7 +29,10 @@ SECRET = "unit-test-secret-value-9f8e7d"
 
 
 def check(label: str, cond: bool, detail: str = "") -> None:
-    print(f"  {'PASS' if cond else 'FAIL'}  {label}" + (f"  ({detail})" if detail and not cond else ""))
+    print(
+        f"  {'PASS' if cond else 'FAIL'}  {label}"
+        + (f"  ({detail})" if detail and not cond else "")
+    )
     if not cond:
         FAILED.append(label)
 
@@ -63,8 +66,11 @@ def main() -> int:
 
     def post(path: str, payload: dict) -> dict:
         req = urllib.request.Request(
-            base + path, data=json.dumps(payload).encode("utf-8"),
-            headers={"Content-Type": "application/json"}, method="POST")
+            base + path,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
         try:
             with urllib.request.urlopen(req, timeout=15) as r:
                 raw = r.read().decode("utf-8")
@@ -83,45 +89,72 @@ def main() -> int:
 
         status, html = get("/")
         check("page serves", status == 200 and "JotBeat Studio" in html)
-        check("onclick handlers well-formed (no terminated-string regression)",
-              "saveKey(''" not in html and "saveKey(" in html)
+        check(
+            "onclick handlers well-formed (no terminated-string regression)",
+            "saveKey(''" not in html and "saveKey(" in html,
+        )
 
         print("=== endpoint round-trip ===")
         r = post("/api/keys/set", {"name": "DUMMY_UI_KEY", "value": SECRET})
-        check("keys set ok with char count", r.get("ok") and r.get("chars") == len(SECRET))
+        check(
+            "keys set ok with char count", r.get("ok") and r.get("chars") == len(SECRET)
+        )
         check(".env written", SECRET in (repo / ".env").read_text(encoding="utf-8"))
 
         _, state_raw = get("/api/state")
         state = json.loads(state_raw)
         row = next(x for x in state["keys"] if x["name"] == "GROQ_API_KEY")
-        check("state lists expected keys", "providers" in row and isinstance(row["set"], bool))
+        check(
+            "state lists expected keys",
+            "providers" in row and isinstance(row["set"], bool),
+        )
         check("ui key visible as stale", "DUMMY_UI_KEY" in state["stale_keys"])
 
-        r = post("/api/providers/add", {
-            "name": "dummy-ui", "env_key": "DUMMY_UI_KEY",
-            "base_url": "http://localhost:9999/v1", "model": "dummy-7b",
-            "family": "openai", "tier": "free",
-            "price_in": 0, "price_out": 0, "free": True,
-            "headers": {"X-Custom": "$DUMMY_UI_KEY"},
-        })
+        r = post(
+            "/api/providers/add",
+            {
+                "name": "dummy-ui",
+                "env_key": "DUMMY_UI_KEY",
+                "base_url": "http://localhost:9999/v1",
+                "model": "dummy-7b",
+                "family": "openai",
+                "tier": "free",
+                "price_in": 0,
+                "price_out": 0,
+                "free": True,
+                "headers": {"X-Custom": "$DUMMY_UI_KEY"},
+            },
+        )
         check("providers add ok", r.get("ok"), str(r))
         saved = json.loads(providers_copy.read_text(encoding="utf-8"))
-        check("provider persisted with headers",
-              saved["providers"]["dummy-ui"]["headers"] == {"X-Custom": "$DUMMY_UI_KEY"})
+        check(
+            "provider persisted with headers",
+            saved["providers"]["dummy-ui"]["headers"] == {"X-Custom": "$DUMMY_UI_KEY"},
+        )
 
-        r = post("/api/route/set", {"role": "triage", "primary": "dummy-ui", "fallback": ""})
+        r = post(
+            "/api/route/set", {"role": "triage", "primary": "dummy-ui", "fallback": ""}
+        )
         check("route set ok", r.get("ok"), str(r))
         saved = json.loads(providers_copy.read_text(encoding="utf-8"))
         check("chain updated", saved["roles"]["triage"]["chain"] == ["dummy-ui"])
 
         r = post("/api/providers/remove", {"name": "dummy-ui"})
-        check("remove refused while chained", not r.get("ok") and "triage" in r.get("error", ""))
+        check(
+            "remove refused while chained",
+            not r.get("ok") and "triage" in r.get("error", ""),
+        )
 
         r = post("/api/providers/test", {"name": "dummy-ui"})
-        check("provider test fails clean (no real server)",
-              r.get("ok") is False and "error" in r)
+        check(
+            "provider test fails clean (no real server)",
+            r.get("ok") is False and "error" in r,
+        )
 
-        r = post("/api/route/set", {"role": "triage", "primary": "groq-free-8b", "fallback": ""})
+        r = post(
+            "/api/route/set",
+            {"role": "triage", "primary": "groq-free-8b", "fallback": ""},
+        )
         check("route restored", r.get("ok"))
         r = post("/api/providers/remove", {"name": "dummy-ui"})
         check("remove ok after unroute", r.get("ok"))

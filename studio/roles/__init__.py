@@ -11,8 +11,15 @@ from __future__ import annotations
 import importlib
 
 ROLE_MODULE_NAMES = {
-    "director", "producer", "coder", "designer", "level",
-    "artist", "sound", "qa", "publisher",
+    "director",
+    "producer",
+    "coder",
+    "designer",
+    "level",
+    "artist",
+    "sound",
+    "qa",
+    "publisher",
 }
 
 

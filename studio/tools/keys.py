@@ -30,7 +30,9 @@ def assert_env_gitignored(root: Path) -> None:
     Fails CLOSED: no git repo / git error / not ignored -> refusal."""
     proc = subprocess.run(
         ["git", "-C", str(root), "check-ignore", ".env"],
-        capture_output=True, text=True, timeout=30,
+        capture_output=True,
+        text=True,
+        timeout=30,
     )
     if proc.returncode != 0:
         raise KeysError(

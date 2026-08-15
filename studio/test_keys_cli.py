@@ -25,7 +25,10 @@ FAILED = []
 
 
 def check(label: str, cond: bool, detail: str = "") -> None:
-    print(f"  {'PASS' if cond else 'FAIL'}  {label}" + (f"  ({detail})" if detail and not cond else ""))
+    print(
+        f"  {'PASS' if cond else 'FAIL'}  {label}"
+        + (f"  ({detail})" if detail and not cond else "")
+    )
     if not cond:
         FAILED.append(label)
 
@@ -55,13 +58,17 @@ def main() -> int:
     check("dummy key flagged stale", "DUMMY_TEST_KEY" in st["stale"])
 
     n = set_key(repo, "DUMMY_TEST_KEY", "replaced-value")
-    check("update in place (no dup)",
-          env_text.count("DUMMY_TEST_KEY") == 0 or
-          (repo / ".env").read_text(encoding="utf-8").count("DUMMY_TEST_KEY") == 1)
+    check(
+        "update in place (no dup)",
+        env_text.count("DUMMY_TEST_KEY") == 0
+        or (repo / ".env").read_text(encoding="utf-8").count("DUMMY_TEST_KEY") == 1,
+    )
 
     removed = remove_key(repo, "DUMMY_TEST_KEY")
-    check("remove_key clears the line", removed and "DUMMY_TEST_KEY"
-          not in (repo / ".env").read_text(encoding="utf-8"))
+    check(
+        "remove_key clears the line",
+        removed and "DUMMY_TEST_KEY" not in (repo / ".env").read_text(encoding="utf-8"),
+    )
     check("remove missing key is a no-op", remove_key(repo, "NOPE") is False)
 
     print("=== guard fails closed ===")
@@ -94,11 +101,20 @@ def main() -> int:
     check("unrelated line preserved", "UNRELATED=keepme" in text)
 
     print("=== CLI wiring ===")
-    r = subprocess.run([sys.executable, str(STUDIO_DIR / "cli.py"), "keys", "list"],
-                       cwd=ROOT, capture_output=True, text=True,
-                       encoding="utf-8", errors="replace", timeout=60)
+    r = subprocess.run(
+        [sys.executable, str(STUDIO_DIR / "cli.py"), "keys", "list"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=60,
+    )
     check("keys list exits 0", r.returncode == 0, r.stderr[-300:])
-    check("lists derived key names", "GROQ_API_KEY" in r.stdout and "ZAI_API_KEY" in r.stdout)
+    check(
+        "lists derived key names",
+        "GROQ_API_KEY" in r.stdout and "ZAI_API_KEY" in r.stdout,
+    )
 
     if FAILED:
         print(f"\n{len(FAILED)} FAILURES: {FAILED}")

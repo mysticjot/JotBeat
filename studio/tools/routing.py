@@ -34,9 +34,16 @@ def roles_using(routing: dict, name: str) -> list[str]:
 
 
 def build_entry(
-    name: str, env_key: str, base_url: str | None, model: str,
-    family: str, tier: str, price_in: float, price_out: float,
-    price_cached_in: float | None = None, free: bool = False,
+    name: str,
+    env_key: str,
+    base_url: str | None,
+    model: str,
+    family: str,
+    tier: str,
+    price_in: float,
+    price_out: float,
+    price_cached_in: float | None = None,
+    free: bool = False,
     headers: dict | None = None,
 ) -> dict:
     """Validate and build a provider entry. Raises RoutingError on bad shape."""

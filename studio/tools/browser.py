@@ -23,13 +23,22 @@ def run_ac_suite(acceptance_ids: list[str]) -> dict:
         cmd += " --grep " + "|".join(acceptance_ids)
 
     proc = subprocess.run(
-        cmd, cwd=GAME_DIR, shell=True, env=env,
-        capture_output=True, text=True, timeout=600,
-        encoding="utf-8", errors="replace",
+        cmd,
+        cwd=GAME_DIR,
+        shell=True,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=600,
+        encoding="utf-8",
+        errors="replace",
     )
     out = (proc.stdout or "") + (proc.stderr or "")
-    lines = [l.strip() for l in out.splitlines()
-             if l.strip().startswith(("✓", "✘", "x ", "-"))]
+    lines = [
+        l.strip()
+        for l in out.splitlines()
+        if l.strip().startswith(("✓", "✘", "x ", "-"))
+    ]
 
     return {
         "passed": proc.returncode == 0,

@@ -31,3 +31,4 @@ playwright-report/
 state/graph-checkpoints.db
 state/ui-debug.log
 .fallow/
+.aislop/

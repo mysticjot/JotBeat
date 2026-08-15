@@ -225,23 +225,26 @@ def run_next_task():
     task = get_next_ready_task()
     mark_running(task)
 
-    result = execute_role(task, state)          # role-routed model call
+    result = execute_role(task, state)  # role-routed model call
     save_artifacts(result)
 
-    build_result = builder.run()                # deterministic, $0
-    qa_result = qa.run(task.acceptance_ids)     # Playwright, $0 infra
+    build_result = builder.run()  # deterministic, $0
+    qa_result = qa.run(task.acceptance_ids)  # Playwright, $0 infra
 
-    audit = auditor.audit(                      # adversarial, independent
-        task=task, build=build_result, qa=qa_result,
+    audit = auditor.audit(  # adversarial, independent
+        task=task,
+        build=build_result,
+        qa=qa_result,
         acceptance=load_acceptance(task.acceptance_ids),
     )
 
     if audit.status == "MET":
-        mark_complete(task); commit_changes(task)
+        mark_complete(task)
+        commit_changes(task)
     elif audit.status == "FAILED":
-        create_patch_task(task, audit)          # bounded by escalation ceiling
+        create_patch_task(task, audit)  # bounded by escalation ceiling
     else:
-        mark_unverified(task, audit)            # human ticket
+        mark_unverified(task, audit)  # human ticket
 ```
 
 **Workflow states (bug-tracker language):**

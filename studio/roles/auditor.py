@@ -28,19 +28,31 @@ def audit(task: dict, build: dict, qa: dict) -> dict:
 
     if active_providers("auditor"):
         text = ModelAdapter("auditor").complete(
-            instructions, context, task_id=task["id"],
+            instructions,
+            context,
+            task_id=task["id"],
         )
         # Phase 4 implements structured verdict parsing; Phase 2 passes it through.
-        return {"status": "UNVERIFIED", "evidence": context, "patch_instructions": "",
-                "model_response": text}
+        return {
+            "status": "UNVERIFIED",
+            "evidence": context,
+            "patch_instructions": "",
+            "model_response": text,
+        }
 
     # Offline stub: an auditor without a model cannot verify — honest UNVERIFIED.
     head = load_routing()["roles"]["auditor"]["chain"][0]
     log_call(
-        task_id=task["id"], role="auditor", provider=head,
+        task_id=task["id"],
+        role="auditor",
+        provider=head,
         model=load_routing()["providers"][head]["model"],
         tokens_in=(len(instructions) + sum(len(c) for c in context)) // 4,
-        tokens_out=8, cached_in=0, retry=0, escalated=False, latency_ms=0,
+        tokens_out=8,
+        cached_in=0,
+        retry=0,
+        escalated=False,
+        latency_ms=0,
     )
     return {
         "status": "UNVERIFIED",

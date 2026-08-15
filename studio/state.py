@@ -32,14 +32,17 @@ def _save(path: Path, data: Any) -> None:
 
 
 def load_project_state() -> dict:
-    return _load(PROJECT_STATE, {
-        "game": None,
-        "phase": "pre-production",
-        "milestone": None,
-        "completed_items": [],
-        "open_bugs": [],
-        "routing_overrides": {},
-    })
+    return _load(
+        PROJECT_STATE,
+        {
+            "game": None,
+            "phase": "pre-production",
+            "milestone": None,
+            "completed_items": [],
+            "open_bugs": [],
+            "routing_overrides": {},
+        },
+    )
 
 
 def save_project_state(state: dict) -> None:
@@ -59,7 +62,9 @@ def get_next_ready_task() -> dict | None:
     queue = load_task_queue()
     done = {i["id"] for i in queue["items"] if i["status"] == "DONE"}
     for item in queue["items"]:
-        if item["status"] == "BACKLOG" and all(d in done for d in item.get("depends_on", [])):
+        if item["status"] == "BACKLOG" and all(
+            d in done for d in item.get("depends_on", [])
+        ):
             return item
     return None
 

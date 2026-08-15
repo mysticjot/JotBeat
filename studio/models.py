@@ -48,13 +48,19 @@ class AllProvidersExhausted(Exception):
 
 
 class ModelAdapter:
-    def __init__(self, role: str, cap_in: int | None = None, cap_out: int | None = None):
+    def __init__(
+        self, role: str, cap_in: int | None = None, cap_out: int | None = None
+    ):
         routing = load_routing()
         self.role = role
         # cap overrides exist for provider pings (no role context); normal
         # callers always use the role's caps from providers.json.
-        self.cap_in = cap_in if cap_in is not None else routing["roles"][role]["max_tokens_in"]
-        self.cap_out = cap_out if cap_out is not None else routing["roles"][role]["max_tokens_out"]
+        self.cap_in = (
+            cap_in if cap_in is not None else routing["roles"][role]["max_tokens_in"]
+        )
+        self.cap_out = (
+            cap_out if cap_out is not None else routing["roles"][role]["max_tokens_out"]
+        )
 
     def complete(
         self,
@@ -83,11 +89,15 @@ class ModelAdapter:
             try:
                 resp = self._call(provider, instructions, context, output_schema)
                 log_call(
-                    task_id=task_id, role=self.role,
-                    provider=provider["name"], model=provider["model"],
-                    tokens_in=resp["tokens_in"], tokens_out=resp["tokens_out"],
+                    task_id=task_id,
+                    role=self.role,
+                    provider=provider["name"],
+                    model=provider["model"],
+                    tokens_in=resp["tokens_in"],
+                    tokens_out=resp["tokens_out"],
                     cached_in=resp.get("cached_in", 0),
-                    retry=0, escalated=escalation_level > 0,
+                    retry=0,
+                    escalated=escalation_level > 0,
                     latency_ms=int((time.time() - t0) * 1000),
                 )
                 return resp["text"]
@@ -106,11 +116,16 @@ class ModelAdapter:
         if family == "google":
             return self._call_google(provider, instructions, context)
         if family == "openai":
-            return self._call_openai_compatible(provider, instructions, context, output_schema)
+            return self._call_openai_compatible(
+                provider, instructions, context, output_schema
+            )
         raise AllProvidersExhausted(
-            f"{provider['name']}: unsupported or missing family {family!r}")
+            f"{provider['name']}: unsupported or missing family {family!r}"
+        )
 
-    def _call_openai_compatible(self, provider, instructions, context, output_schema) -> dict:
+    def _call_openai_compatible(
+        self, provider, instructions, context, output_schema
+    ) -> dict:
         """One httpx client for every OpenAI-compatible endpoint —
         base_url + env key swapped, nothing else."""
         import httpx
@@ -192,32 +207,55 @@ def ping_provider(name: str) -> dict:
     routing = load_routing()
     provider = routing["providers"].get(name)
     if provider is None:
-        return {"ok": False, "latency_ms": 0, "tokens_in": 0, "tokens_out": 0,
-                "error": f"unknown provider: {name}"}
+        return {
+            "ok": False,
+            "latency_ms": 0,
+            "tokens_in": 0,
+            "tokens_out": 0,
+            "error": f"unknown provider: {name}",
+        }
     if not os.environ.get(provider["env_key"]):
-        return {"ok": False, "latency_ms": 0, "tokens_in": 0, "tokens_out": 0,
-                "error": f"env key not set: {provider['env_key']}"}
+        return {
+            "ok": False,
+            "latency_ms": 0,
+            "tokens_in": 0,
+            "tokens_out": 0,
+            "error": f"env key not set: {provider['env_key']}",
+        }
 
     adapter = ModelAdapter("provider-test", cap_in=1000, cap_out=16)
     t0 = time.time()
     try:
         resp = adapter._call(provider, "Reply with the word: ok", ["ping"], None)
     except Exception as e:
-        return {"ok": False, "latency_ms": int((time.time() - t0) * 1000),
-                "tokens_in": 0, "tokens_out": 0,
-                "error": f"{type(e).__name__}: {e}"}
+        return {
+            "ok": False,
+            "latency_ms": int((time.time() - t0) * 1000),
+            "tokens_in": 0,
+            "tokens_out": 0,
+            "error": f"{type(e).__name__}: {e}",
+        }
 
     latency = int((time.time() - t0) * 1000)
     log_call(
-        task_id="provider-test", role="provider_test",
-        provider=provider["name"], model=provider["model"],
-        tokens_in=resp["tokens_in"], tokens_out=resp["tokens_out"],
+        task_id="provider-test",
+        role="provider_test",
+        provider=provider["name"],
+        model=provider["model"],
+        tokens_in=resp["tokens_in"],
+        tokens_out=resp["tokens_out"],
         cached_in=resp.get("cached_in", 0),
-        retry=0, escalated=False, latency_ms=latency,
+        retry=0,
+        escalated=False,
+        latency_ms=latency,
     )
-    return {"ok": True, "latency_ms": latency,
-            "tokens_in": resp["tokens_in"], "tokens_out": resp["tokens_out"],
-            "error": None}
+    return {
+        "ok": True,
+        "latency_ms": latency,
+        "tokens_in": resp["tokens_in"],
+        "tokens_out": resp["tokens_out"],
+        "error": None,
+    }
 
 
 class RateLimited(Exception):

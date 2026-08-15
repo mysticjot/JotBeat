@@ -63,3 +63,9 @@ jobs:
           python test_provider_cli.py
           python test_keys_cli.py
           python test_ui.py
+
+      - name: "Quality gate (AGENTS.md §6 — aislop errors=0, fallow dead-code/dupes clean)"
+        run: |
+          pip install -r requirements.txt
+          python studio/cli.py quality
+

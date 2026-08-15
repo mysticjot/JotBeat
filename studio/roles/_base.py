@@ -26,19 +26,28 @@ def run_role(role: str, task: dict, escalation_level: int = 0) -> dict:
 
     if active_providers(role):
         text = ModelAdapter(role).complete(
-            instructions, context, task_id=task["id"],
+            instructions,
+            context,
+            task_id=task["id"],
             escalation_level=escalation_level,
         )
     else:
         # Offline stub: deterministic output, ledgered at chain-head price.
         head = load_routing()["roles"][role]["chain"][0]
-        text = f"[stub:{role}] no active providers — recorded placeholder for {task['id']}"
+        text = (
+            f"[stub:{role}] no active providers — recorded placeholder for {task['id']}"
+        )
         log_call(
-            task_id=task["id"], role=role, provider=head,
+            task_id=task["id"],
+            role=role,
+            provider=head,
             model=load_routing()["providers"][head]["model"],
             tokens_in=(len(instructions) + sum(len(c) for c in context)) // 4,
-            tokens_out=len(text) // 4, cached_in=0,
-            retry=0, escalated=escalation_level > 0, latency_ms=0,
+            tokens_out=len(text) // 4,
+            cached_in=0,
+            retry=0,
+            escalated=escalation_level > 0,
+            latency_ms=0,
         )
 
     return {"artifacts": [], "notes": text, "instructions": instructions}

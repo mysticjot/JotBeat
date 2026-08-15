@@ -11,7 +11,11 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 
 def _git(args: list[str]) -> subprocess.CompletedProcess:
     return subprocess.run(
-        ["git", *args], cwd=ROOT, capture_output=True, text=True, timeout=120,
+        ["git", *args],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=120,
     )
 
 

@@ -18,8 +18,19 @@ def _prices() -> dict:
     return json.loads(PROVIDERS_FILE.read_text(encoding="utf-8"))["providers"]
 
 
-def log_call(*, task_id, role, provider, model, tokens_in, tokens_out,
-             cached_in=0, retry=0, escalated=False, latency_ms=0) -> dict:
+def log_call(
+    *,
+    task_id,
+    role,
+    provider,
+    model,
+    tokens_in,
+    tokens_out,
+    cached_in=0,
+    retry=0,
+    escalated=False,
+    latency_ms=0,
+) -> dict:
     p = _prices()[provider]
     cost = (
         (tokens_in - cached_in) / 1e6 * p["price_in"]
@@ -29,10 +40,15 @@ def log_call(*, task_id, role, provider, model, tokens_in, tokens_out,
     event = {
         "ts": datetime.now(timezone.utc).isoformat(),
         "type": "model_call",
-        "task": task_id, "role": role,
-        "provider": provider, "model": model,
-        "tokens_in": tokens_in, "tokens_out": tokens_out, "cached_in": cached_in,
-        "retry": retry, "escalated": escalated,
+        "task": task_id,
+        "role": role,
+        "provider": provider,
+        "model": model,
+        "tokens_in": tokens_in,
+        "tokens_out": tokens_out,
+        "cached_in": cached_in,
+        "retry": retry,
+        "escalated": escalated,
         "latency_ms": latency_ms,
         "cost_usd": round(cost, 6),
     }
@@ -57,8 +73,15 @@ def cost_report() -> dict:
             if e.get("type") == "model_call":
                 calls.append(e)
     total = sum(c["cost_usd"] for c in calls)
-    verified = {json.loads(l)["task"] for l in EVENTS.read_text(encoding="utf-8").splitlines()
-                if '"type": "task_verified"' in l} if EVENTS.exists() else set()
+    verified = (
+        {
+            json.loads(l)["task"]
+            for l in EVENTS.read_text(encoding="utf-8").splitlines()
+            if '"type": "task_verified"' in l
+        }
+        if EVENTS.exists()
+        else set()
+    )
     by_role: dict[str, float] = {}
     by_provider: dict[str, float] = {}
     for c in calls:

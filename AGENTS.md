@@ -33,3 +33,25 @@ Coding agents have heavy Phaser 3 training-data bias and will silently write v3 
 - Keys live only in `.env` — never in the repo, never in prompts, never in `state/events.jsonl`.
 - The ledger logs provider names, never credentials.
 - `studio/models.py` activates only providers whose keys exist in `.env`.
+
+## 6. Quality gates run after every coding phase
+
+After ANY coding work — and always before declaring a phase gate passed — run:
+
+```
+python studio/cli.py quality
+```
+
+This runs both deterministic scanners (no LLM, no network calls with credentials):
+
+- **aislop** (Python + slop patterns, lint, security) — error-level findings must be **0**.
+- **fallow** (TS/JS module graph) — `dead-code` and `dupes` must be clean.
+
+Rules:
+
+- Fix findings for real. Mechanical cleanup: `aislop fix --safe` (reversible fixes only).
+- Suppress only with a documented reason in the suppression itself — see `.fallowrc.json`
+  for the pattern (e.g. `DebugState` is exempted because ADR-0001 pins it for Phase 4 QA).
+- `fallow health` is informational until Phase 4 (its CRAP estimate assumes 0% coverage).
+- CI runs this same gate; a failing quality gate blocks the build like any other gate.
+- Never lower `.aislop/config.yml` `ci.failBelow` to make CI pass — ratchet up only.

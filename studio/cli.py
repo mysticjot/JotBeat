@@ -44,6 +44,7 @@ if str(STUDIO_DIR) not in sys.path:
 def load_env() -> None:
     """Populate os.environ from .env (never committed). Keys only live here."""
     import os
+
     env_file = ROOT / ".env"
     if not env_file.exists():
         return
@@ -144,6 +145,7 @@ def init_tree(root: Path, force: bool = False) -> tuple[list[str], list[str]]:
 
 # ---------------------------------------------------------------- Phase 2 commands
 
+
 def cmd_brief(text: str) -> int:
     """Director drafts a GDD + milestone plan from a one-line pitch."""
     import roles
@@ -162,8 +164,7 @@ def cmd_brief(text: str) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     out_file = out_dir / f"{task['id']}.md"
     out_file.write_text(
-        f"# Brief: {text}\n\n"
-        f"## Director draft\n\n{result['notes']}\n",
+        f"# Brief: {text}\n\n## Director draft\n\n{result['notes']}\n",
         encoding="utf-8",
     )
     print(f"brief saved -> {out_file.relative_to(ROOT)}")
@@ -195,18 +196,24 @@ def cmd_plan() -> int:
         dep_m = re.search(r"^Depends on: (.+)$", body, re.MULTILINE)
         status_m = re.search(r"^Status: (\w+)", body, re.MULTILINE)
         acs = re.findall(r"AC-\d+", acs_m.group(1)) if acs_m else []
-        deps = [] if not dep_m or dep_m.group(1).strip() == "none" else re.findall(r"BL-\d+", dep_m.group(1))
-        items.append({
-            "id": m.group(1),
-            "title": m.group(2).strip(),
-            "role": role_m.group(1) if role_m else "coder",
-            "status": status_m.group(1) if status_m else "BACKLOG",
-            "acceptance_ids": acs,
-            "depends_on": deps,
-            "attempts": 0,
-            "escalation_level": 0,
-            "artifacts": [],
-        })
+        deps = (
+            []
+            if not dep_m or dep_m.group(1).strip() == "none"
+            else re.findall(r"BL-\d+", dep_m.group(1))
+        )
+        items.append(
+            {
+                "id": m.group(1),
+                "title": m.group(2).strip(),
+                "role": role_m.group(1) if role_m else "coder",
+                "status": status_m.group(1) if status_m else "BACKLOG",
+                "acceptance_ids": acs,
+                "depends_on": deps,
+                "attempts": 0,
+                "escalation_level": 0,
+                "artifacts": [],
+            }
+        )
 
     state.save_task_queue({"schema_version": 2, "items": items})
     print(f"planned {len(items)} backlog items -> state/task-queue.json")
@@ -218,6 +225,7 @@ def cmd_plan() -> int:
 def cmd_run_next() -> int:
     """Run the orchestrator graph over the ready backlog."""
     import orchestrator
+
     orchestrator.run()
     return 0
 
@@ -246,6 +254,7 @@ def cmd_report() -> int:
     """Ledger cost report — cost per role, provider, verified task."""
     import json
     from ledger import cost_report
+
     print(json.dumps(cost_report(), indent=2))
     return 0
 
@@ -256,9 +265,11 @@ def cmd_report() -> int:
 #  never print key values — presence only. All writes go through
 #  tools/routing.py, the same module the settings UI uses.)
 
+
 def _save_routing(routing: dict) -> None:
     import models
     from tools import routing as routing_mod
+
     routing_mod.save(routing, models.PROVIDERS_FILE)
 
 
@@ -273,8 +284,10 @@ def cmd_provider_list() -> int:
         roles = ",".join(roles_using(routing, name)) or "-"
         key = "set" if os.environ.get(p["env_key"]) else "MISSING"
         verified = "" if p.get("verified") else " (unverified)"
-        print(f"{name:<28} {p.get('tier','?'):<10} {p.get('family','?'):<8} "
-              f"{p.get('model','?'):<34} {roles:<22} {key}{verified}")
+        print(
+            f"{name:<28} {p.get('tier', '?'):<10} {p.get('family', '?'):<8} "
+            f"{p.get('model', '?'):<34} {roles:<22} {key}{verified}"
+        )
     return 0
 
 
@@ -296,10 +309,16 @@ def cmd_provider_add(args) -> int:
     routing = models.load_routing()
     try:
         entry = routing_mod.build_entry(
-            name=args.name, env_key=args.env_key, base_url=args.base_url or None,
-            model=args.model, family=args.family, tier=args.tier,
-            price_in=args.price_in, price_out=args.price_out,
-            price_cached_in=args.price_cached_in, free=args.free,
+            name=args.name,
+            env_key=args.env_key,
+            base_url=args.base_url or None,
+            model=args.model,
+            family=args.family,
+            tier=args.tier,
+            price_in=args.price_in,
+            price_out=args.price_out,
+            price_cached_in=args.price_cached_in,
+            free=args.free,
             headers=_parse_headers(args.header),
         )
         routing_mod.add_provider(routing, entry)
@@ -309,8 +328,10 @@ def cmd_provider_add(args) -> int:
 
     _save_routing(routing)
     print(f"added provider '{entry['name']}' (family={args.family}, tier={args.tier})")
-    print(f"next: `jotbeat keys set {entry['env_key']}`, then `jotbeat provider test "
-          f"{entry['name']}`, then `jotbeat route set ROLE {entry['name']} ...`")
+    print(
+        f"next: `jotbeat keys set {entry['env_key']}`, then `jotbeat provider test "
+        f"{entry['name']}`, then `jotbeat route set ROLE {entry['name']} ...`"
+    )
     return 0
 
 
@@ -341,8 +362,10 @@ def cmd_provider_test(name: str) -> int:
     if result["ok"]:
         routing["providers"][name]["verified"] = True
         _save_routing(routing)
-        print(f"OK   {name}  latency={result['latency_ms']}ms "
-              f"tokens_in={result['tokens_in']} tokens_out={result['tokens_out']}")
+        print(
+            f"OK   {name}  latency={result['latency_ms']}ms "
+            f"tokens_in={result['tokens_in']} tokens_out={result['tokens_out']}"
+        )
         return 0
     print(f"FAIL {name}  {result['error']}")
     print("entry stays registered but unverified — the loop never crashes on this")
@@ -369,6 +392,7 @@ def cmd_route_set(role: str, chain: list[str]) -> int:
 # ------------------------------------------------------- keys (Addendum B)
 # The human never edits .env by hand. Masked input, atomic writes,
 # git-ignore guard — all enforced in tools/keys.py (shared with the UI).
+
 
 def cmd_keys_set(name: str) -> int:
     import getpass
@@ -412,10 +436,21 @@ def cmd_keys_remove(name: str) -> int:
 
 # ------------------------------------------------------- settings UI (Addendum C)
 
+
 def cmd_ui() -> int:
     from tools.ui_server import serve
+
     serve(ROOT)
     return 0
+
+
+# ------------------------------------------------------- quality gate (AGENTS.md §6)
+
+
+def cmd_quality() -> int:
+    from tools.quality import run_quality
+
+    return run_quality(ROOT)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -442,19 +477,26 @@ def main(argv: list[str] | None = None) -> int:
         "provider",
         help="manage providers (key in .env -> provider add -> route set)",
         description="Add flow: 1) key in .env  2) provider add  3) route set. "
-                    "Key values are never printed — presence only.")
+        "Key values are never printed — presence only.",
+    )
     prov_sub = p_prov.add_subparsers(dest="provider_command", required=True)
 
-    prov_sub.add_parser("list", help="name, tier, family, model, roles, key set/missing")
+    prov_sub.add_parser(
+        "list", help="name, tier, family, model, roles, key set/missing"
+    )
 
     p_add = prov_sub.add_parser(
-        "add", help="register a new provider entry",
+        "add",
+        help="register a new provider entry",
         epilog="UNIVERSAL COMPATIBILITY RULE: almost everything is family "
-               "'openai'. For APIs that aren't OpenAI-compatible, do NOT ask "
-               "for per-vendor code — run a local LiteLLM proxy and point a "
-               "family-openai entry at http://localhost:4000/v1.")
+        "'openai'. For APIs that aren't OpenAI-compatible, do NOT ask "
+        "for per-vendor code — run a local LiteLLM proxy and point a "
+        "family-openai entry at http://localhost:4000/v1.",
+    )
     p_add.add_argument("--name", required=True)
-    p_add.add_argument("--env-key", required=True, help="env var NAME (never the value)")
+    p_add.add_argument(
+        "--env-key", required=True, help="env var NAME (never the value)"
+    )
     p_add.add_argument("--base-url", default="", help="required for family=openai")
     p_add.add_argument("--model", required=True)
     p_add.add_argument("--family", required=True, choices=PROVIDER_FAMILIES)
@@ -463,9 +505,13 @@ def main(argv: list[str] | None = None) -> int:
     p_add.add_argument("--price-out", required=True, type=float)
     p_add.add_argument("--price-cached-in", type=float, default=None)
     p_add.add_argument("--free", action="store_true")
-    p_add.add_argument("--header", action="append", metavar="KEY=VALUE",
-                       help="extra request header; repeatable — covers api-key "
-                            "auth styles, referers, any provider quirk")
+    p_add.add_argument(
+        "--header",
+        action="append",
+        metavar="KEY=VALUE",
+        help="extra request header; repeatable — covers api-key "
+        "auth styles, referers, any provider quirk",
+    )
 
     p_rm = prov_sub.add_parser("remove", help="remove a provider (refuses if chained)")
     p_rm.add_argument("name")
@@ -480,7 +526,8 @@ def main(argv: list[str] | None = None) -> int:
     p_rset.add_argument("providers", nargs="+")
 
     p_keys = sub.add_parser(
-        "keys", help="manage .env keys (masked, atomic, git-ignore guarded)")
+        "keys", help="manage .env keys (masked, atomic, git-ignore guarded)"
+    )
     keys_sub = p_keys.add_subparsers(dest="keys_command", required=True)
     p_kset = keys_sub.add_parser("set", help="set a key with masked input")
     p_kset.add_argument("name")
@@ -489,6 +536,10 @@ def main(argv: list[str] | None = None) -> int:
     p_krm.add_argument("name")
 
     sub.add_parser("ui", help="local settings UI (keys, providers, routing)")
+    sub.add_parser(
+        "quality",
+        help="post-coding quality gate: aislop (errors=0) + fallow dead-code/dupes",
+    )
 
     args = parser.parse_args(argv)
 
@@ -535,6 +586,8 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_keys_remove(args.name)
     if args.command == "ui":
         return cmd_ui()
+    if args.command == "quality":
+        return cmd_quality()
 
     return 1
 
