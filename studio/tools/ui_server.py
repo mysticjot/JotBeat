@@ -20,7 +20,7 @@ LOOPBACK = ("127.0.0.1", "::1", "localhost")
 
 # Bump on every UI change — shown at the top of the page so a stale cached
 # page (or an orphan server) is immediately recognizable.
-BUILD = "2026-08-15-2"
+BUILD = "2026-08-15-3"
 
 NO_STORE = ("Cache-Control", "no-store")
 
@@ -69,9 +69,20 @@ PAGE = """<!DOCTYPE html>
   .ok { color:#3fb950; } .fail { color:#f85149; }
   #msg { margin-top:16px; font-size:16px; font-weight:700; min-height:22px;
          padding:8px 10px; border:1px solid #2a313a; border-radius:6px; }
+  #dead { display:none; position:fixed; inset:0; background:rgba(10,12,16,.92);
+          z-index:99; text-align:center; padding-top:18vh; }
+  #dead .box { display:inline-block; background:#1c2129; border:1px solid #f85149;
+               border-radius:8px; padding:24px 32px; max-width:520px; }
 </style>
 </head>
 <body>
+<div id="dead"><div class="box">
+  <h2 class="fail">Settings server is not running</h2>
+  <p>This tab is talking to a server that has already exited.<br>
+  Double-click <b>JotBeat Studio.bat</b> and use the <b>new</b> tab it opens —
+  or go to <b>http://127.0.0.1:8787</b> if a server is already up.</p>
+  <p><button onclick="location.reload()">Retry</button></p>
+</div></div>
 <h1>JotBeat Studio — Settings <span class="muted">· build __BUILD__</span></h1>
 <p id="rootbanner" class="fail" style="display:none; font-weight:600">
 SERVER STARTED IN THE WRONG FOLDER — saves are being refused.
@@ -118,9 +129,11 @@ async function api(path, body) {
     const r = await fetch(path, {method: body ? 'POST' : 'GET',
       headers: {'Content-Type': 'application/json'},
       body: body ? JSON.stringify(body) : undefined});
+    document.getElementById('dead').style.display = 'none';
     return await r.json();
   } catch (e) {
-    return {ok: false, error: 'cannot reach the settings server — is "jotbeat ui" still running? Close and relaunch JotBeat Studio.bat.'};
+    document.getElementById('dead').style.display = 'block';
+    return {ok: false, error: 'cannot reach the settings server — see the overlay.'};
   }
 }
 
@@ -424,12 +437,44 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
     return httpd
 
 
+DEFAULT_PORT = 8787  # fixed, bookmarkable: http://127.0.0.1:8787
+
+
+def _probe_existing(port: int) -> bool:
+    """True if a JotBeat settings server is already answering on `port`.
+    Recognized by the /api/state shape (providers + roles) — works for
+    older builds too, so reuse survives version skew."""
+    import urllib.request
+    try:
+        with urllib.request.urlopen(
+            f"http://127.0.0.1:{port}/api/state", timeout=2
+        ) as r:
+            data = json.loads(r.read().decode("utf-8"))
+        return "providers" in data and "roles" in data
+    except Exception:
+        return False
+
+
 def serve(root: Path) -> None:
-    """Boot the settings panel on a free loopback port and open the browser."""
+    """Boot the settings panel and open the browser.
+
+    Single-instance: if a JotBeat server already answers on DEFAULT_PORT,
+    just open the browser at it and exit — no orphan servers, no dead tabs
+    from stale ports. If the port is taken by something else, fall back to
+    a random free port."""
     from cli import load_env  # populates os.environ from .env for provider tests
     load_env()
 
-    httpd = make_server(root)
+    fixed_url = f"http://127.0.0.1:{DEFAULT_PORT}"
+    if _probe_existing(DEFAULT_PORT):
+        _log(root, f"server already running at {fixed_url} — reusing it")
+        webbrowser.open(fixed_url)
+        return
+
+    try:
+        httpd = make_server(root, DEFAULT_PORT)
+    except OSError:  # port held by a non-JotBeat process
+        httpd = make_server(root, 0)
     url = f"http://127.0.0.1:{httpd.server_address[1]}"
     _log(root, f"server start build={BUILD} root={Path(root).resolve()} url={url}")
     try:  # pythonw (double-click launcher) may have no stdout at all
