@@ -133,6 +133,12 @@ class ModelAdapter:
         headers = {"Content-Type": "application/json"}
         if api_key:
             headers["Authorization"] = f"Bearer {api_key}"
+        # Optional per-provider extra headers (providers.json "headers" object)
+        # — covers api-key auth styles, referers, any quirk without code changes.
+        # A value starting with "$" names an env var (resolved at call time),
+        # so secret header values live in .env, never in the repo.
+        for hk, hv in (provider.get("headers") or {}).items():
+            headers[hk] = os.environ.get(hv[1:], "") if hv.startswith("$") else hv
 
         with httpx.Client(timeout=120) as client:
             resp = client.post(

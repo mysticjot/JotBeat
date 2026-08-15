@@ -10,6 +10,8 @@ Commands:
     report    ledger cost report (per role, per provider, per verified task)
     provider  list / add / remove / test provider entries
     route     set a role's provider chain
+    keys      set / list / remove .env keys (masked input, atomic, guarded)
+    ui        local settings panel (keys, providers, routing) at 127.0.0.1
 
 Adding a provider (3 steps — never hand-edit JSON, never print key values):
     1. put the key in .env          (e.g. MYPROVIDER_API_KEY=...)
@@ -251,27 +253,24 @@ def cmd_report() -> int:
 # ------------------------------------------------------- provider management
 # (Phase 3, HANDOFF-PHASE3 Addendum A — full model agnosticism:
 #  key in .env -> `provider add` -> `route set`. Never hand-edit JSON,
-#  never print key values — presence only.)
+#  never print key values — presence only. All writes go through
+#  tools/routing.py, the same module the settings UI uses.)
 
 def _save_routing(routing: dict) -> None:
-    import json
     import models
-    models.PROVIDERS_FILE.write_text(
-        json.dumps(routing, indent=2) + "\n", encoding="utf-8")
-
-
-def _roles_using(routing: dict, name: str) -> list[str]:
-    return [r for r, cfg in routing["roles"].items() if name in cfg["chain"]]
+    from tools import routing as routing_mod
+    routing_mod.save(routing, models.PROVIDERS_FILE)
 
 
 def cmd_provider_list() -> int:
     import os
     import models
+    from tools.routing import roles_using
 
     routing = models.load_routing()
     print(f"{'name':<28} {'tier':<10} {'family':<8} {'model':<34} {'roles':<22} key")
     for name, p in routing["providers"].items():
-        roles = ",".join(_roles_using(routing, name)) or "-"
+        roles = ",".join(roles_using(routing, name)) or "-"
         key = "set" if os.environ.get(p["env_key"]) else "MISSING"
         verified = "" if p.get("verified") else " (unverified)"
         print(f"{name:<28} {p.get('tier','?'):<10} {p.get('family','?'):<8} "
@@ -279,58 +278,52 @@ def cmd_provider_list() -> int:
     return 0
 
 
-PROVIDER_FAMILIES = ("openai", "google")
-PROVIDER_TIERS = ("free", "bulk", "escalation")
+def _parse_headers(pairs: list[str] | None) -> dict:
+    """Parse repeated --header KEY=VALUE flags into a dict."""
+    headers = {}
+    for pair in pairs or []:
+        if "=" not in pair:
+            raise SystemExit(f"bad --header {pair!r} — expected KEY=VALUE")
+        k, _, v = pair.partition("=")
+        headers[k.strip()] = v.strip()
+    return headers
 
 
 def cmd_provider_add(args) -> int:
     import models
+    from tools import routing as routing_mod
 
     routing = models.load_routing()
-    name = args.name
-    if name in routing["providers"]:
-        print(f"refused: provider '{name}' already exists")
-        return 1
-    if args.family == "openai" and not args.base_url:
-        print("refused: --base-url is required for family=openai")
+    try:
+        entry = routing_mod.build_entry(
+            name=args.name, env_key=args.env_key, base_url=args.base_url or None,
+            model=args.model, family=args.family, tier=args.tier,
+            price_in=args.price_in, price_out=args.price_out,
+            price_cached_in=args.price_cached_in, free=args.free,
+            headers=_parse_headers(args.header),
+        )
+        routing_mod.add_provider(routing, entry)
+    except routing_mod.RoutingError as e:
+        print(f"refused: {e}")
         return 1
 
-    entry = {
-        "name": name,
-        "provider": name,
-        "model": args.model,
-        "env_key": args.env_key,
-        "free": bool(args.free),
-        "tier": args.tier,
-        "family": args.family,
-        "base_url": args.base_url or None,
-        "price_in": args.price_in,
-        "price_out": args.price_out,
-    }
-    if args.price_cached_in is not None:
-        entry["price_cached_in"] = args.price_cached_in
-
-    routing["providers"][name] = entry
     _save_routing(routing)
-    print(f"added provider '{name}' (family={args.family}, tier={args.tier})")
-    print("next: put the key in .env, then `jotbeat provider test "
-          f"{name}`, then `jotbeat route set ROLE {name} ...`")
+    print(f"added provider '{entry['name']}' (family={args.family}, tier={args.tier})")
+    print(f"next: `jotbeat keys set {entry['env_key']}`, then `jotbeat provider test "
+          f"{entry['name']}`, then `jotbeat route set ROLE {entry['name']} ...`")
     return 0
 
 
 def cmd_provider_remove(name: str) -> int:
     import models
+    from tools import routing as routing_mod
 
     routing = models.load_routing()
-    if name not in routing["providers"]:
-        print(f"unknown provider: {name}")
+    try:
+        routing_mod.remove_provider(routing, name)
+    except routing_mod.RoutingError as e:
+        print(f"refused: {e}")
         return 1
-    refs = _roles_using(routing, name)
-    if refs:
-        print(f"refused: '{name}' is still in role chains: {', '.join(refs)}")
-        print("re-route those roles first (`jotbeat route set ROLE ...`)")
-        return 1
-    del routing["providers"][name]
     _save_routing(routing)
     print(f"removed provider '{name}'")
     return 0
@@ -358,33 +351,77 @@ def cmd_provider_test(name: str) -> int:
 
 def cmd_route_set(role: str, chain: list[str]) -> int:
     import models
+    from tools import routing as routing_mod
 
     routing = models.load_routing()
-    if role not in routing["roles"]:
-        print(f"unknown role: {role}")
-        print("known roles: " + ", ".join(sorted(routing["roles"])))
+    try:
+        warnings = routing_mod.set_role_chain(routing, role, chain)
+    except routing_mod.RoutingError as e:
+        print(f"refused: {e}")
         return 1
-    missing = [n for n in chain if n not in routing["providers"]]
-    if missing:
-        print(f"refused: unknown providers: {', '.join(missing)}")
-        return 1
-
-    # Diversification rule: warn (but allow) when the new primary is already
-    # another role's primary.
-    primary = chain[0]
-    for other, cfg in routing["roles"].items():
-        if other != role and cfg["chain"] and cfg["chain"][0] == primary:
-            print(f"warning: '{primary}' is also primary for role "
-                  f"'{other}' (diversification rule) — allowed, flagged")
-
-    routing["roles"][role]["chain"] = chain
     _save_routing(routing)
+    for w in warnings:
+        print(f"warning: {w}")
     print(f"route set: {role} -> {' -> '.join(chain)}")
+    return 0
+
+
+# ------------------------------------------------------- keys (Addendum B)
+# The human never edits .env by hand. Masked input, atomic writes,
+# git-ignore guard — all enforced in tools/keys.py (shared with the UI).
+
+def cmd_keys_set(name: str) -> int:
+    import getpass
+    from tools.keys import KeysError, set_key
+
+    value = getpass.getpass(f"{name} (input hidden): ")
+    try:
+        n = set_key(ROOT, name, value)
+    except KeysError as e:
+        print(e)
+        return 1
+    print(f"{name.strip()} set ({n} chars)")
+    return 0
+
+
+def cmd_keys_list() -> int:
+    import models
+    from tools.keys import key_status
+
+    status = key_status(ROOT, models.load_routing())
+    print(f"{'key':<24} {'needed by':<44} status")
+    for row in status["expected"]:
+        s = f"set ({row['chars']} chars)" if row["set"] else "MISSING"
+        print(f"{row['name']:<24} {','.join(row['providers']):<44} {s}")
+    if status["stale"]:
+        print("stale (no provider references them): " + ", ".join(status["stale"]))
+    return 0
+
+
+def cmd_keys_remove(name: str) -> int:
+    from tools.keys import KeysError, remove_key
+
+    try:
+        removed = remove_key(ROOT, name)
+    except KeysError as e:
+        print(e)
+        return 1
+    print(f"{name.strip()} {'removed' if removed else 'was not set'}")
+    return 0
+
+
+# ------------------------------------------------------- settings UI (Addendum C)
+
+def cmd_ui() -> int:
+    from tools.ui_server import serve
+    serve(ROOT)
     return 0
 
 
 def main(argv: list[str] | None = None) -> int:
     load_env()
+
+    from tools.routing import PROVIDER_FAMILIES, PROVIDER_TIERS
 
     parser = argparse.ArgumentParser(prog="jotbeat", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -410,7 +447,12 @@ def main(argv: list[str] | None = None) -> int:
 
     prov_sub.add_parser("list", help="name, tier, family, model, roles, key set/missing")
 
-    p_add = prov_sub.add_parser("add", help="register a new provider entry")
+    p_add = prov_sub.add_parser(
+        "add", help="register a new provider entry",
+        epilog="UNIVERSAL COMPATIBILITY RULE: almost everything is family "
+               "'openai'. For APIs that aren't OpenAI-compatible, do NOT ask "
+               "for per-vendor code — run a local LiteLLM proxy and point a "
+               "family-openai entry at http://localhost:4000/v1.")
     p_add.add_argument("--name", required=True)
     p_add.add_argument("--env-key", required=True, help="env var NAME (never the value)")
     p_add.add_argument("--base-url", default="", help="required for family=openai")
@@ -421,6 +463,9 @@ def main(argv: list[str] | None = None) -> int:
     p_add.add_argument("--price-out", required=True, type=float)
     p_add.add_argument("--price-cached-in", type=float, default=None)
     p_add.add_argument("--free", action="store_true")
+    p_add.add_argument("--header", action="append", metavar="KEY=VALUE",
+                       help="extra request header; repeatable — covers api-key "
+                            "auth styles, referers, any provider quirk")
 
     p_rm = prov_sub.add_parser("remove", help="remove a provider (refuses if chained)")
     p_rm.add_argument("name")
@@ -433,6 +478,17 @@ def main(argv: list[str] | None = None) -> int:
     p_rset = route_sub.add_parser("set", help="replace a role's provider chain")
     p_rset.add_argument("role")
     p_rset.add_argument("providers", nargs="+")
+
+    p_keys = sub.add_parser(
+        "keys", help="manage .env keys (masked, atomic, git-ignore guarded)")
+    keys_sub = p_keys.add_subparsers(dest="keys_command", required=True)
+    p_kset = keys_sub.add_parser("set", help="set a key with masked input")
+    p_kset.add_argument("name")
+    keys_sub.add_parser("list", help="expected keys, set/missing, char counts, stale")
+    p_krm = keys_sub.add_parser("remove", help="remove a key from .env")
+    p_krm.add_argument("name")
+
+    sub.add_parser("ui", help="local settings UI (keys, providers, routing)")
 
     args = parser.parse_args(argv)
 
@@ -470,6 +526,15 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_provider_test(args.name)
     if args.command == "route" and args.route_command == "set":
         return cmd_route_set(args.role, args.providers)
+    if args.command == "keys":
+        if args.keys_command == "set":
+            return cmd_keys_set(args.name)
+        if args.keys_command == "list":
+            return cmd_keys_list()
+        if args.keys_command == "remove":
+            return cmd_keys_remove(args.name)
+    if args.command == "ui":
+        return cmd_ui()
 
     return 1
 
