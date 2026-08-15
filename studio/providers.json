@@ -123,14 +123,15 @@
     "openrouter-free": {
       "name": "openrouter-free",
       "provider": "openrouter",
-      "model": "meta-llama/llama-3.3-70b-instruct:free",
+      "model": "nvidia/nemotron-3-super-120b-a12b:free",
       "env_key": "OPENROUTER_API_KEY",
       "free": true,
       "tier": "free",
       "base_url": "https://openrouter.ai/api/v1",
       "price_in": 0.0,
       "price_out": 0.0,
-      "family": "openai"
+      "family": "openai",
+      "verified": true
     },
     "fal": {
       "name": "fal",
@@ -148,14 +149,15 @@
     "openrouter-qwen3-coder-free": {
       "name": "openrouter-qwen3-coder-free",
       "provider": "openrouter",
-      "model": "qwen/qwen3-coder:free",
+      "model": "cohere/north-mini-code:free",
       "env_key": "OPENROUTER_API_KEY",
       "free": true,
       "tier": "free",
       "base_url": "https://openrouter.ai/api/v1",
       "price_in": 0.0,
       "price_out": 0.0,
-      "family": "openai"
+      "family": "openai",
+      "verified": true
     },
     "glm-4.7-flash": {
       "name": "glm-4.7-flash",
