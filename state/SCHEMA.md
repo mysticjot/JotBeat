@@ -8,11 +8,12 @@ Current truth: phase, milestone, current task, aggregate counters, per-phase gat
 
 ## `task-queue.json`
 
-Sprint backlog / task board. Each task carries: id, role, workflow status, `acceptance_ids`, `depends_on`, `attempts`, `escalation_level`, `artifacts`. The orchestrator consumes this. Workflow states (roadmap §6):
+Sprint backlog / task board (`items[]`). Each item carries: id, role, workflow status, `acceptance_ids`, `depends_on`, `attempts`, `escalation_level`, `artifacts`. The orchestrator consumes this. Workflow states (set by `studio/state.py` / `orchestrator.py`):
 
 ```text
-BACKLOG → IN SPRINT → IN DEVELOPMENT → CODE REVIEW → QA
-→ VERIFIED / KICKED BACK → CERT REVIEW → DONE
+BACKLOG → IN_DEVELOPMENT → CODE_REVIEW → QA
+→ VERIFIED / KICKED_BACK → CERT_REVIEW → DONE
+                      ↘ BLOCKED_HUMAN (escalation ceiling hit — machine stops)
 ```
 
 ## `events.jsonl`

@@ -26,3 +26,6 @@ Thumbs.db
 # Playwright
 test-results/
 playwright-report/
+
+# Orchestrator runtime state
+state/graph-checkpoints.db

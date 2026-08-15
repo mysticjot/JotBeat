@@ -9,6 +9,7 @@
 ### BL-NNN: <title>
 As a <player/system>, I want <capability> so that <value>.
 ACs: AC-NNN, AC-NNN
+Role: coder
 Depends on: BL-NNN | none
 Milestone: <milestone>
 Priority: P0–P4
@@ -22,6 +23,7 @@ Status: BACKLOG | IN SPRINT | IN DEVELOPMENT | CODE REVIEW | QA | VERIFIED | KIC
 ### BL-001: <title>
 As a player, I want ...
 ACs: AC-001
+Role: coder
 Depends on: none
 Milestone: Prototype
 Priority: P1

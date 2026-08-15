@@ -1,36 +1,261 @@
 {
-  "schema_version": 2,
-  "notes": "Routing table for studio/models.py — shape conforms to models.py, not the reverse. One specialist per job (roadmap §8.1). Prices are USD per 1M tokens; re-rank monthly from real ledger data (docs/BUDGET.md). A provider activates only if its env_key is present and non-empty in .env. Keys are per-model where one vendor serves several models at different prices (e.g. qwen3-coder-next vs qwen3.5-flash).",
+  "schema_version": 3,
+  "notes": "Routing table for studio/models.py \u00e2\u20ac\u201d shape conforms to HANDOFF-PHASE2.md \u00c2\u00a74 (per-model keys are intentional: the ledger prices by model, not by account). A provider activates only if its env_key is present and non-empty in .env. Prices are USD per 1M tokens; re-rank monthly from real ledger data (docs/BUDGET.md).",
   "providers": {
-    "qwen3-coder-next": { "provider": "dashscope", "model": "qwen3-coder-next", "env_key": "QWEN_API_KEY", "free": false, "tier": "bulk", "price_in": 0.11, "price_out": 0.80, "price_cached_in": null },
-    "qwen3.5-flash":    { "provider": "dashscope", "model": "qwen3.5-flash",    "env_key": "QWEN_API_KEY", "free": false, "tier": "bulk", "price_in": 0.03, "price_out": 0.30, "price_cached_in": null },
-    "deepseek-v4-flash": { "provider": "deepseek", "model": "deepseek-v4-flash", "env_key": "DEEPSEEK_API_KEY", "free": false, "tier": "bulk", "price_in": 0.14, "price_out": 0.28, "price_cached_in": 0.003 },
-    "deepseek-v4-pro":  { "provider": "deepseek", "model": "deepseek-v4-pro",  "env_key": "DEEPSEEK_API_KEY", "free": false, "tier": "escalation", "price_in": 0.44, "price_out": 0.87, "price_cached_in": null },
-    "kimi-k2.6":        { "provider": "moonshot", "model": "kimi-k2.6",        "env_key": "KIMI_API_KEY", "free": false, "tier": "bulk", "price_in": 0.95, "price_out": 4.00, "price_cached_in": 0.19 },
-    "glm-4.7":          { "provider": "z.ai",     "model": "glm-4.7",          "env_key": "GLM_API_KEY", "free": false, "tier": "escalation", "price_in": 0.30, "price_out": 1.18, "price_cached_in": 0.059 },
-    "minimax-m3":       { "provider": "minimax",  "model": "minimax-m3",       "env_key": "MINIMAX_API_KEY", "free": false, "tier": "bulk", "price_in": 0.30, "price_out": 1.20, "price_cached_in": null },
-    "groq":             { "provider": "groq",     "model": "groq-free-tier",   "env_key": "GROQ_API_KEY", "free": true, "tier": "free", "price_in": 0.0, "price_out": 0.0, "price_cached_in": null },
-    "cerebras":         { "provider": "cerebras", "model": "cerebras-free-tier", "env_key": "CEREBRAS_API_KEY", "free": true, "tier": "free", "price_in": 0.0, "price_out": 0.0, "price_cached_in": null },
-    "gemini":           { "provider": "google",   "model": "gemini-free-tier", "env_key": "GEMINI_API_KEY", "free": true, "tier": "free", "price_in": 0.0, "price_out": 0.0, "price_cached_in": null },
-    "github-models":    { "provider": "github",   "model": "github-models-free-tier", "env_key": "GITHUB_TOKEN", "free": true, "tier": "free", "price_in": 0.0, "price_out": 0.0, "price_cached_in": null },
-    "mistral":          { "provider": "mistral",  "model": "mistral-free-tier", "env_key": "MISTRAL_API_KEY", "free": true, "tier": "free", "price_in": 0.0, "price_out": 0.0, "price_cached_in": null },
-    "openrouter":       { "provider": "openrouter", "model": "openrouter-free-tier", "env_key": "OPENROUTER_API_KEY", "free": true, "tier": "free", "price_in": 0.0, "price_out": 0.0, "price_cached_in": null },
-    "fal":              { "provider": "fal.ai",   "model": "image-generation", "env_key": "FAL_API_KEY", "free": false, "tier": "art", "price_in": null, "price_out": null, "price_cached_in": null, "approx_per_image_usd": 0.012 }
+    "deepseek-v4-flash": {
+      "name": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "model": "deepseek-v4-flash",
+      "env_key": "DEEPSEEK_API_KEY",
+      "free": false,
+      "tier": "bulk",
+      "base_url": "https://api.deepseek.com/v1",
+      "price_in": 0.14,
+      "price_out": 0.28,
+      "price_cached_in": 0.003
+    },
+    "deepseek-v4-pro": {
+      "name": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "env_key": "DEEPSEEK_API_KEY",
+      "free": false,
+      "tier": "escalation",
+      "base_url": "https://api.deepseek.com/v1",
+      "price_in": 0.44,
+      "price_out": 0.87
+    },
+    "kimi-k2.6": {
+      "name": "kimi-k2.6",
+      "provider": "moonshot",
+      "model": "kimi-k2.6",
+      "env_key": "KIMI_API_KEY",
+      "free": false,
+      "tier": "bulk",
+      "base_url": "https://api.moonshot.ai/v1",
+      "price_in": 0.95,
+      "price_out": 4.0,
+      "price_cached_in": 0.19
+    },
+    "glm-4.7": {
+      "name": "glm-4.7",
+      "provider": "z.ai",
+      "model": "glm-4.7",
+      "env_key": "GLM_API_KEY",
+      "free": false,
+      "tier": "escalation",
+      "base_url": "https://api.z.ai/api/paas/v4",
+      "price_in": 0.3,
+      "price_out": 1.18,
+      "price_cached_in": 0.059
+    },
+    "minimax-m3": {
+      "name": "minimax-m3",
+      "provider": "minimax",
+      "model": "minimax-m3",
+      "env_key": "MINIMAX_API_KEY",
+      "free": false,
+      "tier": "bulk",
+      "base_url": "https://api.minimax.io/v1",
+      "price_in": 0.3,
+      "price_out": 1.2
+    },
+    "groq-free": {
+      "name": "groq-free",
+      "provider": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "env_key": "GROQ_API_KEY",
+      "free": true,
+      "tier": "free",
+      "base_url": "https://api.groq.com/openai/v1",
+      "price_in": 0.0,
+      "price_out": 0.0
+    },
+    "cerebras-free": {
+      "name": "cerebras-free",
+      "provider": "cerebras",
+      "model": "llama-3.3-70b",
+      "env_key": "CEREBRAS_API_KEY",
+      "free": true,
+      "tier": "free",
+      "base_url": "https://api.cerebras.ai/v1",
+      "price_in": 0.0,
+      "price_out": 0.0
+    },
+    "gemini-free": {
+      "name": "gemini-free",
+      "provider": "google",
+      "model": "gemini-2.5-flash",
+      "env_key": "GEMINI_API_KEY",
+      "free": true,
+      "tier": "free",
+      "base_url": null,
+      "price_in": 0.0,
+      "price_out": 0.0,
+      "_client": "google-genai (not OpenAI-compatible; base_url unused)"
+    },
+    "github-models-free": {
+      "name": "github-models-free",
+      "provider": "github",
+      "model": "gpt-4o-mini",
+      "env_key": "GITHUB_TOKEN",
+      "free": true,
+      "tier": "free",
+      "base_url": "https://models.github.ai/inference",
+      "price_in": 0.0,
+      "price_out": 0.0
+    },
+    "mistral-free": {
+      "name": "mistral-free",
+      "provider": "mistral",
+      "model": "mistral-small-latest",
+      "env_key": "MISTRAL_API_KEY",
+      "free": true,
+      "tier": "free",
+      "base_url": "https://api.mistral.ai/v1",
+      "price_in": 0.0,
+      "price_out": 0.0
+    },
+    "openrouter-free": {
+      "name": "openrouter-free",
+      "provider": "openrouter",
+      "model": "meta-llama/llama-3.3-70b-instruct:free",
+      "env_key": "OPENROUTER_API_KEY",
+      "free": true,
+      "tier": "free",
+      "base_url": "https://openrouter.ai/api/v1",
+      "price_in": 0.0,
+      "price_out": 0.0
+    },
+    "fal": {
+      "name": "fal",
+      "provider": "fal.ai",
+      "model": "image-generation",
+      "env_key": "FAL_API_KEY",
+      "free": false,
+      "tier": "art",
+      "base_url": null,
+      "price_in": null,
+      "price_out": null,
+      "approx_per_image_usd": 0.012
+    },
+    "openrouter-qwen3-coder-free": {
+      "name": "openrouter-qwen3-coder-free",
+      "provider": "openrouter",
+      "model": "qwen/qwen3-coder:free",
+      "env_key": "OPENROUTER_API_KEY",
+      "free": true,
+      "tier": "bulk",
+      "base_url": "https://openrouter.ai/api/v1",
+      "price_in": 0.0,
+      "price_out": 0.0
+    }
   },
   "roles": {
-    "director":        { "chain": ["gemini", "groq", "cerebras"], "max_tokens_in": 10000, "max_tokens_out": 2000 },
-    "coder":           { "chain": ["qwen3-coder-next", "deepseek-v4-flash", "groq", "cerebras", "gemini"], "max_tokens_in": 30000, "max_tokens_out": 4500 },
-    "designer":        { "chain": ["gemini", "groq"], "max_tokens_in": 8000, "max_tokens_out": 2000 },
-    "qa":              { "chain": ["deepseek-v4-flash", "qwen3-coder-next", "groq"], "max_tokens_in": 13000, "max_tokens_out": 2500 },
-    "auditor":         { "chain": ["kimi-k2.6", "glm-4.7"], "max_tokens_in": 17000, "max_tokens_out": 1500 },
-    "escalation":      { "chain": ["glm-4.7", "deepseek-v4-pro"], "max_tokens_in": 17000, "max_tokens_out": 4500 },
-    "vision_observer": { "chain": ["minimax-m3"], "max_tokens_in": 8000, "max_tokens_out": 2000 },
-    "triage":          { "chain": ["qwen3.5-flash", "groq"], "max_tokens_in": 2000, "max_tokens_out": 500 },
-    "manifests":       { "chain": ["groq", "cerebras", "gemini"], "max_tokens_in": 3000, "max_tokens_out": 1000 },
-    "publisher":       { "chain": ["groq", "gemini"], "max_tokens_in": 5000, "max_tokens_out": 1000 }
+    "director": {
+      "chain": [
+        "gemini-free",
+        "deepseek-v4-flash"
+      ],
+      "max_tokens_in": 10000,
+      "max_tokens_out": 2000
+    },
+    "coder": {
+      "chain": [
+        "groq-free",
+        "openrouter-qwen3-coder-free",
+        "deepseek-v4-flash"
+      ],
+      "max_tokens_in": 30000,
+      "max_tokens_out": 4500
+    },
+    "designer": {
+      "chain": [
+        "gemini-free",
+        "groq-free"
+      ],
+      "max_tokens_in": 8000,
+      "max_tokens_out": 2000
+    },
+    "qa": {
+      "chain": [
+        "groq-free",
+        "deepseek-v4-flash"
+      ],
+      "max_tokens_in": 13000,
+      "max_tokens_out": 2500
+    },
+    "auditor": {
+      "chain": [
+        "kimi-k2.6",
+        "glm-4.7"
+      ],
+      "max_tokens_in": 17000,
+      "max_tokens_out": 1500
+    },
+    "escalation": {
+      "chain": [
+        "glm-4.7",
+        "deepseek-v4-pro"
+      ],
+      "max_tokens_in": 17000,
+      "max_tokens_out": 4500
+    },
+    "vision": {
+      "chain": [
+        "minimax-m3"
+      ],
+      "max_tokens_in": 8000,
+      "max_tokens_out": 1000
+    },
+    "triage": {
+      "chain": [
+        "openrouter-qwen3-coder-free"
+      ],
+      "max_tokens_in": 4000,
+      "max_tokens_out": 1000
+    },
+    "manifests": {
+      "chain": [
+        "groq-free"
+      ],
+      "max_tokens_in": 3000,
+      "max_tokens_out": 1000
+    },
+    "publisher": {
+      "chain": [
+        "groq-free",
+        "gemini-free"
+      ],
+      "max_tokens_in": 5000,
+      "max_tokens_out": 1000
+    },
+    "producer": {
+      "chain": [
+        "openrouter-qwen3-coder-free",
+        "groq-free"
+      ],
+      "max_tokens_in": 4000,
+      "max_tokens_out": 1000
+    },
+    "level": {
+      "chain": [
+        "gemini-free",
+        "groq-free"
+      ],
+      "max_tokens_in": 8000,
+      "max_tokens_out": 2000
+    }
   },
-  "free_chain": ["groq", "cerebras", "gemini", "github-models", "mistral", "openrouter"],
-  "rate_limit_policy": "On 429, fall through to the next provider in the role's chain; the scheduler reorders the queue and runs CPU work (build, regression, validation) in the window (roadmap §2.8).",
-  "escalation_ceiling": "2 verified failures -> escalation chain with shrunk context -> 2 more -> human ticket (docs/BUDGET.md).",
-  "cache_notes": "DeepSeek responses include prompt_cache_hit_tokens — map it to cached_in in the ledger (docs/BUDGET.md §9.5); prefix caching requires stable prompt prefixes (studio/prompts/)."
+  "free_chain": [
+    "groq-free",
+    "cerebras-free",
+    "gemini-free",
+    "github-models-free",
+    "mistral-free",
+    "openrouter-free"
+  ],
+  "rate_limit_policy": "On 429, fall through to the next provider in the role's chain; the scheduler reorders the queue and runs CPU work (build, regression, validation) in the window (roadmap \u00c2\u00a72.8).",
+  "escalation_ceiling": "2 verified failures -> escalation chain with shrunk context -> 2 more -> human ticket (docs/BUDGET.md; constants in orchestrator.py, do not modify).",
+  "cache_notes": "DeepSeek responses include prompt_cache_hit_tokens \u00e2\u20ac\u201d map it to cached_in in the ledger (HANDOFF-PHASE2.md \u00c2\u00a76a); prefix caching requires stable prompt prefixes (studio/prompts/, Phase 3)."
 }

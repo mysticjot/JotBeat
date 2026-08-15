@@ -1,16 +1,17 @@
 {
-  "schema_version": 1,
-  "tasks": [],
-  "_task_schema": {
-    "id": "BL-NNN",
-    "title": "string",
-    "role": "director|producer|coder|designer|level|artist|sound|qa|auditor|publisher",
-    "status": "BACKLOG|IN SPRINT|IN DEVELOPMENT|CODE REVIEW|QA|VERIFIED|KICKED BACK|CERT REVIEW|DONE",
-    "acceptance_ids": ["AC-NNN"],
-    "depends_on": ["BL-NNN"],
-    "attempts": 0,
-    "escalation_level": 0,
-    "artifacts": []
-  },
-  "_notes": "Sprint backlog / task board. Escalation ceiling: attempts >= 2 -> escalate one level; level 2 with attempts >= 2 -> human ticket (docs/BUDGET.md)."
+  "schema_version": 2,
+  "items": [
+    {
+      "id": "BL-001",
+      "title": "<title>",
+      "role": "coder",
+      "status": "BLOCKED_HUMAN",
+      "acceptance_ids": [],
+      "depends_on": [],
+      "attempts": 0,
+      "escalation_level": 0,
+      "artifacts": [],
+      "reason": ""
+    }
+  ]
 }

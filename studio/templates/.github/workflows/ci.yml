@@ -49,3 +49,14 @@ jobs:
         run: |
           npx playwright install --with-deps chromium
           npx playwright test
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: "Orchestrator live graph test (Phase 2 gate)"
+        working-directory: studio
+        run: |
+          pip install -r ../requirements.txt
+          python test_graph_live.py

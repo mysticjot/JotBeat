@@ -10,11 +10,17 @@
 | director | 10,000 | 2,000 | 1M-context model for whole-GDD reads |
 | coder | 30,000 | 4,500 | diff-only output contract (target ~1.5k out) |
 | designer | 8,000 | 2,000 | |
-| artist / sound | 3,000 | 1,000 | JSON manifests are trivial |
+| level | 8,000 | 2,000 | LDtk level generation |
+| manifests (artist / sound) | 3,000 | 1,000 | JSON manifests are trivial |
 | qa | 13,000 | 2,500 | prefix caching expected |
 | auditor | 17,000 | 1,500 | receives evidence digests, never raw traces |
+| escalation | 17,000 | 4,500 | frontier model with shrunk context |
+| vision | 8,000 | 1,000 | screenshot review |
 | publisher | 5,000 | 1,000 | |
-| triage | 2,000 | 500 | cheapest classification model |
+| producer | 4,000 | 1,000 | cost accounting, cap enforcement |
+| triage | 4,000 | 1,000 | cheapest classification model |
+
+Caps mirror `studio/providers.json` roles v3 — change one, change both.
 
 The Producer rejects calls that exceed caps.
 
