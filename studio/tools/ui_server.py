@@ -20,7 +20,7 @@ LOOPBACK = ("127.0.0.1", "::1", "localhost")
 
 # Bump on every UI change — shown at the top of the page so a stale cached
 # page (or an orphan server) is immediately recognizable.
-BUILD = "2026-08-15-3"
+BUILD = "2026-08-15-4"
 
 NO_STORE = ("Cache-Control", "no-store")
 
@@ -49,30 +49,67 @@ PAGE = """<!DOCTYPE html>
 <meta charset="utf-8">
 <title>JotBeat Studio — Settings</title>
 <style>
-  body { font-family: system-ui, sans-serif; background:#14171c; color:#dde3ea;
-         max-width: 960px; margin: 24px auto; padding: 0 16px; }
-  h1 { font-size: 20px; } h2 { font-size: 16px; margin-top: 32px;
-       border-bottom: 1px solid #2a313a; padding-bottom: 6px; }
+  :root {
+    --bg:#0f1216; --panel:#161b22; --panel2:#1d232c; --border:#2a323d;
+    --text:#e2e8f0; --muted:#8b96a3; --accent:#4f7cff; --accent-hi:#6b91ff;
+    --ok:#3fb950; --warn:#d29922; --fail:#f85149;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+         background: var(--bg); color: var(--text);
+         max-width: 980px; margin: 28px auto; padding: 0 18px; }
+  h1 { font-size: 21px; letter-spacing: .2px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em;
+       color: var(--muted); margin: 0 0 12px; }
+  .card { background: var(--panel); border: 1px solid var(--border);
+          border-radius: 10px; padding: 18px 20px; margin-top: 22px;
+          box-shadow: 0 1px 2px rgba(0,0,0,.45), 0 10px 28px rgba(0,0,0,.28); }
   table { border-collapse: collapse; width: 100%; font-size: 13px; }
-  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #232a33; }
-  th { color: #8b96a3; font-weight: 600; }
-  input, select, textarea { background:#1c2129; color:#dde3ea;
-       border:1px solid #39424e; border-radius:4px; padding:4px 6px; font-size:13px; }
-  button { background:#2d6cdf; color:#fff; border:0; border-radius:4px;
-           padding:5px 10px; font-size:13px; cursor:pointer; }
-  button.sec { background:#39424e; }
-  .dot { display:inline-block; width:9px; height:9px; border-radius:50%;
-         background:#5a6470; margin-right:6px; }
-  .dot.on { background:#3fb950; }
-  .muted { color:#8b96a3; font-size:12px; }
-  .warn { color:#d29922; font-size:12px; }
-  .ok { color:#3fb950; } .fail { color:#f85149; }
-  #msg { margin-top:16px; font-size:16px; font-weight:700; min-height:22px;
-         padding:8px 10px; border:1px solid #2a313a; border-radius:6px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #232a33; }
+  tbody tr { transition: background .12s ease; }
+  tbody tr:hover { background: rgba(79,124,255,.06); }
+  tbody tr:last-child td { border-bottom: 0; }
+  th { color: var(--muted); font-weight: 600; font-size: 11px;
+       text-transform: uppercase; letter-spacing: .06em; }
+  input, select, textarea { background: var(--panel2); color: var(--text);
+       border: 1px solid #39424e; border-radius: 6px; padding: 6px 8px;
+       font-size: 13px;
+       transition: border-color .12s ease, box-shadow .12s ease; }
+  input:focus, select:focus, textarea:focus { outline: none;
+       border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,124,255,.22); }
+  button { background: var(--accent); color: #fff; border: 0; border-radius: 6px;
+           padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer;
+           transition: background .12s ease, transform .12s ease,
+                       box-shadow .12s ease; }
+  button:hover { background: var(--accent-hi); transform: translateY(-1px);
+           box-shadow: 0 4px 14px rgba(79,124,255,.28); }
+  button:active { transform: translateY(0); box-shadow: none; }
+  button.sec { background: var(--panel2); border: 1px solid #39424e; }
+  button.sec:hover { background: #242b36; box-shadow: 0 4px 12px rgba(0,0,0,.35); }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+         background: #5a6470; margin-right: 6px; }
+  .dot.on { background: var(--ok); box-shadow: 0 0 8px rgba(63,185,80,.7); }
+  .muted { color: var(--muted); font-size: 12px; }
+  .warn { color: var(--warn); font-size: 12px; }
+  .ok { color: var(--ok); } .fail { color: var(--fail); }
+  #msg { margin-top: 18px; font-size: 15px; font-weight: 700; min-height: 22px;
+         padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+         background: var(--panel); }
+  #msg.ok { border-color: rgba(63,185,80,.5); background: rgba(63,185,80,.08); }
+  #msg.fail { border-color: rgba(248,81,73,.5); background: rgba(248,81,73,.08); }
+  #msg.warn { border-color: rgba(210,153,34,.5); background: rgba(210,153,34,.08); }
+  .spin { display: inline-block; width: 11px; height: 11px; margin-right: 5px;
+          border: 2px solid #39424e; border-top-color: var(--accent);
+          border-radius: 50%; animation: rot .7s linear infinite;
+          vertical-align: -1px; }
+  @keyframes rot { to { transform: rotate(360deg); } }
+  #addform { background: var(--panel2); }
   #dead { display:none; position:fixed; inset:0; background:rgba(10,12,16,.92);
           z-index:99; text-align:center; padding-top:18vh; }
-  #dead .box { display:inline-block; background:#1c2129; border:1px solid #f85149;
-               border-radius:8px; padding:24px 32px; max-width:520px; }
+  #dead .box { display:inline-block; background: var(--panel);
+               border:1px solid var(--fail); border-radius:10px;
+               padding:24px 32px; max-width:520px;
+               box-shadow: 0 20px 60px rgba(0,0,0,.5); }
 </style>
 </head>
 <body>
@@ -91,10 +128,13 @@ Close this tab and relaunch via JotBeat Studio.bat.</p>
 through the same modules as the CLI. Non-OpenAI API? Run a local LiteLLM proxy
 and add it here as family "openai" pointing at http://localhost:4000/v1.</p>
 
+<section class="card">
 <h2>1 · API Keys</h2>
 <table id="keys"><thead><tr><th></th><th>Provider</th><th>Key</th><th>Status</th>
 <th></th></tr></thead><tbody></tbody></table>
+</section>
 
+<section class="card">
 <h2>2 · Providers</h2>
 <table id="providers"><thead><tr><th>Name</th><th>Model</th><th>Family</th>
 <th>Tier</th><th>$/M in</th><th>$/M out</th><th></th></tr></thead><tbody></tbody></table>
@@ -115,10 +155,13 @@ and add it here as family "openai" pointing at http://localhost:4000/v1.</p>
   isn't, run LiteLLM locally and point here at http://localhost:4000/v1.</p>
   <p><button onclick="addProvider()">Add</button></p>
 </div>
+</section>
 
+<section class="card">
 <h2>3 · Role Routing</h2>
 <table id="roles"><thead><tr><th>Role</th><th>Primary</th><th>Fallback</th>
 <th></th></tr></thead><tbody></tbody></table>
+</section>
 <p id="msg"></p>
 
 <script>
@@ -172,7 +215,7 @@ async function saveKey(prov, name) {
   const st = document.getElementById('test-' + prov);
   const val = input.value;
   if (!val.trim()) { msg('empty value refused', 'fail'); return; }
-  st.textContent = 'saving…'; st.className = 'muted';
+  st.innerHTML = '<span class="spin"></span>saving…'; st.className = 'muted';
   const r = await api('/api/keys/set', {name: name, value: val});
   if (r.ok) {
     msg('SAVED ✓ ' + name + ' (' + r.chars + ' chars)', 'ok');
@@ -187,7 +230,7 @@ async function saveKey(prov, name) {
 
 async function testProvider(prov) {
   const el = document.getElementById('test-' + prov);
-  el.textContent = 'testing…';
+  el.innerHTML = '<span class="spin"></span>testing…';
   const r = await api('/api/providers/test', {name: prov});
   el.textContent = r.ok ? ('OK · ' + r.latency_ms + 'ms') : ('FAIL · ' + r.error);
   el.className = r.ok ? 'ok' : 'fail';
