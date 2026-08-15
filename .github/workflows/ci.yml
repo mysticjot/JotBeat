@@ -60,3 +60,4 @@ jobs:
         run: |
           pip install -r ../requirements.txt
           python test_graph_live.py
+          python test_provider_cli.py

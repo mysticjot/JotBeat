@@ -48,11 +48,13 @@ class AllProvidersExhausted(Exception):
 
 
 class ModelAdapter:
-    def __init__(self, role: str):
+    def __init__(self, role: str, cap_in: int | None = None, cap_out: int | None = None):
         routing = load_routing()
         self.role = role
-        self.cap_in = routing["roles"][role]["max_tokens_in"]
-        self.cap_out = routing["roles"][role]["max_tokens_out"]
+        # cap overrides exist for provider pings (no role context); normal
+        # callers always use the role's caps from providers.json.
+        self.cap_in = cap_in if cap_in is not None else routing["roles"][role]["max_tokens_in"]
+        self.cap_out = cap_out if cap_out is not None else routing["roles"][role]["max_tokens_out"]
 
     def complete(
         self,
@@ -98,15 +100,19 @@ class ModelAdapter:
         raise AllProvidersExhausted(f"[{self.role}] all providers failed: {last_err}")
 
     def _call(self, provider, instructions, context, output_schema) -> dict:
-        """Dispatch to the provider's API. One small client per provider family."""
-        if provider.get("provider") == "google":
-            return self._call_gemini(provider, instructions, context)
-        return self._call_openai_compatible(provider, instructions, context, output_schema)
+        """Dispatch on the provider's API FAMILY — never on its name.
+        Any OpenAI-compatible endpoint (hosted or self-hosted) is config-only."""
+        family = provider.get("family")
+        if family == "google":
+            return self._call_google(provider, instructions, context)
+        if family == "openai":
+            return self._call_openai_compatible(provider, instructions, context, output_schema)
+        raise AllProvidersExhausted(
+            f"{provider['name']}: unsupported or missing family {family!r}")
 
     def _call_openai_compatible(self, provider, instructions, context, output_schema) -> dict:
-        """One httpx client for every OpenAI-compatible provider (DeepSeek,
-        DashScope/Qwen, Moonshot/Kimi, z.ai/GLM, MiniMax, Groq, Cerebras,
-        Mistral, OpenRouter) — base_url + env key swapped, nothing else."""
+        """One httpx client for every OpenAI-compatible endpoint —
+        base_url + env key swapped, nothing else."""
         import httpx
 
         api_key = os.environ.get(provider["env_key"])
@@ -145,12 +151,12 @@ class ModelAdapter:
             "text": data["choices"][0]["message"]["content"],
             "tokens_in": usage.get("prompt_tokens", 0),
             "tokens_out": usage.get("completion_tokens", 0),
-            # DeepSeek: prompt_cache_hit_tokens -> cached_in (BUDGET.md cost model)
+            # OpenAI-compatible cache-hit field -> cached_in (BUDGET.md cost model)
             "cached_in": usage.get("prompt_cache_hit_tokens", 0),
         }
 
-    def _call_gemini(self, provider, instructions, context) -> dict:
-        """Gemini via google-genai (the one non-OpenAI-compatible provider)."""
+    def _call_google(self, provider, instructions, context) -> dict:
+        """The google family — via the google-genai SDK (not OpenAI-compatible)."""
         from google import genai
         from google.genai import types
 
@@ -170,6 +176,42 @@ class ModelAdapter:
             "tokens_out": getattr(usage, "candidates_token_count", 0) or 0,
             "cached_in": getattr(usage, "cached_content_token_count", 0) or 0,
         }
+
+
+def ping_provider(name: str) -> dict:
+    """Minimal live ping for `jotbeat provider test` — one tiny completion
+    through the adapter, ledgered like any call. Never raises: a failed ping
+    returns ok=False and leaves the entry registered but unverified.
+    Returns {"ok", "latency_ms", "tokens_in", "tokens_out", "error"}."""
+    routing = load_routing()
+    provider = routing["providers"].get(name)
+    if provider is None:
+        return {"ok": False, "latency_ms": 0, "tokens_in": 0, "tokens_out": 0,
+                "error": f"unknown provider: {name}"}
+    if not os.environ.get(provider["env_key"]):
+        return {"ok": False, "latency_ms": 0, "tokens_in": 0, "tokens_out": 0,
+                "error": f"env key not set: {provider['env_key']}"}
+
+    adapter = ModelAdapter("provider-test", cap_in=1000, cap_out=16)
+    t0 = time.time()
+    try:
+        resp = adapter._call(provider, "Reply with the word: ok", ["ping"], None)
+    except Exception as e:
+        return {"ok": False, "latency_ms": int((time.time() - t0) * 1000),
+                "tokens_in": 0, "tokens_out": 0,
+                "error": f"{type(e).__name__}: {e}"}
+
+    latency = int((time.time() - t0) * 1000)
+    log_call(
+        task_id="provider-test", role="provider_test",
+        provider=provider["name"], model=provider["model"],
+        tokens_in=resp["tokens_in"], tokens_out=resp["tokens_out"],
+        cached_in=resp.get("cached_in", 0),
+        retry=0, escalated=False, latency_ms=latency,
+    )
+    return {"ok": True, "latency_ms": latency,
+            "tokens_in": resp["tokens_in"], "tokens_out": resp["tokens_out"],
+            "error": None}
 
 
 class RateLimited(Exception):

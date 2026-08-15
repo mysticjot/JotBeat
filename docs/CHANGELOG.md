@@ -10,13 +10,17 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 - `providers.json` v3 routing table (per-model entries, free tiers, base_urls); `task-queue.json` `{"items": []}` schema with underscore statuses incl. `BLOCKED_HUMAN`.
 - `studio/test_graph_live.py` in CI (Python 3.12 via setup-python); `requirements.txt` pins langgraph + langgraph-checkpoint-sqlite.
 - ADR-0002: no Phaser runtime global in ESM builds — explicit imports only.
+- Provider CLI (Phase 3 Addendum A): `jotbeat provider list|add|remove|test` + `jotbeat route set` — full model agnosticism, no hand-edited JSON, key presence only (never values). `provider test` pings through ModelAdapter, ledgered, never crashes the loop; `provider remove` refuses while chained; `route set` validates names and warns on diversification violations.
+- `family` field on every provider entry; `models.py._call` dispatches on family ONLY (`openai` → shared httpx client, `google` → google-genai) — zero provider-name strings in models.py. Any OpenAI-compatible endpoint (incl. self-hosted) is now a pure config add.
+- `studio/test_provider_cli.py` — add/route/remove round-trip acceptance test, wired into CI.
 
 ### Fixed
 - Windows cp1252 decode crash in `tools/shell.py` / `tools/browser.py` subprocess reads (now UTF-8 with `errors="replace"`).
 - `orchestrator.py patch()` KeyError when reached from build/QA failure without an audit record.
 
 ### Changed
-- Qwen routing: DashScope entries removed; coder model now routes through OpenRouter free tier (`qwen/qwen3-coder:free`, `OPENROUTER_API_KEY`). Coder chain: groq-free → openrouter-qwen3-coder-free → deepseek-v4-flash. Triage/producer re-pointed to the OpenRouter Qwen entry.
+- Provider routing correction (HANDOFF-PHASE3 §2): triage diversification restored via `groq-free-8b` (llama-3.1-8b-instant); producer → gemini-free → deepseek-v4-flash; auditor chain kimi-k2.6 → glm-4.7 → glm-4.7-flash; vision glm-4.6v-flash → glm-4.6v (`ZAI_API_KEY`); MiniMax removed (M-series is text-only); prices synced to the verified table (HANDOFF-PHASE2 §4, Aug 15 2026).
+- Qwen routing: DashScope entries removed; coder model now routes through OpenRouter free tier (`qwen/qwen3-coder:free`, `OPENROUTER_API_KEY`). Coder chain: groq-free → openrouter-qwen3-coder-free → deepseek-v4-flash.
 - `models.py active_providers` activates only providers whose env key exists (free tiers are not keyless), per AGENTS.md §5.
 - BUDGET.md per-role caps table mirrors providers.json roles v3.
 

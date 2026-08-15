@@ -8,6 +8,15 @@ Commands:
     run-next  run the orchestrator graph over ready backlog items
     verify    deterministic BVT + scripted QA (no model calls)
     report    ledger cost report (per role, per provider, per verified task)
+    provider  list / add / remove / test provider entries
+    route     set a role's provider chain
+
+Adding a provider (3 steps — never hand-edit JSON, never print key values):
+    1. put the key in .env          (e.g. MYPROVIDER_API_KEY=...)
+    2. jotbeat provider add --name NAME --env-key MYPROVIDER_API_KEY \
+         --base-url https://... --model MODEL --family openai \
+         --tier free --price-in 0 --price-out 0 --free
+    3. jotbeat route set ROLE NAME [FALLBACK...]
 
 Usage: python studio/cli.py <command>  (run from the repo root;
 the studio/ dir is added to sys.path automatically)
@@ -239,6 +248,141 @@ def cmd_report() -> int:
     return 0
 
 
+# ------------------------------------------------------- provider management
+# (Phase 3, HANDOFF-PHASE3 Addendum A — full model agnosticism:
+#  key in .env -> `provider add` -> `route set`. Never hand-edit JSON,
+#  never print key values — presence only.)
+
+def _save_routing(routing: dict) -> None:
+    import json
+    import models
+    models.PROVIDERS_FILE.write_text(
+        json.dumps(routing, indent=2) + "\n", encoding="utf-8")
+
+
+def _roles_using(routing: dict, name: str) -> list[str]:
+    return [r for r, cfg in routing["roles"].items() if name in cfg["chain"]]
+
+
+def cmd_provider_list() -> int:
+    import os
+    import models
+
+    routing = models.load_routing()
+    print(f"{'name':<28} {'tier':<10} {'family':<8} {'model':<34} {'roles':<22} key")
+    for name, p in routing["providers"].items():
+        roles = ",".join(_roles_using(routing, name)) or "-"
+        key = "set" if os.environ.get(p["env_key"]) else "MISSING"
+        verified = "" if p.get("verified") else " (unverified)"
+        print(f"{name:<28} {p.get('tier','?'):<10} {p.get('family','?'):<8} "
+              f"{p.get('model','?'):<34} {roles:<22} {key}{verified}")
+    return 0
+
+
+PROVIDER_FAMILIES = ("openai", "google")
+PROVIDER_TIERS = ("free", "bulk", "escalation")
+
+
+def cmd_provider_add(args) -> int:
+    import models
+
+    routing = models.load_routing()
+    name = args.name
+    if name in routing["providers"]:
+        print(f"refused: provider '{name}' already exists")
+        return 1
+    if args.family == "openai" and not args.base_url:
+        print("refused: --base-url is required for family=openai")
+        return 1
+
+    entry = {
+        "name": name,
+        "provider": name,
+        "model": args.model,
+        "env_key": args.env_key,
+        "free": bool(args.free),
+        "tier": args.tier,
+        "family": args.family,
+        "base_url": args.base_url or None,
+        "price_in": args.price_in,
+        "price_out": args.price_out,
+    }
+    if args.price_cached_in is not None:
+        entry["price_cached_in"] = args.price_cached_in
+
+    routing["providers"][name] = entry
+    _save_routing(routing)
+    print(f"added provider '{name}' (family={args.family}, tier={args.tier})")
+    print("next: put the key in .env, then `jotbeat provider test "
+          f"{name}`, then `jotbeat route set ROLE {name} ...`")
+    return 0
+
+
+def cmd_provider_remove(name: str) -> int:
+    import models
+
+    routing = models.load_routing()
+    if name not in routing["providers"]:
+        print(f"unknown provider: {name}")
+        return 1
+    refs = _roles_using(routing, name)
+    if refs:
+        print(f"refused: '{name}' is still in role chains: {', '.join(refs)}")
+        print("re-route those roles first (`jotbeat route set ROLE ...`)")
+        return 1
+    del routing["providers"][name]
+    _save_routing(routing)
+    print(f"removed provider '{name}'")
+    return 0
+
+
+def cmd_provider_test(name: str) -> int:
+    import models
+
+    routing = models.load_routing()
+    if name not in routing["providers"]:
+        print(f"unknown provider: {name}")
+        return 1
+
+    result = models.ping_provider(name)
+    if result["ok"]:
+        routing["providers"][name]["verified"] = True
+        _save_routing(routing)
+        print(f"OK   {name}  latency={result['latency_ms']}ms "
+              f"tokens_in={result['tokens_in']} tokens_out={result['tokens_out']}")
+        return 0
+    print(f"FAIL {name}  {result['error']}")
+    print("entry stays registered but unverified — the loop never crashes on this")
+    return 1
+
+
+def cmd_route_set(role: str, chain: list[str]) -> int:
+    import models
+
+    routing = models.load_routing()
+    if role not in routing["roles"]:
+        print(f"unknown role: {role}")
+        print("known roles: " + ", ".join(sorted(routing["roles"])))
+        return 1
+    missing = [n for n in chain if n not in routing["providers"]]
+    if missing:
+        print(f"refused: unknown providers: {', '.join(missing)}")
+        return 1
+
+    # Diversification rule: warn (but allow) when the new primary is already
+    # another role's primary.
+    primary = chain[0]
+    for other, cfg in routing["roles"].items():
+        if other != role and cfg["chain"] and cfg["chain"][0] == primary:
+            print(f"warning: '{primary}' is also primary for role "
+                  f"'{other}' (diversification rule) — allowed, flagged")
+
+    routing["roles"][role]["chain"] = chain
+    _save_routing(routing)
+    print(f"route set: {role} -> {' -> '.join(chain)}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     load_env()
 
@@ -256,6 +400,39 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("run-next", help="run the orchestrator over ready tasks")
     sub.add_parser("verify", help="deterministic BVT + scripted QA (no models)")
     sub.add_parser("report", help="ledger cost report")
+
+    p_prov = sub.add_parser(
+        "provider",
+        help="manage providers (key in .env -> provider add -> route set)",
+        description="Add flow: 1) key in .env  2) provider add  3) route set. "
+                    "Key values are never printed — presence only.")
+    prov_sub = p_prov.add_subparsers(dest="provider_command", required=True)
+
+    prov_sub.add_parser("list", help="name, tier, family, model, roles, key set/missing")
+
+    p_add = prov_sub.add_parser("add", help="register a new provider entry")
+    p_add.add_argument("--name", required=True)
+    p_add.add_argument("--env-key", required=True, help="env var NAME (never the value)")
+    p_add.add_argument("--base-url", default="", help="required for family=openai")
+    p_add.add_argument("--model", required=True)
+    p_add.add_argument("--family", required=True, choices=PROVIDER_FAMILIES)
+    p_add.add_argument("--tier", required=True, choices=PROVIDER_TIERS)
+    p_add.add_argument("--price-in", required=True, type=float)
+    p_add.add_argument("--price-out", required=True, type=float)
+    p_add.add_argument("--price-cached-in", type=float, default=None)
+    p_add.add_argument("--free", action="store_true")
+
+    p_rm = prov_sub.add_parser("remove", help="remove a provider (refuses if chained)")
+    p_rm.add_argument("name")
+
+    p_test = prov_sub.add_parser("test", help="minimal live ping, ledgered")
+    p_test.add_argument("name")
+
+    p_route = sub.add_parser("route", help="role routing")
+    route_sub = p_route.add_subparsers(dest="route_command", required=True)
+    p_rset = route_sub.add_parser("set", help="replace a role's provider chain")
+    p_rset.add_argument("role")
+    p_rset.add_argument("providers", nargs="+")
 
     args = parser.parse_args(argv)
 
@@ -282,6 +459,17 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_verify()
     if args.command == "report":
         return cmd_report()
+    if args.command == "provider":
+        if args.provider_command == "list":
+            return cmd_provider_list()
+        if args.provider_command == "add":
+            return cmd_provider_add(args)
+        if args.provider_command == "remove":
+            return cmd_provider_remove(args.name)
+        if args.provider_command == "test":
+            return cmd_provider_test(args.name)
+    if args.command == "route" and args.route_command == "set":
+        return cmd_route_set(args.role, args.providers)
 
     return 1
 

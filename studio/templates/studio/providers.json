@@ -12,7 +12,8 @@
       "base_url": "https://api.deepseek.com/v1",
       "price_in": 0.14,
       "price_out": 0.28,
-      "price_cached_in": 0.003
+      "price_cached_in": 0.0028,
+      "family": "openai"
     },
     "deepseek-v4-pro": {
       "name": "deepseek-v4-pro",
@@ -22,8 +23,10 @@
       "free": false,
       "tier": "escalation",
       "base_url": "https://api.deepseek.com/v1",
-      "price_in": 0.44,
-      "price_out": 0.87
+      "price_in": 0.435,
+      "price_out": 0.87,
+      "price_cached_in": 0.003625,
+      "family": "openai"
     },
     "kimi-k2.6": {
       "name": "kimi-k2.6",
@@ -35,30 +38,21 @@
       "base_url": "https://api.moonshot.ai/v1",
       "price_in": 0.95,
       "price_out": 4.0,
-      "price_cached_in": 0.19
+      "price_cached_in": 0.19,
+      "family": "openai"
     },
     "glm-4.7": {
       "name": "glm-4.7",
       "provider": "z.ai",
       "model": "glm-4.7",
-      "env_key": "GLM_API_KEY",
+      "env_key": "ZAI_API_KEY",
       "free": false,
       "tier": "escalation",
       "base_url": "https://api.z.ai/api/paas/v4",
-      "price_in": 0.3,
-      "price_out": 1.18,
-      "price_cached_in": 0.059
-    },
-    "minimax-m3": {
-      "name": "minimax-m3",
-      "provider": "minimax",
-      "model": "minimax-m3",
-      "env_key": "MINIMAX_API_KEY",
-      "free": false,
-      "tier": "bulk",
-      "base_url": "https://api.minimax.io/v1",
-      "price_in": 0.3,
-      "price_out": 1.2
+      "price_in": 0.6,
+      "price_out": 2.2,
+      "price_cached_in": 0.11,
+      "family": "openai"
     },
     "groq-free": {
       "name": "groq-free",
@@ -69,7 +63,8 @@
       "tier": "free",
       "base_url": "https://api.groq.com/openai/v1",
       "price_in": 0.0,
-      "price_out": 0.0
+      "price_out": 0.0,
+      "family": "openai"
     },
     "cerebras-free": {
       "name": "cerebras-free",
@@ -80,7 +75,8 @@
       "tier": "free",
       "base_url": "https://api.cerebras.ai/v1",
       "price_in": 0.0,
-      "price_out": 0.0
+      "price_out": 0.0,
+      "family": "openai"
     },
     "gemini-free": {
       "name": "gemini-free",
@@ -92,7 +88,8 @@
       "base_url": null,
       "price_in": 0.0,
       "price_out": 0.0,
-      "_client": "google-genai (not OpenAI-compatible; base_url unused)"
+      "_client": "google-genai (not OpenAI-compatible; base_url unused)",
+      "family": "google"
     },
     "github-models-free": {
       "name": "github-models-free",
@@ -103,7 +100,8 @@
       "tier": "free",
       "base_url": "https://models.github.ai/inference",
       "price_in": 0.0,
-      "price_out": 0.0
+      "price_out": 0.0,
+      "family": "openai"
     },
     "mistral-free": {
       "name": "mistral-free",
@@ -114,7 +112,8 @@
       "tier": "free",
       "base_url": "https://api.mistral.ai/v1",
       "price_in": 0.0,
-      "price_out": 0.0
+      "price_out": 0.0,
+      "family": "openai"
     },
     "openrouter-free": {
       "name": "openrouter-free",
@@ -125,7 +124,8 @@
       "tier": "free",
       "base_url": "https://openrouter.ai/api/v1",
       "price_in": 0.0,
-      "price_out": 0.0
+      "price_out": 0.0,
+      "family": "openai"
     },
     "fal": {
       "name": "fal",
@@ -137,7 +137,8 @@
       "base_url": null,
       "price_in": null,
       "price_out": null,
-      "approx_per_image_usd": 0.012
+      "approx_per_image_usd": 0.012,
+      "family": "none"
     },
     "openrouter-qwen3-coder-free": {
       "name": "openrouter-qwen3-coder-free",
@@ -145,10 +146,59 @@
       "model": "qwen/qwen3-coder:free",
       "env_key": "OPENROUTER_API_KEY",
       "free": true,
-      "tier": "bulk",
+      "tier": "free",
       "base_url": "https://openrouter.ai/api/v1",
       "price_in": 0.0,
-      "price_out": 0.0
+      "price_out": 0.0,
+      "family": "openai"
+    },
+    "glm-4.7-flash": {
+      "name": "glm-4.7-flash",
+      "provider": "z.ai",
+      "model": "glm-4.7-flash",
+      "env_key": "ZAI_API_KEY",
+      "free": true,
+      "tier": "free",
+      "base_url": "https://api.z.ai/api/paas/v4",
+      "price_in": 0.0,
+      "price_out": 0.0,
+      "family": "openai"
+    },
+    "glm-4.6v-flash": {
+      "name": "glm-4.6v-flash",
+      "provider": "z.ai",
+      "model": "glm-4.6v-flash",
+      "env_key": "ZAI_API_KEY",
+      "free": true,
+      "tier": "free",
+      "base_url": "https://api.z.ai/api/paas/v4",
+      "price_in": 0.0,
+      "price_out": 0.0,
+      "family": "openai"
+    },
+    "glm-4.6v": {
+      "name": "glm-4.6v",
+      "provider": "z.ai",
+      "model": "glm-4.6v",
+      "env_key": "ZAI_API_KEY",
+      "free": false,
+      "tier": "bulk",
+      "base_url": "https://api.z.ai/api/paas/v4",
+      "price_in": 0.3,
+      "price_out": 0.9,
+      "family": "openai"
+    },
+    "groq-free-8b": {
+      "name": "groq-free-8b",
+      "provider": "groq",
+      "model": "llama-3.1-8b-instant",
+      "env_key": "GROQ_API_KEY",
+      "free": true,
+      "tier": "free",
+      "base_url": "https://api.groq.com/openai/v1",
+      "price_in": 0.0,
+      "price_out": 0.0,
+      "family": "openai"
     }
   },
   "roles": {
@@ -188,7 +238,8 @@
     "auditor": {
       "chain": [
         "kimi-k2.6",
-        "glm-4.7"
+        "glm-4.7",
+        "glm-4.7-flash"
       ],
       "max_tokens_in": 17000,
       "max_tokens_out": 1500
@@ -203,14 +254,15 @@
     },
     "vision": {
       "chain": [
-        "minimax-m3"
+        "glm-4.6v-flash",
+        "glm-4.6v"
       ],
       "max_tokens_in": 8000,
       "max_tokens_out": 1000
     },
     "triage": {
       "chain": [
-        "openrouter-qwen3-coder-free"
+        "groq-free-8b"
       ],
       "max_tokens_in": 4000,
       "max_tokens_out": 1000
@@ -232,8 +284,8 @@
     },
     "producer": {
       "chain": [
-        "openrouter-qwen3-coder-free",
-        "groq-free"
+        "gemini-free",
+        "deepseek-v4-flash"
       ],
       "max_tokens_in": 4000,
       "max_tokens_out": 1000
@@ -249,11 +301,15 @@
   },
   "free_chain": [
     "groq-free",
+    "groq-free-8b",
     "cerebras-free",
     "gemini-free",
     "github-models-free",
     "mistral-free",
-    "openrouter-free"
+    "openrouter-free",
+    "openrouter-qwen3-coder-free",
+    "glm-4.7-flash",
+    "glm-4.6v-flash"
   ],
   "rate_limit_policy": "On 429, fall through to the next provider in the role's chain; the scheduler reorders the queue and runs CPU work (build, regression, validation) in the window (roadmap \u00c2\u00a72.8).",
   "escalation_ceiling": "2 verified failures -> escalation chain with shrunk context -> 2 more -> human ticket (docs/BUDGET.md; constants in orchestrator.py, do not modify).",

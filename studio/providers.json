@@ -12,7 +12,8 @@
       "base_url": "https://api.deepseek.com/v1",
       "price_in": 0.14,
       "price_out": 0.28,
-      "price_cached_in": 0.0028
+      "price_cached_in": 0.0028,
+      "family": "openai"
     },
     "deepseek-v4-pro": {
       "name": "deepseek-v4-pro",
@@ -24,7 +25,8 @@
       "base_url": "https://api.deepseek.com/v1",
       "price_in": 0.435,
       "price_out": 0.87,
-      "price_cached_in": 0.003625
+      "price_cached_in": 0.003625,
+      "family": "openai"
     },
     "kimi-k2.6": {
       "name": "kimi-k2.6",
@@ -36,7 +38,8 @@
       "base_url": "https://api.moonshot.ai/v1",
       "price_in": 0.95,
       "price_out": 4.0,
-      "price_cached_in": 0.19
+      "price_cached_in": 0.19,
+      "family": "openai"
     },
     "glm-4.7": {
       "name": "glm-4.7",
@@ -48,7 +51,8 @@
       "base_url": "https://api.z.ai/api/paas/v4",
       "price_in": 0.6,
       "price_out": 2.2,
-      "price_cached_in": 0.11
+      "price_cached_in": 0.11,
+      "family": "openai"
     },
     "groq-free": {
       "name": "groq-free",
@@ -59,7 +63,8 @@
       "tier": "free",
       "base_url": "https://api.groq.com/openai/v1",
       "price_in": 0.0,
-      "price_out": 0.0
+      "price_out": 0.0,
+      "family": "openai"
     },
     "cerebras-free": {
       "name": "cerebras-free",
@@ -70,7 +75,8 @@
       "tier": "free",
       "base_url": "https://api.cerebras.ai/v1",
       "price_in": 0.0,
-      "price_out": 0.0
+      "price_out": 0.0,
+      "family": "openai"
     },
     "gemini-free": {
       "name": "gemini-free",
@@ -82,7 +88,8 @@
       "base_url": null,
       "price_in": 0.0,
       "price_out": 0.0,
-      "_client": "google-genai (not OpenAI-compatible; base_url unused)"
+      "_client": "google-genai (not OpenAI-compatible; base_url unused)",
+      "family": "google"
     },
     "github-models-free": {
       "name": "github-models-free",
@@ -93,7 +100,8 @@
       "tier": "free",
       "base_url": "https://models.github.ai/inference",
       "price_in": 0.0,
-      "price_out": 0.0
+      "price_out": 0.0,
+      "family": "openai"
     },
     "mistral-free": {
       "name": "mistral-free",
@@ -104,7 +112,8 @@
       "tier": "free",
       "base_url": "https://api.mistral.ai/v1",
       "price_in": 0.0,
-      "price_out": 0.0
+      "price_out": 0.0,
+      "family": "openai"
     },
     "openrouter-free": {
       "name": "openrouter-free",
@@ -115,7 +124,8 @@
       "tier": "free",
       "base_url": "https://openrouter.ai/api/v1",
       "price_in": 0.0,
-      "price_out": 0.0
+      "price_out": 0.0,
+      "family": "openai"
     },
     "fal": {
       "name": "fal",
@@ -127,7 +137,8 @@
       "base_url": null,
       "price_in": null,
       "price_out": null,
-      "approx_per_image_usd": 0.012
+      "approx_per_image_usd": 0.012,
+      "family": "none"
     },
     "openrouter-qwen3-coder-free": {
       "name": "openrouter-qwen3-coder-free",
@@ -138,7 +149,8 @@
       "tier": "free",
       "base_url": "https://openrouter.ai/api/v1",
       "price_in": 0.0,
-      "price_out": 0.0
+      "price_out": 0.0,
+      "family": "openai"
     },
     "glm-4.7-flash": {
       "name": "glm-4.7-flash",
@@ -149,7 +161,8 @@
       "tier": "free",
       "base_url": "https://api.z.ai/api/paas/v4",
       "price_in": 0.0,
-      "price_out": 0.0
+      "price_out": 0.0,
+      "family": "openai"
     },
     "glm-4.6v-flash": {
       "name": "glm-4.6v-flash",
@@ -160,7 +173,8 @@
       "tier": "free",
       "base_url": "https://api.z.ai/api/paas/v4",
       "price_in": 0.0,
-      "price_out": 0.0
+      "price_out": 0.0,
+      "family": "openai"
     },
     "glm-4.6v": {
       "name": "glm-4.6v",
@@ -171,7 +185,8 @@
       "tier": "bulk",
       "base_url": "https://api.z.ai/api/paas/v4",
       "price_in": 0.3,
-      "price_out": 0.9
+      "price_out": 0.9,
+      "family": "openai"
     },
     "groq-free-8b": {
       "name": "groq-free-8b",
@@ -182,7 +197,8 @@
       "tier": "free",
       "base_url": "https://api.groq.com/openai/v1",
       "price_in": 0.0,
-      "price_out": 0.0
+      "price_out": 0.0,
+      "family": "openai"
     }
   },
   "roles": {
