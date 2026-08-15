@@ -10,12 +10,33 @@ carry char counts, not values.
 
 from __future__ import annotations
 
+import datetime
 import json
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 LOOPBACK = ("127.0.0.1", "::1", "localhost")
+
+# Bump on every UI change — shown at the top of the page so a stale cached
+# page (or an orphan server) is immediately recognizable.
+BUILD = "2026-08-15-2"
+
+NO_STORE = ("Cache-Control", "no-store")
+
+
+def _log(root: Path, line: str) -> None:
+    """Append one line to state/ui-debug.log. NEVER log key values —
+    only timestamps, routes, and outcome/error text (which carries names
+    and char counts at most). Best-effort: logging must never break a request."""
+    try:
+        log_path = Path(root) / "state" / "ui-debug.log"
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        stamp = datetime.datetime.now().isoformat(timespec="seconds")
+        with log_path.open("a", encoding="utf-8") as f:
+            f.write(f"{stamp} {line}\n")
+    except OSError:
+        pass
 
 
 def is_loopback(addr: str) -> bool:
@@ -46,11 +67,15 @@ PAGE = """<!DOCTYPE html>
   .muted { color:#8b96a3; font-size:12px; }
   .warn { color:#d29922; font-size:12px; }
   .ok { color:#3fb950; } .fail { color:#f85149; }
-  #msg { margin-top:12px; font-size:13px; min-height:18px; }
+  #msg { margin-top:16px; font-size:16px; font-weight:700; min-height:22px;
+         padding:8px 10px; border:1px solid #2a313a; border-radius:6px; }
 </style>
 </head>
 <body>
-<h1>JotBeat Studio — Settings</h1>
+<h1>JotBeat Studio — Settings <span class="muted">· build __BUILD__</span></h1>
+<p id="rootbanner" class="fail" style="display:none; font-weight:600">
+SERVER STARTED IN THE WRONG FOLDER — saves are being refused.
+Close this tab and relaunch via JotBeat Studio.bat.</p>
 <p class="muted">Keys are masked on entry and never shown again. All writes go
 through the same modules as the CLI. Non-OpenAI API? Run a local LiteLLM proxy
 and add it here as family "openai" pointing at http://localhost:4000/v1.</p>
@@ -106,6 +131,8 @@ function msg(text, cls) {
 
 async function refresh() {
   STATE = await api('/api/state');
+  if (STATE && STATE.root_ok === false)
+    document.getElementById('rootbanner').style.display = 'block';
   renderKeys(); renderProviders(); renderRoles();
 }
 
@@ -128,11 +155,21 @@ function renderKeys() {
 }
 
 async function saveKey(prov, name) {
-  const v = document.getElementById('key-' + prov).value;
-  if (!v.trim()) { msg('empty value refused', 'fail'); return; }
-  const r = await api('/api/keys/set', {name: name, value: v});
-  if (r.ok) { msg(name + ' set (' + r.chars + ' chars)', 'ok'); refresh(); }
-  else msg(r.error, 'fail');
+  const input = document.getElementById('key-' + prov);
+  const st = document.getElementById('test-' + prov);
+  const val = input.value;
+  if (!val.trim()) { msg('empty value refused', 'fail'); return; }
+  st.textContent = 'saving…'; st.className = 'muted';
+  const r = await api('/api/keys/set', {name: name, value: val});
+  if (r.ok) {
+    msg('SAVED ✓ ' + name + ' (' + r.chars + ' chars)', 'ok');
+    st.textContent = 'saved ✓'; st.className = 'ok';
+    input.value = '';
+    refresh();
+  } else {
+    msg('SAVE FAILED: ' + r.error, 'fail');
+    st.textContent = 'save FAILED'; st.className = 'fail';
+  }
 }
 
 async function testProvider(prov) {
@@ -244,7 +281,17 @@ def _state(root: Path) -> dict:
         {"name": r, "chain": cfg["chain"]}
         for r, cfg in routing["roles"].items()
     ]
+    # root_ok=False means the server was launched in the wrong folder —
+    # every key write would be refused. The page shows a red banner.
+    from tools.keys import assert_env_gitignored
+    try:
+        assert_env_gitignored(root)
+        root_ok = True
+    except Exception:
+        root_ok = False
     return {
+        "build": BUILD,
+        "root_ok": root_ok,
         "keys": key_status(root, routing)["expected"],
         "stale_keys": key_status(root, routing)["stale"],
         "providers": providers,
@@ -270,9 +317,17 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
             body = json.dumps(data).encode("utf-8")
             self.send_response(status)
             self.send_header("Content-Type", "application/json")
+            self.send_header(*NO_STORE)
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
+
+        def _respond(self, data: dict, status: int = 200) -> None:
+            """_json + one debug-log line. Logs outcome text only —
+            request bodies (which carry key values) are never logged."""
+            outcome = data.get("error") or "ok"
+            _log(root, f"{self.command} {self.path} -> {status} {outcome}")
+            self._json(data, status)
 
         def _body(self) -> dict:
             n = int(self.headers.get("Content-Length") or 0)
@@ -286,9 +341,11 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
             if not self._guard():
                 return
             if self.path == "/":
-                body = PAGE.encode("utf-8")
+                body = PAGE.replace("__BUILD__", BUILD).encode("utf-8")
+                _log(root, "GET / (page loaded)")
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header(*NO_STORE)
                 self.send_header("Content-Length", str(len(body)))
                 self.end_headers()
                 self.wfile.write(body)
@@ -308,11 +365,11 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
             try:
                 if self.path == "/api/keys/set":
                     n = set_key(root, body.get("name", ""), body.get("value", ""))
-                    self._json({"ok": True, "chars": n})
+                    self._respond({"ok": True, "chars": n})
 
                 elif self.path == "/api/keys/remove":
                     removed = remove_key(root, body.get("name", ""))
-                    self._json({"ok": True, "removed": removed})
+                    self._respond({"ok": True, "removed": removed})
 
                 elif self.path == "/api/providers/add":
                     routing = models.load_routing()
@@ -327,13 +384,13 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
                     )
                     routing_mod.add_provider(routing, entry)
                     routing_mod.save(routing, models.PROVIDERS_FILE)
-                    self._json({"ok": True})
+                    self._respond({"ok": True})
 
                 elif self.path == "/api/providers/remove":
                     routing = models.load_routing()
                     routing_mod.remove_provider(routing, body.get("name", ""))
                     routing_mod.save(routing, models.PROVIDERS_FILE)
-                    self._json({"ok": True})
+                    self._respond({"ok": True})
 
                 elif self.path == "/api/providers/test":
                     result = models.ping_provider(body.get("name", ""))
@@ -341,7 +398,7 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
                         routing = models.load_routing()
                         routing["providers"][body["name"]]["verified"] = True
                         routing_mod.save(routing, models.PROVIDERS_FILE)
-                    self._json(result)
+                    self._respond(result)
 
                 elif self.path == "/api/route/set":
                     chain = [c for c in (body.get("primary"), body.get("fallback")) if c]
@@ -353,15 +410,15 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
                     warnings = routing_mod.set_role_chain(
                         routing, body.get("role", ""), chain)
                     routing_mod.save(routing, models.PROVIDERS_FILE)
-                    self._json({"ok": True, "warnings": warnings})
+                    self._respond({"ok": True, "warnings": warnings})
 
                 else:
-                    self._json({"ok": False, "error": "not found"}, 404)
+                    self._respond({"ok": False, "error": "not found"}, 404)
 
             except (KeysError, routing_mod.RoutingError) as e:
-                self._json({"ok": False, "error": str(e)}, 400)
+                self._respond({"ok": False, "error": str(e)}, 400)
             except Exception as e:
-                self._json({"ok": False, "error": f"{type(e).__name__}: {e}"}, 500)
+                self._respond({"ok": False, "error": f"{type(e).__name__}: {e}"}, 500)
 
     httpd = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     return httpd
@@ -374,6 +431,7 @@ def serve(root: Path) -> None:
 
     httpd = make_server(root)
     url = f"http://127.0.0.1:{httpd.server_address[1]}"
+    _log(root, f"server start build={BUILD} root={Path(root).resolve()} url={url}")
     try:  # pythonw (double-click launcher) may have no stdout at all
         print(f"JotBeat settings -> {url}  (loopback only; Ctrl+C to stop)")
     except Exception:
