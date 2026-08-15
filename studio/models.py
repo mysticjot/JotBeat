@@ -188,6 +188,9 @@ class ModelAdapter:
             config=types.GenerateContentConfig(
                 system_instruction=instructions,
                 max_output_tokens=self.cap_out,
+                # Gemini 3.x spends output tokens on "thinking" first —
+                # without this, small caps return empty text (tokens_out=0).
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
             ),
         )
         usage = resp.usage_metadata

@@ -168,7 +168,23 @@ def cmd_brief(text: str) -> int:
         encoding="utf-8",
     )
     print(f"brief saved -> {out_file.relative_to(ROOT)}")
-    print(result["notes"])
+
+    # Split the Director's marked sections into the real docs (HANDOFF §4).
+    sections = re.split(r"^=== (GDD|TEST_PLAN) ===\s*$", result["notes"], flags=re.MULTILINE)
+    # re.split with a capture group yields [pre, name, body, name, body, ...]
+    named = {
+        sections[i]: sections[i + 1].strip()
+        for i in range(1, len(sections) - 1, 2)
+    }
+    if "GDD" in named:
+        (ROOT / "docs" / "GDD.md").write_text(named["GDD"] + "\n", encoding="utf-8")
+        print("GDD written -> docs/GDD.md")
+    if "TEST_PLAN" in named:
+        (ROOT / "docs" / "TEST_PLAN.md").write_text(named["TEST_PLAN"] + "\n", encoding="utf-8")
+        print("TEST_PLAN written -> docs/TEST_PLAN.md")
+    if not named:
+        print("WARNING: Director output had no === GDD === / === TEST_PLAN === "
+              "markers — draft kept in docs/briefs/ only, docs unchanged")
     return 0
 
 
