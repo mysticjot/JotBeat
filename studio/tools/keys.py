@@ -116,6 +116,8 @@ def key_status(root: Path, routing: dict) -> dict:
     Never contains values."""
     expected: dict[str, list[str]] = {}
     for pname, p in routing["providers"].items():
+        if not p.get("env_key"):
+            continue  # keyless local server (Ollama, LiteLLM) — no key to track
         expected.setdefault(p["env_key"], []).append(pname)
 
     present: dict[str, int] = {}

@@ -303,7 +303,7 @@ def cmd_provider_list() -> int:
     print(f"{'name':<28} {'tier':<10} {'family':<8} {'model':<34} {'roles':<22} key")
     for name, p in routing["providers"].items():
         roles = ",".join(roles_using(routing, name)) or "-"
-        key = "set" if os.environ.get(p["env_key"]) else "MISSING"
+        key = "keyless" if not p.get("env_key") else ("set" if os.environ.get(p["env_key"]) else "MISSING")
         verified = "" if p.get("verified") else " (unverified)"
         print(
             f"{name:<28} {p.get('tier', '?'):<10} {p.get('family', '?'):<8} "
@@ -327,20 +327,50 @@ def cmd_provider_add(args) -> int:
     import models
     from tools import routing as routing_mod
 
+    hint = args.hint
+    preset = routing_mod.detect_preset(hint)
+    fields: dict = {}
+    if preset:
+        preset_name, fields = preset
+        print(f"preset '{preset_name}' detected — auto-filled "
+              f"family={fields['family']}, base={fields.get('base_url') or '(sdk)'}"
+              + (" (keyless local server)" if fields.get("keyless") else ""))
+    name = args.name or hint
+    model = args.model or ""
+    if preset and preset[0] == "ollama":
+        available = routing_mod.ollama_models()
+        if not available:
+            print("refused: Ollama is running but has no models — "
+                  "run `ollama pull <model>` first (e.g. ollama pull qwen3-coder)")
+            return 1
+        if not model:
+            model = available[0]
+            print(f"model auto-picked: {model} (installed: {', '.join(available)})")
+        elif model not in available:
+            print(f"refused: model '{model}' not installed — "
+                  f"available: {', '.join(available)}")
+            return 1
+    elif not model and not preset:
+        print("refused: unknown provider hint and no --model given. "
+              f"Known presets: {', '.join(sorted(routing_mod.PRESETS))} "
+              "(everything else: pass --model, --base-url, --env-key, ...)")
+        return 1
+
     routing = models.load_routing()
     try:
         entry = routing_mod.build_entry(
-            name=args.name,
-            env_key=args.env_key,
-            base_url=args.base_url or None,
-            model=args.model,
-            family=args.family,
-            tier=args.tier,
-            price_in=args.price_in,
-            price_out=args.price_out,
-            price_cached_in=args.price_cached_in,
-            free=args.free,
+            name=name,
+            env_key=args.env_key if args.env_key is not None else fields.get("env_key", ""),
+            base_url=args.base_url or fields.get("base_url") or None,
+            model=model,
+            family=args.family or fields.get("family", ""),
+            tier=args.tier or fields.get("tier", ""),
+            price_in=args.price_in if args.price_in is not None else fields.get("price_in", 0.0),
+            price_out=args.price_out if args.price_out is not None else fields.get("price_out", 0.0),
+            price_cached_in=args.price_cached_in if args.price_cached_in is not None else fields.get("price_cached_in"),
+            free=args.free or fields.get("free", False),
             headers=_parse_headers(args.header),
+            keyless=bool(fields.get("keyless")),
         )
         routing_mod.add_provider(routing, entry)
     except routing_mod.RoutingError as e:
@@ -348,11 +378,17 @@ def cmd_provider_add(args) -> int:
         return 1
 
     _save_routing(routing)
-    print(f"added provider '{entry['name']}' (family={args.family}, tier={args.tier})")
-    print(
-        f"next: `jotbeat keys set {entry['env_key']}`, then `jotbeat provider test "
-        f"{entry['name']}`, then `jotbeat route set ROLE {entry['name']} ...`"
-    )
+    print(f"added provider '{entry['name']}' (family={entry['family']}, tier={entry['tier']}, model={entry['model']})")
+    if entry["env_key"]:
+        print(
+            f"next: `jotbeat keys set {entry['env_key']}`, then `jotbeat provider test "
+            f"{entry['name']}`, then `jotbeat route set ROLE {entry['name']} ...`"
+        )
+    else:
+        print(
+            f"next: `jotbeat provider test {entry['name']}` (keyless — no key to set), "
+            f"then `jotbeat route set ROLE {entry['name']} ...`"
+        )
     return 0
 
 
@@ -508,22 +544,30 @@ def main(argv: list[str] | None = None) -> int:
 
     p_add = prov_sub.add_parser(
         "add",
-        help="register a new provider entry",
-        epilog="UNIVERSAL COMPATIBILITY RULE: almost everything is family "
+        help="register a new provider entry (preset hint auto-fills everything)",
+        epilog="Presets auto-detect the family/base_url/key: ollama, litellm, "
+        "openrouter, groq, deepseek, zai, kimi, mistral, cerebras, gemini, "
+        "github-models, opencode. Example: `jotbeat provider add ollama` "
+        "(picks a model from your local server automatically). "
+        "UNIVERSAL COMPATIBILITY RULE: almost everything is family "
         "'openai'. For APIs that aren't OpenAI-compatible, do NOT ask "
         "for per-vendor code — run a local LiteLLM proxy and point a "
         "family-openai entry at http://localhost:4000/v1.",
     )
-    p_add.add_argument("--name", required=True)
     p_add.add_argument(
-        "--env-key", required=True, help="env var NAME (never the value)"
+        "hint",
+        help="provider name, or a preset to auto-fill (e.g. ollama, groq, opencode)",
+    )
+    p_add.add_argument("--name", default="", help="override the entry name")
+    p_add.add_argument(
+        "--env-key", default=None, help="env var NAME (never the value)"
     )
     p_add.add_argument("--base-url", default="", help="required for family=openai")
-    p_add.add_argument("--model", required=True)
-    p_add.add_argument("--family", required=True, choices=PROVIDER_FAMILIES)
-    p_add.add_argument("--tier", required=True, choices=PROVIDER_TIERS)
-    p_add.add_argument("--price-in", required=True, type=float)
-    p_add.add_argument("--price-out", required=True, type=float)
+    p_add.add_argument("--model", default="", help="model id (auto-detected for ollama)")
+    p_add.add_argument("--family", default="", choices=PROVIDER_FAMILIES)
+    p_add.add_argument("--tier", default="", choices=PROVIDER_TIERS)
+    p_add.add_argument("--price-in", type=float, default=None)
+    p_add.add_argument("--price-out", type=float, default=None)
     p_add.add_argument("--price-cached-in", type=float, default=None)
     p_add.add_argument("--free", action="store_true")
     p_add.add_argument(

@@ -22,7 +22,7 @@ LOOPBACK = ("127.0.0.1", "::1", "localhost")
 
 # Bump on every UI change — shown at the top of the page so a stale cached
 # page (or an orphan server) is immediately recognizable.
-BUILD = "2026-08-15-5"
+BUILD = "2026-08-15-6"
 
 NO_STORE = ("Cache-Control", "no-store")
 
@@ -140,6 +140,15 @@ and add it here as family "openai" pointing at http://localhost:4000/v1.</p>
 <th>Tier</th><th>$/M in</th><th>$/M out</th><th></th></tr></thead><tbody></tbody></table>
 <p><button class="sec" onclick="document.getElementById('addform').style.display='block'">+ Add provider</button></p>
 <div id="addform" style="display:none; border:1px solid #2a313a; padding:12px; border-radius:6px;">
+  <p><select id="ppreset">
+     <option value="">— quick add (auto-fills everything) —</option>
+     <option>ollama</option><option>litellm</option><option>openrouter</option>
+     <option>groq</option><option>deepseek</option><option>zai</option>
+     <option>kimi</option><option>mistral</option><option>cerebras</option>
+     <option>gemini</option><option>github-models</option><option>opencode</option>
+     </select>
+     <button class="sec" onclick="presetFill()">Auto-fill</button>
+     <span class="muted">ollama/litellm are keyless local servers — no key needed.</span></p>
   <p><input id="pname" placeholder="name"> <input id="pmodel" placeholder="model">
      <input id="pbase" placeholder="base URL" size="30"></p>
   <p><input id="penv" placeholder="env var NAME (e.g. MYPROVIDER_API_KEY)" size="34">
@@ -250,6 +259,31 @@ function renderProviders() {
   }
 }
 
+async function presetFill() {
+  const preset = v('ppreset');
+  if (!preset) { msg('pick a preset first', 'fail'); return; }
+  const r = await api('/api/providers/preset?name=' + encodeURIComponent(preset));
+  if (!r.ok) { msg(r.error, 'fail'); return; }
+  const f = r.fields;
+  document.getElementById('pname').value = r.name;
+  document.getElementById('pbase').value = f.base_url || '';
+  document.getElementById('penv').value = f.env_key || '';
+  document.getElementById('pfamily').value = f.family;
+  document.getElementById('ptier').value = f.tier;
+  document.getElementById('pfree').checked = !!f.free;
+  if (f.price_in != null) document.getElementById('ppin').value = f.price_in;
+  if (f.price_out != null) document.getElementById('ppout').value = f.price_out;
+  if (f.price_cached_in != null) document.getElementById('ppcached').value = f.price_cached_in;
+  if (r.models && r.models.length) {
+    document.getElementById('pmodel').value = r.models[0];
+    msg('auto-filled — installed models: ' + r.models.join(', '), 'ok');
+  } else if (r.warning) {
+    msg('auto-filled, but: ' + r.warning, 'fail');
+  } else {
+    msg('auto-filled — enter the model id, then Add', 'ok');
+  }
+}
+
 async function addProvider() {
   const headers = {};
   for (const line of document.getElementById('pheaders').value.split('\\n')) {
@@ -259,6 +293,7 @@ async function addProvider() {
     }
   }
   const r = await api('/api/providers/add', {
+    preset: v('ppreset'),
     name: v('pname'), model: v('pmodel'), base_url: v('pbase'), env_key: v('penv'),
     family: v('pfamily'), tier: v('ptier'), free: document.getElementById('pfree').checked,
     price_in: parseFloat(v('ppin') || '0'), price_out: parseFloat(v('ppout') || '0'),
@@ -409,6 +444,24 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
                 self.wfile.write(body)
             elif self.path == "/api/state":
                 self._json(_state(root))
+            elif self.path.startswith("/api/providers/preset"):
+                from tools import routing as routing_mod
+                from urllib.parse import parse_qs, urlparse
+
+                q = parse_qs(urlparse(self.path).query)
+                pres = routing_mod.detect_preset(q.get("name", [""])[0])
+                if not pres:
+                    self._json({"ok": False, "error": "unknown preset"}, 404)
+                else:
+                    pname, fields = pres
+                    out = {"ok": True, "name": pname, "fields": fields}
+                    if pname == "ollama":
+                        try:
+                            out["models"] = routing_mod.ollama_models()
+                        except routing_mod.RoutingError as e:
+                            out["models"] = []
+                            out["warning"] = str(e)
+                    self._json(out)
             else:
                 self._json({"ok": False, "error": "not found"}, 404)
 
@@ -437,18 +490,51 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
 
                 elif self.path == "/api/providers/add":
                     routing = models.load_routing()
+                    # Preset merge: anything the form left blank falls back
+                    # to the detected preset's fields (same path as the CLI).
+                    pres = routing_mod.detect_preset(
+                        body.get("preset") or body.get("name", "")
+                    )
+                    pf = pres[1] if pres else {}
+
+                    def pick(key, default=""):
+                        v = body.get(key)
+                        return v if v not in (None, "") else pf.get(key, default)
+
+                    model = pick("model")
+                    if pres and pres[0] == "ollama":
+                        available = routing_mod.ollama_models()
+                        if not available:
+                            raise routing_mod.RoutingError(
+                                "Ollama is running but has no models — "
+                                "run `ollama pull <model>` first"
+                            )
+                        if not model:
+                            model = available[0]
+                        elif model not in available:
+                            raise routing_mod.RoutingError(
+                                f"model '{model}' not installed — "
+                                f"available: {', '.join(available)}"
+                            )
                     entry = routing_mod.build_entry(
-                        name=body.get("name", ""),
-                        env_key=body.get("env_key", ""),
-                        base_url=body.get("base_url") or None,
-                        model=body.get("model", ""),
-                        family=body.get("family", ""),
-                        tier=body.get("tier", ""),
-                        price_in=body.get("price_in"),
-                        price_out=body.get("price_out"),
-                        price_cached_in=body.get("price_cached_in"),
-                        free=body.get("free", False),
+                        name=body.get("name", "") or (pres[0] if pres else ""),
+                        env_key=pick("env_key"),
+                        base_url=pick("base_url") or None,
+                        model=model,
+                        family=pick("family"),
+                        tier=pick("tier"),
+                        price_in=body.get("price_in")
+                            if body.get("price_in") is not None
+                            else pf.get("price_in", 0.0),
+                        price_out=body.get("price_out")
+                            if body.get("price_out") is not None
+                            else pf.get("price_out", 0.0),
+                        price_cached_in=body.get("price_cached_in")
+                            if body.get("price_cached_in") is not None
+                            else pf.get("price_cached_in"),
+                        free=bool(body.get("free")) or bool(pf.get("free")),
                         headers=body.get("headers"),
+                        keyless=bool(pf.get("keyless")),
                     )
                     routing_mod.add_provider(routing, entry)
                     routing_mod.save(routing, models.PROVIDERS_FILE)

@@ -16,6 +16,133 @@ from pathlib import Path
 PROVIDER_FAMILIES = ("openai", "google")
 PROVIDER_TIERS = ("free", "bulk", "escalation")
 
+# Quick-add presets — `jotbeat provider add ollama` (or the UI dropdown)
+# fills everything detectable; flags/fields only override. "keyless"
+# providers are local servers that need no API key at all.
+# Prices for paid presets mirror the entries already in providers.json.
+PRESETS: dict[str, dict] = {
+    "ollama": {
+        "base_url": "http://localhost:11434/v1",
+        "env_key": "",
+        "family": "openai",
+        "tier": "free",
+        "free": True,
+        "keyless": True,
+    },
+    "litellm": {
+        "base_url": "http://localhost:4000/v1",
+        "env_key": "",
+        "family": "openai",
+        "tier": "free",
+        "free": True,
+        "keyless": True,
+    },
+    "openrouter": {
+        "base_url": "https://openrouter.ai/api/v1",
+        "env_key": "OPENROUTER_API_KEY",
+        "family": "openai",
+        "tier": "free",
+        "free": True,
+    },
+    "groq": {
+        "base_url": "https://api.groq.com/openai/v1",
+        "env_key": "GROQ_API_KEY",
+        "family": "openai",
+        "tier": "free",
+        "free": True,
+    },
+    "deepseek": {
+        "base_url": "https://api.deepseek.com/v1",
+        "env_key": "DEEPSEEK_API_KEY",
+        "family": "openai",
+        "tier": "bulk",
+        "price_in": 0.14,
+        "price_out": 0.28,
+        "price_cached_in": 0.0028,
+    },
+    "zai": {
+        "base_url": "https://api.z.ai/api/paas/v4",
+        "env_key": "ZAI_API_KEY",
+        "family": "openai",
+        "tier": "bulk",
+    },
+    "kimi": {
+        "base_url": "https://api.moonshot.ai/v1",
+        "env_key": "KIMI_API_KEY",
+        "family": "openai",
+        "tier": "bulk",
+    },
+    "mistral": {
+        "base_url": "https://api.mistral.ai/v1",
+        "env_key": "MISTRAL_API_KEY",
+        "family": "openai",
+        "tier": "free",
+        "free": True,
+    },
+    "cerebras": {
+        "base_url": "https://api.cerebras.ai/v1",
+        "env_key": "CEREBRAS_API_KEY",
+        "family": "openai",
+        "tier": "free",
+        "free": True,
+    },
+    "gemini": {
+        "base_url": None,
+        "env_key": "GEMINI_API_KEY",
+        "family": "google",
+        "tier": "free",
+        "free": True,
+    },
+    "github-models": {
+        "base_url": "https://models.github.ai/inference",
+        "env_key": "GITHUB_TOKEN",
+        "family": "openai",
+        "tier": "free",
+        "free": True,
+    },
+    "opencode": {
+        # OpenCode Zen — OpenAI-compatible curated gateway (opencode.ai/docs/zen)
+        "base_url": "https://opencode.ai/zen/v1",
+        "env_key": "OPENCODE_API_KEY",
+        "family": "openai",
+        "tier": "free",
+        "free": True,
+    },
+}
+PRESET_ALIASES = {
+    "moonshot": "kimi",
+    "google": "gemini",
+    "github": "github-models",
+    "opencode-zen": "opencode",
+    "zen": "opencode",
+}
+
+
+def detect_preset(hint: str) -> tuple[str, dict] | None:
+    """Match a hint ('ollama', 'groq', ...) to a preset. Returns
+    (preset_name, fields) or None."""
+    h = (hint or "").strip().lower()
+    h = PRESET_ALIASES.get(h, h)
+    if h in PRESETS:
+        return h, dict(PRESETS[h])
+    return None
+
+
+def ollama_models() -> list[str]:
+    """List models installed on the local Ollama server.
+    Raises RoutingError if the server isn't running."""
+    import httpx
+
+    try:
+        r = httpx.get("http://localhost:11434/api/tags", timeout=5)
+        r.raise_for_status()
+    except Exception as e:
+        raise RoutingError(
+            f"Ollama server not reachable at localhost:11434 ({e}) — "
+            "install it from ollama.com and run `ollama pull <model>` first"
+        )
+    return [m["name"] for m in r.json().get("models", [])]
+
 
 class RoutingError(Exception):
     """Refusal — loud, safe, file untouched."""
@@ -45,6 +172,7 @@ def build_entry(
     price_cached_in: float | None = None,
     free: bool = False,
     headers: dict | None = None,
+    keyless: bool = False,
 ) -> dict:
     """Validate and build a provider entry. Raises RoutingError on bad shape."""
     name = (name or "").strip()
@@ -56,7 +184,10 @@ def build_entry(
         raise RoutingError(f"tier must be one of {PROVIDER_TIERS}")
     if family == "openai" and not base_url:
         raise RoutingError("base_url is required for family=openai")
-    if not env_key or not env_key.strip():
+    if keyless:
+        env_key = ""  # local server (Ollama, LiteLLM) — no credential at all
+        free = True
+    elif not env_key or not env_key.strip():
         raise RoutingError("env_key (the variable NAME, not the value) is required")
     if not model or not model.strip():
         raise RoutingError("model is required")

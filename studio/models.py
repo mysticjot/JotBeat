@@ -28,13 +28,14 @@ def load_routing() -> dict:
 
 def active_providers(role: str) -> list[dict]:
     """Ordered provider chain for a role, filtered to providers with keys.
-    'free' means $0 pricing, not keyless — every tier still needs its env key."""
+    'free' means $0 pricing, not keyless — but a provider with an EMPTY
+    env_key (Ollama, LiteLLM, local servers) is keyless and always active."""
     routing = load_routing()
     chain = routing["roles"][role]["chain"]
     out = []
     for name in chain:
         p = routing["providers"][name]
-        if os.environ.get(p["env_key"]):
+        if not p.get("env_key") or os.environ.get(p["env_key"]):
             out.append(p)
     return out
 
@@ -130,7 +131,7 @@ class ModelAdapter:
         base_url + env key swapped, nothing else."""
         import httpx
 
-        api_key = os.environ.get(provider["env_key"])
+        api_key = os.environ.get(provider["env_key"]) if provider.get("env_key") else None
         if not api_key and not provider.get("free"):
             raise AllProvidersExhausted(f"missing env key {provider['env_key']}")
 
@@ -217,7 +218,7 @@ def ping_provider(name: str) -> dict:
             "tokens_out": 0,
             "error": f"unknown provider: {name}",
         }
-    if not os.environ.get(provider["env_key"]):
+    if provider.get("env_key") and not os.environ.get(provider["env_key"]):
         return {
             "ok": False,
             "latency_ms": 0,

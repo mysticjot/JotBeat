@@ -209,6 +209,19 @@
       "price_out": 0.0,
       "family": "openai",
       "verified": true
+    },
+    "ollama": {
+      "name": "ollama",
+      "provider": "ollama",
+      "model": "qwen2.5-coder:3b",
+      "env_key": "",
+      "free": true,
+      "tier": "free",
+      "family": "openai",
+      "base_url": "http://localhost:11434/v1",
+      "price_in": 0.0,
+      "price_out": 0.0,
+      "verified": true
     }
   },
   "roles": {
