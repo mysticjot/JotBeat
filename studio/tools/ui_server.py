@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import datetime
 import json
+import os
 import webbrowser
 from contextlib import suppress
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -21,7 +22,7 @@ LOOPBACK = ("127.0.0.1", "::1", "localhost")
 
 # Bump on every UI change — shown at the top of the page so a stale cached
 # page (or an orphan server) is immediately recognizable.
-BUILD = "2026-08-15-4"
+BUILD = "2026-08-15-5"
 
 NO_STORE = ("Cache-Control", "no-store")
 
@@ -200,7 +201,9 @@ function renderKeys() {
       const dot = row.set ? '<span class="dot on"></span>' : '<span class="dot"></span>';
       const status = row.set ? 'set · ' + row.chars + ' chars' : 'missing';
       tr.innerHTML = '<td>' + dot + '</td><td>' + prov + '</td>' +
-        '<td><input type="password" id="key-' + prov + '" placeholder="' + row.name + '"></td>' +
+        '<td><input type="password" id="key-' + prov + '" placeholder="' + row.name + '"' +
+        ' autocomplete="new-password" data-1p-ignore="true" data-lpignore="true"' +
+        ' data-form-type="other" autocapitalize="off" spellcheck="false"></td>' +
         '<td class="muted">' + status + ' <span id="test-' + prov + '"></span></td>' +
         '<td><button onclick="saveKey(\\'' + prov + '\\',\\'' + row.name + '\\')">Save</button> ' +
         '<button class="sec" onclick="testProvider(\\'' + prov + '\\')">Test</button></td>';
@@ -420,10 +423,16 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
             try:
                 if self.path == "/api/keys/set":
                     n = set_key(root, body.get("name", ""), body.get("value", ""))
+                    # sync the live process env — the server loaded .env at
+                    # startup, so provider tests would otherwise miss keys
+                    # saved during this session ("env key not set" bug)
+                    os.environ[body["name"].strip()] = body["value"].strip()
                     self._respond({"ok": True, "chars": n})
 
                 elif self.path == "/api/keys/remove":
                     removed = remove_key(root, body.get("name", ""))
+                    if removed:
+                        os.environ.pop(body["name"].strip(), None)
                     self._respond({"ok": True, "removed": removed})
 
                 elif self.path == "/api/providers/add":

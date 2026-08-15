@@ -25,6 +25,7 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 - `orchestrator.py patch()` KeyError when reached from build/QA failure without an audit record.
 
 ### Changed
+- `jotbeat verify` is now the phase-end endpoint (AGENTS.md §1): BVT + scripted QA + the §6 quality gate (aislop + fallow) in one command; all three must pass or it exits 1. A phase gate declared without a green quality run is void.
 - Provider routing correction (HANDOFF-PHASE3 §2): triage diversification restored via `groq-free-8b` (llama-3.1-8b-instant); producer → gemini-free → deepseek-v4-flash; auditor chain kimi-k2.6 → glm-4.7 → glm-4.7-flash; vision glm-4.6v-flash → glm-4.6v (`ZAI_API_KEY`); MiniMax removed (M-series is text-only); prices synced to the verified table (HANDOFF-PHASE2 §4, Aug 15 2026).
 - Qwen routing: DashScope entries removed; coder model now routes through OpenRouter free tier (`qwen/qwen3-coder:free`, `OPENROUTER_API_KEY`). Coder chain: groq-free → openrouter-qwen3-coder-free → deepseek-v4-flash.
 - `models.py active_providers` activates only providers whose env key exists (free tiers are not keyless), per AGENTS.md §5.

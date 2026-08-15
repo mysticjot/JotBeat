@@ -231,9 +231,11 @@ def cmd_run_next() -> int:
 
 
 def cmd_verify() -> int:
-    """Deterministic verification only — no model calls."""
+    """Deterministic verification only — no model calls.
+    Phase-end endpoint (AGENTS.md §1/§6): BVT + scripted QA + quality gate."""
     import json
     from tools.browser import run_ac_suite
+    from tools.quality import run_quality
     from tools.shell import run_bvt
 
     build = run_bvt()
@@ -246,8 +248,11 @@ def cmd_verify() -> int:
     if not qa["passed"]:
         print("--- qa log tail ---")
         print(qa["log_tail"])
-    print(json.dumps({"bvt": build["passed"], "qa": qa["passed"]}))
-    return 0 if build["passed"] and qa["passed"] else 1
+    quality = run_quality(ROOT)
+    print(f"QUALITY: {'PASS' if quality == 0 else 'FAIL'}  (aislop errors=0 + score floor, fallow dead-code/dupes)")
+    print(json.dumps({"bvt": build["passed"], "qa": qa["passed"],
+                      "quality": quality == 0}))
+    return 0 if build["passed"] and qa["passed"] and quality == 0 else 1
 
 
 def cmd_report() -> int:

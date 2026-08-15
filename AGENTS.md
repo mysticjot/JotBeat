@@ -10,6 +10,7 @@ Do NOT roll phases into one unverified blob. After each phase, run its gate chec
 - **Phase 1 done** ⟺ Playwright can read `window.__game.state` from a headless run AND BVT green in CI.
 - **Phase 2 done** ⟺ a stub task flows through the full loop and lands in `events.jsonl` with a cost attached.
 - Later phases: gate criteria are in the roadmap's phase sections. A phase is not complete until its gate is demonstrated, not asserted.
+- **Every phase ends with the same endpoint:** `jotbeat verify` — BVT + scripted QA + the §6 quality gate (aislop + fallow). All three must pass; a phase gate declared without a green quality run is void.
 
 ## 2. Docs before code
 
