@@ -44,7 +44,7 @@ jobs:
         working-directory: game
         run: npm ci && npm run build-nolog
 
-      - name: Playwright BVT (Phase 1 gate: headless state assertions)
+      - name: "Playwright BVT (Phase 1 gate — headless state assertions)"
         working-directory: game
         run: |
           npx playwright install --with-deps chromium
