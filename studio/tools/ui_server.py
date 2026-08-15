@@ -370,11 +370,17 @@ def serve(root: Path) -> None:
 
     httpd = make_server(root)
     url = f"http://127.0.0.1:{httpd.server_address[1]}"
-    print(f"JotBeat settings -> {url}  (loopback only; Ctrl+C to stop)")
+    try:  # pythonw (double-click launcher) may have no stdout at all
+        print(f"JotBeat settings -> {url}  (loopback only; Ctrl+C to stop)")
+    except Exception:
+        pass
     webbrowser.open(url)
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        print("\nsettings UI stopped")
+        try:
+            print("\nsettings UI stopped")
+        except Exception:
+            pass
     finally:
         httpd.server_close()
