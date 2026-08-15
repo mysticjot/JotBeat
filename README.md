@@ -1,93 +1,65 @@
 # JotBeat
 
+**An auditable AI game-production system: it plans, builds, tests, verifies, remembers, and explains every beat of development.**
 
+Agents create — the system verifies. JotBeat turns a pitch into a milestone plan, builds each backlog item, proves it against acceptance criteria, and keeps the whole production ownable. The repo is the product: local-first, git-backed, human-readable, runnable without JotBeat.
 
-## Getting started
+Status: **Pre-production — Phase 0 (Foundation) complete.** See `JotBeat-Studio-Roadmap.md` for the full plan.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+## Layout
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/lorecentric-group/jotbeat.git
-git branch -M main
-git push -uf origin main
+game/        Phaser 4 + TypeScript game (Phase 1+)
+studio/      Orchestration system (Python) — cli.py, providers.json, templates/
+docs/        The codified context: GDD, TEST_PLAN, ART_BIBLE, NARRATIVE_BIBLE,
+             BACKLOG, ADR, BUDGET, CHANGELOG
+state/       project-state.json, task-queue.json, events.jsonl (ledger)
+artifacts/   screenshots, audio, builds, traces (git-lfs)
+reports/     bvt, regression, cert, triage
 ```
 
-## Integrate with your tools
+## Quick start
 
-* [Set up project integrations](https://gitlab.com/lorecentric-group/jotbeat/-/settings/integrations)
+```bash
+# Materialize/regenerate the project tree from templates (Phase 0 gate)
+python studio/cli.py init            # add --force to overwrite, --path DIR to target elsewhere
 
-## Collaborate with your team
+# Set up provider keys (never commit .env)
+cp .env.example .env                 # fill in the slots you have; empty = provider inactive
+```
 
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+## Working contract
 
-## Test and Deploy
+`AGENTS.md` pins the rules for all work in this repo:
 
-Use the built-in continuous integration in GitLab.
-
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+1. **Phase gates are the contract** — a phase is done when its gate is demonstrated, not asserted.
+2. **Docs before code** — the agents read `docs/` and `state/`; skipping them means rebuilding the orchestrator twice.
+3. **Phaser 4, not 3** — v3 API patterns are rejected on sight.
+4. **The debug hook is non-negotiable** — `window.__game.state` is pinned in ADR-0001; the Phase 4 QA harness hangs off it.
+5. **Keys stay out** — `.env` is gitignored; the ledger logs provider names, never credentials.
 
 ## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+| Phase | Contents | Gate |
+|---|---|---|
+| 0 — Foundation ✅ | repo tree, docs, state schemas, providers.json, CI | `jotbeat init` reproduces tree; CI green on empty build |
+| 1 — Game Scaffold | Phaser 4 + Vite, LDtk greybox map, debug hook | Playwright reads `window.__game.state` headless; BVT green |
+| 2 — Orchestrator Core | LangGraph state machine, model adapter, ledger, CLI | stub task flows through the loop with cost attached |
+| 3 — Vertical Slice | 10 acceptance criteria (key/door/exit dungeon) | all ACs implemented, playable in placeholder art |
+| 4 — QA & Cert | scripted Playwright QA, regression, adversarial audit | cert passes; planted bug gets kicked back |
+| 5 — Art & Audio | Art Bible lock, Kaggle GPU batch, provenance manifest | slice looks/sounds coherent; every asset validates |
+| 6 — Release Candidate | polish, semver, itch.io via butler | playable on itch.io; cost measured |
+| 7 — Post-launch | dashboard, live ops, new genres | deferred |
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+## Cost model
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+Provider-routed model calls with per-role token caps and an escalation ceiling
+(cheap model → 2 failures → frontier with shrunk context → 2 more → human ticket).
+Target: **$0.36–0.54 cash per finished game**; free-chain best case $0.00. Art/audio
+runs on Kaggle's free 30 GPU-hours/week in a weekly batch. Every call is ledgered
+to `state/events.jsonl` — cost per game is a measured fact, not an estimate.
 
 ## License
-For open source projects, say how it is licensed.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Component licenses are tracked in the roadmap's License Matrix (§23); every generated
+asset carries provenance (model + license) in `game/assets/manifest.json`.
