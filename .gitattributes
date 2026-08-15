@@ -1,0 +1,8 @@
+# Binary assets tracked via git-lfs
+artifacts/**/*.png filter=lfs diff=lfs merge=lfs -text
+artifacts/**/*.zip filter=lfs diff=lfs merge=lfs -text
+game/assets/**/*.png filter=lfs diff=lfs merge=lfs -text
+game/assets/**/*.ogg filter=lfs diff=lfs merge=lfs -text
+game/assets/**/*.mp3 filter=lfs diff=lfs merge=lfs -text
+game/assets/**/*.wav filter=lfs diff=lfs merge=lfs -text
+game/assets/**/*.webm filter=lfs diff=lfs merge=lfs -text

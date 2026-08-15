@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "notes": "Routing table for studio/models.py. One specialist per job (roadmap §8.1). Prices are USD per 1M tokens; re-rank monthly from real ledger data, not pricing pages. A provider activates only if its env_key is present and non-empty in .env.",
+  "roles": {
+    "director": {
+      "model": "gemini-free-tier",
+      "provider": "google",
+      "env_key": "GEMINI_API_KEY",
+      "price_in": 0.0, "price_out": 0.0, "cached_in": null,
+      "why": "1M context for whole-GDD reads"
+    },
+    "coder": {
+      "model": "qwen3-coder-next",
+      "provider": "dashscope",
+      "env_key": "QWEN_API_KEY",
+      "price_in": 0.11, "price_out": 0.80, "cached_in": null,
+      "why": "Purpose-built coder; high tool-format following = parseable patches"
+    },
+    "qa": {
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "env_key": "DEEPSEEK_API_KEY",
+      "price_in": 0.14, "price_out": 0.28, "cached_in": 0.003,
+      "why": "Test code is code; prefix cache eats context"
+    },
+    "auditor": {
+      "model": "kimi-k2.6",
+      "provider": "moonshot",
+      "env_key": "KIMI_API_KEY",
+      "price_in": 0.95, "price_out": 4.00, "cached_in": 0.19,
+      "fallback": { "model": "glm-4.7", "provider": "z.ai", "env_key": "GLM_API_KEY", "price_in": 0.30, "price_out": 1.18, "cached_in": 0.059 },
+      "why": "Long-document review; sunk subscription = $0 marginal cash; GLM-4.7 post-downgrade"
+    },
+    "escalation": {
+      "model": "glm-4.7",
+      "provider": "z.ai",
+      "env_key": "GLM_API_KEY",
+      "price_in": 0.30, "price_out": 1.18, "cached_in": null,
+      "fallback": { "model": "deepseek-v4-pro", "provider": "deepseek", "env_key": "DEEPSEEK_API_KEY", "price_in": 0.44, "price_out": 0.87, "cached_in": null },
+      "why": "Hard bugs, shrunk context only. Ceiling: 2 failures -> frontier -> 2 more -> human ticket"
+    },
+    "vision_observer": {
+      "model": "minimax-m3",
+      "provider": "minimax",
+      "env_key": "MINIMAX_API_KEY",
+      "price_in": 0.30, "price_out": 1.20, "cached_in": null,
+      "why": "Native multimodal, cheapest frontier-ish"
+    },
+    "triage": {
+      "model": "qwen3.5-flash",
+      "provider": "dashscope",
+      "env_key": "QWEN_API_KEY",
+      "price_in": 0.03, "price_out": 0.30, "cached_in": null,
+      "why": "Cheapest input on market; classification needs no brains"
+    },
+    "manifests": {
+      "model": "groq-free-tier",
+      "provider": "groq",
+      "env_key": "GROQ_API_KEY",
+      "price_in": 0.0, "price_out": 0.0, "cached_in": null,
+      "why": "Art/sound JSON manifests are trivial"
+    }
+  },
+  "free_chain": [
+    { "provider": "groq", "env_key": "GROQ_API_KEY" },
+    { "provider": "cerebras", "env_key": "CEREBRAS_API_KEY" },
+    { "provider": "google", "env_key": "GEMINI_API_KEY" },
+    { "provider": "github-models", "env_key": "GITHUB_TOKEN" },
+    { "provider": "mistral", "env_key": "MISTRAL_API_KEY" },
+    { "provider": "openrouter", "env_key": "OPENROUTER_API_KEY" }
+  ],
+  "rate_limit_policy": "On 429, fall through to the next provider in the chain; the scheduler reorders the queue and runs CPU work (build, regression, validation) in the window (roadmap §2.8).",
+  "art_overflow": { "provider": "fal.ai", "env_key": "FAL_API_KEY", "approx_per_image_usd": 0.012 }
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "project": "jotbeat",
+  "created": null,
+  "phase": 0,
+  "phase_name": "Foundation",
+  "milestone": null,
+  "current_task": null,
+  "counters": {
+    "tasks_completed": 0,
+    "tasks_failed": 0,
+    "total_tokens_in": 0,
+    "total_tokens_out": 0,
+    "total_cost_usd": 0.0
+  },
+  "gates": {
+    "phase_0": "pending",
+    "phase_1": "pending",
+    "phase_2": "pending",
+    "phase_3": "pending",
+    "phase_4": "pending",
+    "phase_5": "pending",
+    "phase_6": "pending"
+  },
+  "notes": "Current truth. All roles read this; only the Producer writes it. See docs/BUDGET.md for counters."
+}

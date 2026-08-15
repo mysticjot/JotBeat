@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  bvt:
+    name: Build Verification (empty-build green)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify repository tree (Phase 0 gate)
+        run: |
+          set -e
+          for d in game studio docs state artifacts reports; do
+            test -d "$d" || { echo "missing dir: $d"; exit 1; }
+          done
+          for f in docs/GDD.md docs/TEST_PLAN.md docs/ART_BIBLE.md docs/BUDGET.md \
+                   state/project-state.json state/task-queue.json state/events.jsonl \
+                   studio/providers.json; do
+            test -f "$f" || { echo "missing file: $f"; exit 1; }
+          done
+          python3 -c "import json; json.load(open('state/project-state.json')); json.load(open('state/task-queue.json')); json.load(open('studio/providers.json'))"
+          echo "tree OK"
+
+      - name: Verify no credentials in repo
+        run: |
+          set -e
+          if git ls-files | grep -E '(^|/)\.env$' ; then
+            echo ".env must never be committed"; exit 1
+          fi
+          echo "no .env tracked"
+
+      - name: Game build (skipped until Phase 1 scaffold exists)
+        working-directory: game
+        run: |
+          if [ -f package.json ]; then
+            npm ci && npm run build
+          else
+            echo "no game scaffold yet (Phase 1) — empty build passes by definition"
+          fi
