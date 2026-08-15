@@ -2,8 +2,8 @@
   "schema_version": 1,
   "project": "jotbeat",
   "created": null,
-  "phase": 1,
-  "phase_name": "Game Scaffold",
+  "phase": 2,
+  "phase_name": "Orchestrator Core",
   "milestone": null,
   "current_task": null,
   "counters": {
@@ -16,7 +16,7 @@
   "gates": {
     "phase_0": "passed",
     "phase_1": "passed",
-    "phase_2": "pending",
+    "phase_2": "passed",
     "phase_3": "pending",
     "phase_4": "pending",
     "phase_5": "pending",
