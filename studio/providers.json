@@ -13,7 +13,8 @@
       "price_in": 0.14,
       "price_out": 0.28,
       "price_cached_in": 0.0028,
-      "family": "openai"
+      "family": "openai",
+      "verified": true
     },
     "deepseek-v4-pro": {
       "name": "deepseek-v4-pro",
@@ -26,7 +27,8 @@
       "price_in": 0.435,
       "price_out": 0.87,
       "price_cached_in": 0.003625,
-      "family": "openai"
+      "family": "openai",
+      "verified": true
     },
     "kimi-k2.6": {
       "name": "kimi-k2.6",
@@ -64,7 +66,8 @@
       "base_url": "https://api.groq.com/openai/v1",
       "price_in": 0.0,
       "price_out": 0.0,
-      "family": "openai"
+      "family": "openai",
+      "verified": true
     },
     "cerebras-free": {
       "name": "cerebras-free",
@@ -81,7 +84,7 @@
     "gemini-free": {
       "name": "gemini-free",
       "provider": "google",
-      "model": "gemini-2.5-flash",
+      "model": "gemini-3.5-flash",
       "env_key": "GEMINI_API_KEY",
       "free": true,
       "tier": "free",
@@ -89,7 +92,8 @@
       "price_in": 0.0,
       "price_out": 0.0,
       "_client": "google-genai (not OpenAI-compatible; base_url unused)",
-      "family": "google"
+      "family": "google",
+      "verified": true
     },
     "github-models-free": {
       "name": "github-models-free",
@@ -113,7 +117,8 @@
       "base_url": "https://api.mistral.ai/v1",
       "price_in": 0.0,
       "price_out": 0.0,
-      "family": "openai"
+      "family": "openai",
+      "verified": true
     },
     "openrouter-free": {
       "name": "openrouter-free",
@@ -162,7 +167,8 @@
       "base_url": "https://api.z.ai/api/paas/v4",
       "price_in": 0.0,
       "price_out": 0.0,
-      "family": "openai"
+      "family": "openai",
+      "verified": true
     },
     "glm-4.6v-flash": {
       "name": "glm-4.6v-flash",
@@ -174,7 +180,8 @@
       "base_url": "https://api.z.ai/api/paas/v4",
       "price_in": 0.0,
       "price_out": 0.0,
-      "family": "openai"
+      "family": "openai",
+      "verified": true
     },
     "glm-4.6v": {
       "name": "glm-4.6v",
@@ -198,7 +205,8 @@
       "base_url": "https://api.groq.com/openai/v1",
       "price_in": 0.0,
       "price_out": 0.0,
-      "family": "openai"
+      "family": "openai",
+      "verified": true
     }
   },
   "roles": {
