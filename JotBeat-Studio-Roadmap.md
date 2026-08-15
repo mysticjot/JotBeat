@@ -331,33 +331,36 @@ One specialist per job. No DeepSeek stacking. All providers are API-key signups 
 
 ### 8.1 Routing table (providers.json)
 
+All prices below verified against official/near-official sources, Aug 15 2026.
+
 | Role | Model | Why this one | $/1M in | $/1M out | Cached in |
 |---|---|---|---|---|---|
 | Director | **Gemini** (free tier) | 1M context for whole-GDD reads | $0 | $0 | — |
-| **Coder** | **Qwen3-Coder-Next** | Purpose-built coder; 92.7% tool-format following = parseable patches, fewer format retries | $0.11 | $0.80 | — |
-| QA (test authoring) | **DeepSeek V4 Flash** | Test code is code; 79% SWE-bench at $0.28 output; prefix cache eats context | $0.14 | $0.28 | $0.003 |
-| Auditor (while subscribed) | **Kimi K2.6** | Long-document review; sunk subscription = $0 marginal cash | $0.95 | $4.00 | $0.19 |
-| Auditor (post-downgrade) | **GLM-4.7** | Open-weights quality tier for review | $0.30 | $1.18 | $0.059 |
-| Escalation | **GLM-4.7** / DeepSeek V4 Pro | Hard bugs, shrunk context only | $0.30–0.44 | $0.87–1.18 | — |
-| Vision observer | **MiniMax M3** | Native multimodal, cheapest frontier-ish | $0.30 | $1.20 | — |
-| Triage | **Qwen3.5 Flash** | Cheapest input on market; classification needs no brains | $0.03 | $0.30 | — |
-| Art/Sound manifests | **Groq** (free tier) | JSON manifests are trivial | $0 | $0 | — |
-| Free-chain backbone | Groq → Cerebras → Gemini → GitHub Models → Mistral → OpenRouter | Development iteration at $0 | $0 | $0 | — |
+| **Coder** | **Qwen3-Coder 480B via OpenRouter** (`qwen/qwen3-coder:free`) | Purpose-built coder; free tier = 50 req/day, 1,000/day after one-time $10 credit purchase; OpenAI-compatible endpoint | $0 | $0 | — |
+| Coder (paid fallback) | **DeepSeek V4 Flash** | Verified: $0.14/$0.28, cache-hit $0.0028; 2,500 concurrency | $0.14 | $0.28 | $0.0028 |
+| QA (test authoring) | **DeepSeek V4 Flash** | Test code is code; prefix cache eats repeated context | $0.14 | $0.28 | $0.0028 |
+| Auditor (while subscribed) | **Kimi K2.6** | Long-document review; sunk subscription = $0 marginal cash | sub | sub | — |
+| Auditor (post-downgrade) | **GLM-4.7** (z.ai) | Verified: $0.60/$2.20, cached $0.11; free fallback GLM-4.7-Flash | $0.60 | $2.20 | $0.11 |
+| Escalation | **GLM-4.7** / DeepSeek V4 Pro | Hard bugs, shrunk context only; V4 Pro verified $0.435/$0.87, cache $0.003625 | $0.435–0.60 | $0.87–2.20 | — |
+| Vision observer | **GLM-4.6V-Flash** (z.ai, free) | Free vision model; paid fallback GLM-4.6V $0.30/$0.90 | $0 | $0 | — |
+| Triage | **Groq `llama-3.1-8b-instant`** (free) | Verified free tier: 30 RPM / 14,400 req/day; classification needs no brains | $0 | $0 | — |
+| Art/Sound manifests | **Groq** (free tier) | JSON manifests are trivial; `qwen/qwen3-32b` free at 60 RPM / 1,000 req/day | $0 | $0 | — |
+| Free-chain backbone | Groq → OpenRouter → Cerebras → Gemini → GitHub Models → Mistral | Development iteration at $0 | $0 | $0 | — |
+
+**Retired from routing (Aug 2026 verification):** Alibaba DashScope direct — the free Qwen OAuth tier ended April 15, 2026; Model Studio now requires a billing profile after the 90-day/1M-token starter quota. Qwen access runs through OpenRouter instead. MiniMax removed from vision duty — the M-series is text-only; z.ai's GLM-4.6V-Flash covers vision free.
 
 ### 8.2 Key sources
 
 | Provider | Key location |
 |---|---|
 | DeepSeek | platform.deepseek.com |
-| Qwen | Alibaba Model Studio / DashScope — **international endpoint** |
+| Qwen (via OpenRouter) | openrouter.ai — no card needed; one-time $10 credit purchase raises free-model limit from 50 → 1,000 req/day permanently |
 | Kimi | platform.moonshot.ai |
-| GLM | z.ai (international) |
-| MiniMax | platform.minimax.io |
+| GLM (text + vision) | z.ai (international) |
 | Gemini | Google AI Studio |
 | Groq / Cerebras / Mistral | respective consoles, free tiers |
-| OpenRouter | openrouter.ai (optional master router; $10 top-up raises free limits) |
 | GitHub Models | GitHub PAT |
-| fal.ai (art overflow) | fal.ai dashboard |
+| fal.ai (art overflow) | fal.ai dashboard — FLUX.2 [dev] verified $0.012/MP (~$0.013 per 1024×1024 image) |
 
 ### 8.3 Non-key components
 
@@ -392,21 +395,25 @@ With token rationing (§9.3): **~2.5M tokens/game**.
 | Role | Model | Tokens (in/out) | Cost |
 |---|---|---|---|
 | Director | Gemini free | 160k / 40k | $0.00 |
-| Coder | Qwen3-Coder-Next | 1.19M / 128k | $0.23 |
+| Coder | Qwen3-Coder via OpenRouter `:free` | 1.19M / 128k | $0.00 |
 | QA | DeepSeek V4 Flash (70% cached) | 210k / 75k | $0.03 |
-| Auditor | Kimi K2.6 (sunk sub) → GLM-4.7 later | 520k / 98k | $0.00 cash now / $0.18 later |
-| Escalation | GLM-4.7 | 80k / 15k | $0.04 |
-| Vision observer | MiniMax M3 | 100k / 12k | $0.04 |
-| Triage | Qwen3.5 Flash | 100k / 25k | $0.01 |
+| Auditor | Kimi K2.6 (sunk sub) → GLM-4.7 later | 520k / 98k | $0.00 cash now / $0.53 later |
+| Escalation | GLM-4.7 | 80k / 15k | $0.08 |
+| Vision observer | GLM-4.6V-Flash (free) | 100k / 12k | $0.00 |
+| Triage | Groq llama-3.1-8b-instant (free) | 100k / 25k | $0.00 |
 | Manifests | Groq free | 30k / 10k | $0.00 |
 
 ```text
-TODAY (Kimi subscribed):        $0.36 cash per finished game
-AFTER KIMI DOWNGRADE:           $0.54 per finished game
-Art (Kaggle free GPU):          $0.00     (paid fallback: ~$0.72 via fal.ai)
+TODAY (Kimi subscribed):        $0.11 cash per finished game
+  (+ one-time $10 OpenRouter credit purchase — unlocks 1,000 free
+   requests/day forever; the credits themselves barely get touched)
+AFTER KIMI DOWNGRADE:           $0.64 per finished game
+  (auditor moves to GLM-4.7 paid; swap to GLM-4.7-Flash free and
+   it drops back to ~$0.11 with a review-quality tradeoff)
+Art (Kaggle free GPU):          $0.00     (paid fallback: ~$0.75 via fal.ai FLUX.2 [dev])
 Audio (jsfxr/Kaggle):           $0.00
 Hosting / CI / QA infra:        $0.00
-ALL-PAID WORST CASE:            ~$1.26 per game
+ALL-PAID WORST CASE:            ~$0.80 per game
 FREE-CHAIN BEST CASE:           $0.00 per game (development pace)
 ```
 
@@ -415,8 +422,8 @@ FREE-CHAIN BEST CASE:           $0.00 per game (development pace)
 1. **Diff-only output contract** — Coder emits unified diffs, never whole files (output ~4.5k → ~1.5k/call)
 2. **Repo map, not repo** — precomputed index (~4k tokens) + max 2 target files per call
 3. **Log tails** — error context = last 50 lines; retries stop snowballing
-4. **Prefix caching** — identical role prompts/system context across calls; DeepSeek cache rate $0.003/M
-5. **Small model for triage, big model for surgery** — failure classification is a 2k-token Qwen3.5 Flash call
+4. **Prefix caching** — identical role prompts/system context across calls; DeepSeek cache-hit rate $0.0028/M (verified)
+5. **Small model for triage, big model for surgery** — failure classification is a 2k-token Groq `llama-3.1-8b-instant` call (free, 14,400 req/day)
 6. **Auditor evidence digests** — structured summaries, not raw Playwright traces
 7. **State summarization** — `STATE_SUMMARY.md` (~2k tokens) replaces raw `events.jsonl` reads
 
@@ -434,7 +441,7 @@ Sustained:    1–2 games/day free; ~30 games/month ≈ 152M tokens
 
 ```json
 {"ts": "2026-08-15T...", "task": "AC-004-door", "role": "coder",
- "provider": "dashscope", "model": "qwen3-coder-next",
+ "provider": "openrouter", "model": "qwen/qwen3-coder:free",
  "tokens_in": 13240, "tokens_out": 1180, "cached_in": 9268,
  "retry": 2, "escalated": false, "cost_usd": 0.0024}
 ```
@@ -502,7 +509,7 @@ LAYER 1 — Deterministic (free, local, instant)
   Scripted E2E: Playwright fake input + window.__game.state assertions
 
 LAYER 2 — AI observer (cheap, second opinion)
-  MiniMax M3 reviews screenshots/traces, classifies failures,
+  GLM-4.6V-Flash reviews screenshots/traces, classifies failures,
   proposes new edge-case scenarios
 
 LAYER 3 — Cert audit (adversarial, independent)
@@ -689,7 +696,7 @@ npm run build → dist/ → BVT gate → version bump (semver)
 - [ ] TEST_PLAN.md written: AC-001…AC-010 with verification methods
 - [ ] Backlog prioritized; dependencies mapped
 
-### 17.2 Mechanics (Coder: Qwen3-Coder-Next)
+### 17.2 Mechanics (Coder: Qwen3-Coder via OpenRouter)
 
 - [ ] Player movement (arrow keys) — AC-001
 - [ ] Wall collision — AC-002
@@ -705,7 +712,7 @@ npm run build → dist/ → BVT gate → version bump (semver)
 ### 17.3 Screens (greybox)
 
 - [ ] Title / Game Over / Victory / Pause — DOM overlay (GSAP) or Phaser scenes
-- [ ] Triage loop live: build failure → Qwen3.5 Flash classification → fix
+- [ ] Triage loop live: build failure → Groq llama-3.1-8b-instant classification → fix
 
 **Gate:** all 10 ACs implemented; BVT green; playable start-to-victory in placeholder art.
 
@@ -728,7 +735,7 @@ npm run build → dist/ → BVT gate → version bump (semver)
 
 ### 18.3 AI observer
 
-- [ ] MiniMax M3 reviews failure screenshots
+- [ ] GLM-4.6V-Flash reviews failure screenshots
 - [ ] Failure classification feeds triage
 - [ ] Edge-case scenario proposals → new test candidates
 
@@ -791,7 +798,7 @@ npm run build → dist/ → BVT gate → version bump (semver)
 
 - [ ] Cert summary (all ACs MET)
 - [ ] Known issues list
-- [ ] Ledger: actual cost vs. $0.36–0.54 model; routing table re-rank
+- [ ] Ledger: actual cost vs. $0.11–0.64 model; routing table re-rank
 
 **Gate:** playable on itch.io; audit trail complete; cost measured.
 
@@ -812,7 +819,7 @@ npm run build → dist/ → BVT gate → version bump (semver)
 
 | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|
-| Free-tier rate limits stall a run | High | Low | Rate-limit-aware scheduler; paid fallthrough ($0.36/game) |
+| Free-tier rate limits stall a run | High | Low | Rate-limit-aware scheduler; paid fallthrough ($0.11/game) |
 | Free tier terms change / shrink | Medium | Medium | Provider chain; paid backbone absorbs |
 | Kaggle quota or batch failure | Medium | Low | fal.ai fallback ~$0.72/game |
 | Model price hikes (DeepSeek warned) | Medium | Low | providers.json is config, not code |
