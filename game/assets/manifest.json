@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "notes": "Every asset carries provenance (model/tool + license). The Auditor checks this at cert time (roadmap §23). Phase 1 entries are greybox placeholders — Phase 5 replaces them behind this same manifest interface.",
+  "assets": [
+    {
+      "id": "tiles/greybox.png",
+      "kind": "tileset",
+      "source": "procedural (Pillow generator script, Phase 1 scaffold)",
+      "license": "project-internal",
+      "placeholder": true
+    },
+    {
+      "id": "sprites/player.png",
+      "kind": "sprite",
+      "source": "procedural (Pillow generator script, Phase 1 scaffold)",
+      "license": "project-internal",
+      "placeholder": true
+    },
+    {
+      "id": "maps/dungeon.json",
+      "kind": "tilemap",
+      "source": "exported from maps/dungeon.ldtk (LDtk, MIT)",
+      "license": "project-internal",
+      "placeholder": true
+    }
+  ]
+}

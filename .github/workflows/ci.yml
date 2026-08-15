@@ -7,7 +7,7 @@ on:
 
 jobs:
   bvt:
-    name: Build Verification (empty-build green)
+    name: Build Verification
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,11 +34,18 @@ jobs:
           fi
           echo "no .env tracked"
 
-      - name: Game build (skipped until Phase 1 scaffold exists)
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: game/package-lock.json
+
+      - name: Game build
+        working-directory: game
+        run: npm ci && npm run build-nolog
+
+      - name: Playwright BVT (Phase 1 gate: headless state assertions)
         working-directory: game
         run: |
-          if [ -f package.json ]; then
-            npm ci && npm run build
-          else
-            echo "no game scaffold yet (Phase 1) — empty build passes by definition"
-          fi
+          npx playwright install --with-deps chromium
+          npx playwright test
