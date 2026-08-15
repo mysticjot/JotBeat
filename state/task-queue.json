@@ -3,15 +3,151 @@
   "items": [
     {
       "id": "BL-001",
-      "title": "<title>",
+      "title": "Player Movement",
       "role": "coder",
-      "status": "BLOCKED_HUMAN",
-      "acceptance_ids": [],
+      "status": "BACKLOG",
+      "acceptance_ids": [
+        "AC-001"
+      ],
       "depends_on": [],
       "attempts": 0,
       "escalation_level": 0,
-      "artifacts": [],
-      "reason": ""
+      "artifacts": []
+    },
+    {
+      "id": "BL-002",
+      "title": "Wall Collision",
+      "role": "coder",
+      "status": "BACKLOG",
+      "acceptance_ids": [
+        "AC-002"
+      ],
+      "depends_on": [],
+      "attempts": 0,
+      "escalation_level": 0,
+      "artifacts": []
+    },
+    {
+      "id": "BL-003",
+      "title": "Key Pickup + Inventory",
+      "role": "coder",
+      "status": "BACKLOG",
+      "acceptance_ids": [
+        "AC-003"
+      ],
+      "depends_on": [
+        "BL-001"
+      ],
+      "attempts": 0,
+      "escalation_level": 0,
+      "artifacts": []
+    },
+    {
+      "id": "BL-004",
+      "title": "Locked Door Blocks Without Key",
+      "role": "coder",
+      "status": "BACKLOG",
+      "acceptance_ids": [
+        "AC-004"
+      ],
+      "depends_on": [
+        "BL-002",
+        "BL-003"
+      ],
+      "attempts": 0,
+      "escalation_level": 0,
+      "artifacts": []
+    },
+    {
+      "id": "BL-005",
+      "title": "Key Unlocks Door, Key Consumed",
+      "role": "coder",
+      "status": "BACKLOG",
+      "acceptance_ids": [
+        "AC-005"
+      ],
+      "depends_on": [
+        "BL-004"
+      ],
+      "attempts": 0,
+      "escalation_level": 0,
+      "artifacts": []
+    },
+    {
+      "id": "BL-006",
+      "title": "Exit Triggers Victory Scene",
+      "role": "coder",
+      "status": "BACKLOG",
+      "acceptance_ids": [
+        "AC-006"
+      ],
+      "depends_on": [
+        "BL-005"
+      ],
+      "attempts": 0,
+      "escalation_level": 0,
+      "artifacts": []
+    },
+    {
+      "id": "BL-007",
+      "title": "Game Over State",
+      "role": "coder",
+      "status": "BACKLOG",
+      "acceptance_ids": [
+        "AC-007"
+      ],
+      "depends_on": [
+        "BL-001"
+      ],
+      "attempts": 0,
+      "escalation_level": 0,
+      "artifacts": []
+    },
+    {
+      "id": "BL-008",
+      "title": "Pause Screen",
+      "role": "coder",
+      "status": "BACKLOG",
+      "acceptance_ids": [
+        "AC-008"
+      ],
+      "depends_on": [
+        "BL-001"
+      ],
+      "attempts": 0,
+      "escalation_level": 0,
+      "artifacts": []
+    },
+    {
+      "id": "BL-009",
+      "title": "HUD Key Count",
+      "role": "coder",
+      "status": "BACKLOG",
+      "acceptance_ids": [
+        "AC-009"
+      ],
+      "depends_on": [
+        "BL-003"
+      ],
+      "attempts": 0,
+      "escalation_level": 0,
+      "artifacts": []
+    },
+    {
+      "id": "BL-010",
+      "title": "Title Screen With Start Flow",
+      "role": "coder",
+      "status": "BACKLOG",
+      "acceptance_ids": [
+        "AC-010"
+      ],
+      "depends_on": [
+        "BL-006",
+        "BL-007"
+      ],
+      "attempts": 0,
+      "escalation_level": 0,
+      "artifacts": []
     }
   ]
 }
