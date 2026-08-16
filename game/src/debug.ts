@@ -29,6 +29,9 @@ declare global {
         __game: {
             state: DebugState;
             setSeed: (seed: string) => void;
+            /** Live Phaser.Game instance, set by StartGame (ADR-0001 extension:
+             *  scene-level QA assertions like HUD text need it). */
+            game?: unknown;
         };
     }
 }

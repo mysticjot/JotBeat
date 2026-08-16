@@ -36,7 +36,12 @@ const StartGame = (parent: string) => {
 
     installDebugHook();
 
-    return new Game({ ...config, parent });
+    const game = new Game({ ...config, parent });
+    //  QA hook extension (ADR-0001): the Phase 4 harness asserts against
+    //  state, but scene-level checks (HUD text objects, entity counts) need
+    //  the live instance — e.g. scene.getScene('Game').hudText.
+    (window as any).__game.game = game;
+    return game;
 
 }
 

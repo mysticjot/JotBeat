@@ -13,6 +13,7 @@ export class Game extends Scene
     private oxygen = 100;
     private oxygenTimer!: Phaser.Time.TimerEvent;
     private isPaused = false;
+    private hudText!: Phaser.GameObjects.Text;
 
     constructor ()
     {
@@ -99,6 +100,12 @@ export class Game extends Scene
             }
         });
 
+        // HUD: fixed to camera, top-left corner
+        this.hudText = this.add.text(10, 10, '', {
+            fontFamily: 'Arial', fontSize: 18, color: '#ffffff',
+            stroke: '#000000', strokeThickness: 4,
+        }).setScrollFactor(0).setDepth(1000);
+
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     }
@@ -118,6 +125,14 @@ export class Game extends Scene
         this.key.update();
         this.door.update();
         setPosition(this.player.x, this.player.y);
+        this.updateHud();
+    }
+
+    private updateHud (): void
+    {
+        const state = (window as any).__game?.state;
+        const keys = state?.inventory?.keys ?? 0;
+        this.hudText.setText(`Keys: ${keys}`);
     }
 
     private pauseGame (): void
