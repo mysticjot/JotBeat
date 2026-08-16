@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { setPosition, setScene, addToInventory, removeFromInventory, setVictory } from '../debug';
+import { setPosition, setScene, addToInventory, removeFromInventory, setVictory, setGameOver, setOxygen, debugSetOxygen } from '../debug';
 import { Player } from '../entities/Player';
 import { Key } from '../entities/Key';
 import { Door } from '../entities/Door';
@@ -10,6 +10,8 @@ export class Game extends Scene
     private key!: Key;
     private door!: Door;
     private doorOpened = false;
+    private oxygen = 100;
+    private oxygenTimer!: Phaser.Time.TimerEvent;
 
     constructor ()
     {
@@ -21,6 +23,9 @@ export class Game extends Scene
     create ()
     {
         setScene('Game');
+        setOxygen(100);
+        debugSetOxygen(100);
+        this.oxygen = 100;
 
         const map = this.make.tilemap({ key: 'dungeon' });
         const tiles = map.addTilesetImage('greybox', 'greybox');
@@ -60,6 +65,23 @@ export class Game extends Scene
         const exitZone = this.add.zone(exitTileCol * 32 + 16, exitTileRow * 32 + 16, 32, 32);
         this.physics.add.existing(exitZone, true);  // immovable static body
         this.physics.add.overlap(this.player, exitZone, this.triggerVictory, undefined, this);
+
+        // Oxygen timer: drain 1 unit per second. When it hits 0, game over.
+        this.oxygenTimer = this.time.addEvent({
+            delay: 1000,
+            callback: () => {
+                const query = new URLSearchParams(window.location.search);
+                const fastOxygen = query.get('fastOxygen');
+                const drainRate = fastOxygen === '1' ? 10 : 1;
+                this.oxygen = Math.max(0, this.oxygen - drainRate);
+                setOxygen(this.oxygen);
+                debugSetOxygen(this.oxygen);
+                if (this.oxygen <= 0) {
+                    this.triggerGameOver();
+                }
+            },
+            loop: true
+        });
 
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
@@ -107,8 +129,18 @@ export class Game extends Scene
             // The exit should only trigger after the door is unlocked/open.
             return;
         }
+        // Stop the oxygen timer when the game ends
+        this.oxygenTimer.remove();
         // Transition to the Victory scene and mark it in the debug state.
         setVictory();
         this.scene.start('Victory');
+    }
+
+    private triggerGameOver ()
+    {
+        // Stop the oxygen timer to prevent re-triggering
+        this.oxygenTimer.remove();
+        setGameOver();
+        this.scene.start('GameOver');
     }
 }

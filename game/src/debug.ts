@@ -55,9 +55,19 @@ export function setScene (scene: string): void
     state.scene = scene;
 }
 
+export function setOxygen (oxygen: number): void
+{
+    state.oxygen = Math.round(oxygen * 100) / 100;
+}
+
 export function setVictory (): void
 {
     state.scene = 'Victory';
+}
+
+export function setGameOver (): void
+{
+    state.scene = 'GameOver';
 }
 
 export function setPosition (x: number, y: number): void
@@ -88,4 +98,9 @@ export function removeFromInventory (item: string): void
 export function setDoorState (doorId: string, doorState: string): void
 {
     state.doors[doorId] = doorState;
+}
+
+export function debugSetOxygen (oxygen: number): void
+{
+    state.oxygen = Math.round(oxygen * 100) / 100;
 }
