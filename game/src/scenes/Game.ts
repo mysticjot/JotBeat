@@ -1,12 +1,14 @@
 import { Scene } from 'phaser';
-import { setPosition, setScene, addToInventory } from '../debug';
+import { setPosition, setScene, addToInventory, setDoorState, removeFromInventory } from '../debug';
 import { Player } from '../entities/Player';
 import { Key } from '../entities/Key';
+import { Door } from '../entities/Door';
 
 export class Game extends Scene
 {
     private player!: Player;
     private key!: Key;
+    private door!: Door;
 
     constructor ()
     {
@@ -18,6 +20,7 @@ export class Game extends Scene
     create ()
     {
         setScene('Game');
+        setDoorState('main', 'locked');
 
         const map = this.make.tilemap({ key: 'dungeon' });
         const tiles = map.addTilesetImage('greybox', 'greybox');
@@ -28,11 +31,17 @@ export class Game extends Scene
 
         this.player = new Player(this, 5 * 32 + 16, 5 * 32 + 16);
         // Place the key on a guaranteed floor tile at (9, 10) => pixel (304, 336)
-        // Map row 10 (0-indexed): data[10*30+9] = 1 (floor), far from the wall at col 10
         this.key = new Key(this, 9 * 32 + 16, 10 * 32 + 16);
+        // Place the locked door at tile (15, 10) => pixel (496, 336)
+        this.door = new Door(this, 15 * 32 + 16, 10 * 32 + 16);
+
+        // Ensure the door is positioned at the exact tile boundary so it fully blocks the tile
+        const doorBody = this.door.body as Phaser.Physics.Arcade.Body;
+        doorBody.setSize(32, 32);
+        doorBody.setOffset(0, 0);
 
         this.physics.add.collider(this.player, layer);
-        // Use overlap for pickup detection
+        this.physics.add.collider(this.player, this.door, this.openDoor, undefined, this);
         this.physics.add.overlap(this.player, this.key, this.pickUpKey, undefined, this);
 
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -45,6 +54,7 @@ export class Game extends Scene
     {
         this.player.update();
         this.key.update();
+        this.door.update();
         setPosition(this.player.x, this.player.y);
     }
 
@@ -55,5 +65,22 @@ export class Game extends Scene
         }
         key.destroy();
         addToInventory('keys');
+    }
+
+    private openDoor (player: Phaser.GameObjects.GameObject, door: Phaser.GameObjects.GameObject)
+    {
+        const doorSprite = door as Door;
+        if (doorSprite.active)
+        {
+            // Check if the player has a key
+            const state = (window as any).__game?.state;
+            if (state && state.inventory.keys > 0)
+            {
+                // Open the door and consume the key
+                door.destroy();
+                setDoorState('main', 'open');
+                removeFromInventory('keys');
+            }
+        }
     }
 }

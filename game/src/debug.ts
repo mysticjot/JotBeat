@@ -8,6 +8,8 @@ export interface DebugState {
     inventory: Record<string, number>;
     doors: Record<string, string>;
     seed: string;
+    oxygen: number;
+    paused: boolean;
 }
 
 const DEFAULT_SEED = 'jotbeat-default-seed';
@@ -18,6 +20,8 @@ const state: DebugState = {
     inventory: {},
     doors: {},
     seed: DEFAULT_SEED,
+    oxygen: 100,
+    paused: false,
 };
 
 declare global {
@@ -55,4 +59,28 @@ export function setPosition (x: number, y: number): void
 {
     state.position.x = Math.round(x * 100) / 100;
     state.position.y = Math.round(y * 100) / 100;
+}
+
+export function addToInventory (item: string): void
+{
+    if (state.inventory[item]) {
+        state.inventory[item]++;
+    } else {
+        state.inventory[item] = 1;
+    }
+}
+
+export function removeFromInventory (item: string): void
+{
+    if (state.inventory[item]) {
+        state.inventory[item]--;
+        if (state.inventory[item] === 0) {
+            delete state.inventory[item];
+        }
+    }
+}
+
+export function setDoorState (doorId: string, doorState: string): void
+{
+    state.doors[doorId] = doorState;
 }
