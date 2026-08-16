@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { setPosition, setScene, addToInventory, setDoorState, removeFromInventory } from '../debug';
+import { setPosition, setScene, addToInventory, removeFromInventory } from '../debug';
 import { Player } from '../entities/Player';
 import { Key } from '../entities/Key';
 import { Door } from '../entities/Door';
@@ -9,6 +9,7 @@ export class Game extends Scene
     private player!: Player;
     private key!: Key;
     private door!: Door;
+    private doorOpened = false;
 
     constructor ()
     {
@@ -20,7 +21,6 @@ export class Game extends Scene
     create ()
     {
         setScene('Game');
-        setDoorState('main', 'locked');
 
         const map = this.make.tilemap({ key: 'dungeon' });
         const tiles = map.addTilesetImage('greybox', 'greybox');
@@ -30,10 +30,13 @@ export class Game extends Scene
         map.setCollisionBetween(2, 2, true, false, 'Dungeon');
 
         this.player = new Player(this, 5 * 32 + 16, 5 * 32 + 16);
-        // Place the key on a guaranteed floor tile at (9, 10) => pixel (304, 336)
-        this.key = new Key(this, 9 * 32 + 16, 10 * 32 + 16);
-        // Place the locked door at tile (15, 10) => pixel (496, 336)
-        this.door = new Door(this, 15 * 32 + 16, 10 * 32 + 16);
+        // Key on the row-8 main corridor (fully open floor, crosses the
+        // col-9 wall strip through its only gap) — human-approved greybox
+        // layout fix: the old (9,10) spot wedged the door approach behind
+        // the col-10 wall column and blocked BL-005 twice.
+        this.key = new Key(this, 7 * 32 + 16, 8 * 32 + 16);
+        // Locked door further along the same corridor at tile (12, 8).
+        this.door = new Door(this, 12 * 32 + 16, 8 * 32 + 16);
 
         // Ensure the door is positioned at the exact tile boundary so it fully blocks the tile
         const doorBody = this.door.body as Phaser.Physics.Arcade.Body;
@@ -70,15 +73,15 @@ export class Game extends Scene
     private openDoor (player: Phaser.GameObjects.GameObject, door: Phaser.GameObjects.GameObject)
     {
         const doorSprite = door as Door;
-        if (doorSprite.active)
+        if (doorSprite.active && !this.doorOpened)
         {
             // Check if the player has a key
             const state = (window as any).__game?.state;
             if (state && state.inventory.keys > 0)
             {
                 // Open the door and consume the key
-                door.destroy();
-                setDoorState('main', 'open');
+                this.doorOpened = true;
+                doorSprite.open();
                 removeFromInventory('keys');
             }
         }

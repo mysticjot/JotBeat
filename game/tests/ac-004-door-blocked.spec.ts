@@ -1,27 +1,43 @@
 import { expect, test } from '@playwright/test';
 
 // AC-004: Locked door blocks the player when they have 0 keys.
-// The locked door is at tile (15, 10) => pixel (496, 336)
-// Player spawns at tile (5, 5), key at tile (9, 10)
-// This test must NOT pick up the key, so we take a route that avoids passing through the key tile.
+// The locked door is at tile (12, 8) => pixel (400, 272); key at (7, 8).
+// Player spawns at tile (5, 5).
+// This test must NOT pick up the key, so we route around the key tile.
 
-async function driveTo(page: any, tx: number, ty: number, budgetMs = 10000) {
+async function driveTo(page: any, tx: number, ty: number, budgetMs = 15000) {
+  // tx/ty in PIXELS. Corridor-safe: keeps the cross axis within 4px of the
+  // target line BEFORE and DURING dominant-axis travel, with press duration
+  // proportional to the remaining delta — coarse 150ms presses overshoot the
+  // ±8px usable band of a one-tile corridor and wedge the body on corners.
   const start = Date.now();
   let last = { x: NaN, y: NaN };
+  let stuckStreak = 0;
+  const pressMs = (delta: number) => Math.min(200, Math.max(30, Math.abs(delta) / 160 * 900));
   while (Date.now() - start < budgetMs) {
     const pos = await page.evaluate(() => (window as any).__game.state.position);
     const dx = tx - pos.x, dy = ty - pos.y;
-    if (Math.abs(dx) < 12 && Math.abs(dy) < 12) return;
-    const stuck = Math.abs(pos.x - last.x) < 1 && Math.abs(pos.y - last.y) < 1;
+    if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+    const immobile = Math.abs(pos.x - last.x) < 0.5 && Math.abs(pos.y - last.y) < 0.5;
+    stuckStreak = immobile ? stuckStreak + 1 : 0;
     last = pos;
     let key: string;
-    if (stuck || Math.abs(dx) > Math.abs(dy)) key = dx > 0 ? 'ArrowRight' : 'ArrowLeft';
-    if (!stuck && Math.abs(dy) >= Math.abs(dx)) key = dy > 0 ? 'ArrowDown' : 'ArrowUp';
-    if (stuck) key = Math.abs(dx) > Math.abs(dy)
-      ? (dy > 0 ? 'ArrowDown' : 'ArrowUp')
-      : (dx > 0 ? 'ArrowRight' : 'ArrowLeft');
+    let ms: number;
+    if (stuckStreak >= 2) {
+      key = Math.abs(dx) > Math.abs(dy)
+        ? (dy >= 0 ? 'ArrowDown' : 'ArrowUp')   // sidestep around the wall
+        : (dx >= 0 ? 'ArrowRight' : 'ArrowLeft');
+      ms = 120;
+      stuckStreak = 0;
+    } else if (Math.abs(dy) > 4) {
+      key = dy > 0 ? 'ArrowDown' : 'ArrowUp';
+      ms = pressMs(dy);
+    } else {
+      key = dx > 0 ? 'ArrowRight' : 'ArrowLeft';
+      ms = pressMs(dx);
+    }
     await page.keyboard.down(key!);
-    await page.waitForTimeout(150);
+    await page.waitForTimeout(ms);
     await page.keyboard.up(key!);
   }
   throw new Error(`driveTo(${tx},${ty}) timed out; ended at ${JSON.stringify(last)}`);
@@ -48,19 +64,18 @@ test.describe('AC-004', () => {
     const doors = await page.evaluate(() => ({ ...(window as any).__game.state.doors }));
     expect(doors.main).toBe('locked');
 
-    // Navigate to just above the locked door at (15, 10) via the safe top corridor:
-    // Route: up to row 2 (clear corridor), then right to column 15, then down to row 10.
-    // This avoids both the key tile at (9,10) and the wall column at x=10 (rows 4–6).
-    await driveTo(page, 5 * 32 + 16, 2 * 32 + 16);  // go straight up to the corridor
-    await driveTo(page, 15 * 32 + 16, 2 * 32 + 16); // go right along the top
-    await driveTo(page, 15 * 32 + 16, 9 * 32 + 16); // go down to row 9 (immediately above door)
+    // Navigate to just above the locked door at (12, 8) via the top corridor:
+    // up col 5 to row 2, right to col 12, down to row 7 — avoids the key at (7, 8).
+    await driveTo(page, 5 * 32 + 16, 2 * 32 + 16);  // up to the corridor
+    await driveTo(page, 12 * 32 + 16, 2 * 32 + 16); // right along the top
+    await driveTo(page, 12 * 32 + 16, 7 * 32 + 16); // down to row 7 (above door)
 
     // Verify we are directly above the door
     const aboveDoor = await page.evaluate(() => ({ ...(window as any).__game.state.position }));
-    expect(Math.abs(aboveDoor.x - (15 * 32 + 16))).toBeLessThan(12);
-    expect(Math.abs(aboveDoor.y - (9 * 32 + 16))).toBeLessThan(12);
+    expect(Math.abs(aboveDoor.x - (12 * 32 + 16))).toBeLessThan(12);
+    expect(Math.abs(aboveDoor.y - (7 * 32 + 16))).toBeLessThan(12);
 
-    // Attempt to walk down INTO the locked door tile (15, 10)
+    // Attempt to walk down INTO the locked door tile (12, 8)
     const before = await page.evaluate(() => ({ ...(window as any).__game.state.position }));
 
     await page.keyboard.down('ArrowDown');
@@ -69,12 +84,12 @@ test.describe('AC-004', () => {
 
     const after = await page.evaluate(() => ({ ...(window as any).__game.state.position }));
 
-    // Player should be blocked: y must not reach the door row (y < 10*32+16)
+    // Player should be blocked: y must not reach the door row (y < 8*32+16)
     // x stays centered on the column
     expect(after.x).toBeGreaterThanOrEqual(before.x - 5);
     expect(after.x).toBeLessThanOrEqual(before.x + 5);
     expect(after.y).toBeGreaterThanOrEqual(before.y - 5);
-    expect(after.y).toBeLessThan(10 * 32 + 16 - 12);  // definitely NOT past the door center
+    expect(after.y).toBeLessThan(8 * 32 + 16 - 12);  // definitely NOT past the door center
 
     // Door must still report 'locked'
     const doorsAfter = await page.evaluate(() => ({ ...(window as any).__game.state.doors }));

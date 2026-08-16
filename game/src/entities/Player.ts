@@ -14,6 +14,11 @@ export class Player extends Physics.Arcade.Sprite
         scene.physics.add.existing(this);
 
         this.setCollideWorldBounds(true);
+        // Body smaller than the 32px tile: a full-tile body has ZERO
+        // clearance in one-tile corridors — 2px of drift wedges it on the
+        // corner of a wall tile (blocked BL-005 thrice). 20px leaves 6px/side.
+        const body = this.body as Phaser.Physics.Arcade.Body;
+        body.setSize(20, 20);
         this.cursors = scene.input.keyboard!.createCursorKeys();
     }
 
