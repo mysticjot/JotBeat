@@ -20,6 +20,7 @@ ROLE_MODULE_NAMES = {
     "sound",
     "qa",
     "publisher",
+    "narrative",
 }
 
 

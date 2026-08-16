@@ -5,6 +5,10 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 ## [Unreleased]
 
 ### Added
+- Anti-slop enforcement chain (Creative Director directive, 2026-08-16): `studio/guardrails/slop_patterns.json` — vendored pattern list (banned phrases/words, structural regexes, 5-dimension scoring rubric) distilled from MIT-licensed stop-slop (Hardik Pandya) and no-ai-slop (Peter Yang), credited in-file; `studio/tools/slop.py` mechanical checker (zero API cost) + player-facing string collector; CANON exemption parsed from NARRATIVE_BIBLE.md verbatim lines.
+- Narrative Designer role activated (pulled from Phase 7): routing `narrative → glm-4.7 → glm-4.7-flash` (via new `jotbeat route add`), `studio/roles/narrative.py` (mechanical pre-check + judgment pass with slop patterns in its instructions), owns NARRATIVE_BIBLE.md and all player-facing text. First pass: `'You escaped!'` flagged CANON-VIOLATION → Victory card now carries the canon reveal line verbatim.
+- Auditor slop gate: mechanical check runs FIRST on every player-facing string — any match = FAILED verdict, line quoted, kicked back (no model call spent); strings then ride the LLM audit context for the judgment pass. Slop is a cert failure, same class as a broken AC.
+- `studio/test_slop_guardrails.py` (slop fails / voice line passes / patterns non-empty / canon exempt), wired into CI.
 - **SALTBOUND: The Sunken Seal** — title named (Creative Director, 2026-08-16). Title screen, GDD pitch (Maren, tide-thief, lungstone), and docs updated; visual baselines re-shot.
 - `docs/NARRATIVE_BIBLE.md` written from approved canon (the Drowning, Maren, the Curator, lungstone-as-oxygen-timer, Game 1 arc beats, saga spine, naming/voice rules). Awaits human approval before Phase 5 art starts.
 - Phase 4 QA harness (HANDOFF-PHASE4): Playwright viewport matrix (chromium desktop/tablet/mobile projects in `game/playwright.config.ts`); `jotbeat verify` runs the full matrix while the per-commit loop gate stays desktop-only for speed (`run_ac_suite(..., projects=None)`).

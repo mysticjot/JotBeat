@@ -1,0 +1,107 @@
+{
+  "_credit": "Pattern content extracted (not copied wholesale) from two MIT-licensed rulesets: stop-slop by Hardik Pandya (https://github.com/hardikpandya/stop-slop) and no-ai-slop by Peter Yang (https://github.com/petergyang/no-ai-slop). Both MIT. Vendored locally per Creative Director directive 2026-08-16 — never fetched at runtime. The governing test: if a line could appear in any AI-generated game ever made, it is slop.",
+  "canon_exemption": "Lines fixed verbatim as CANON in docs/NARRATIVE_BIBLE.md are exempt from every check (the reveal 'The door you opened wasn't the exit. It was the lock.' is canon, not a binary-contrast crutch). tools/slop.py loads the exemption list from the bible, not from memory.",
+  "banned_phrases": [
+    "ancient evil", "darkness stirs", "whispers of the deep", "destiny awaits",
+    "forgotten realm", "chosen one", "unspeakable force", "awakening power",
+    "here's the thing", "the uncomfortable truth is", "it turns out",
+    "let me be clear", "the truth is,", "i'll say it again",
+    "i'm going to be honest", "can we talk about", "here's the problem though",
+    "full stop.", "let that sink in", "this matters because", "make no mistake",
+    "here's why that matters", "game-changer", "deep dive", "take a step back",
+    "moving forward", "circle back", "on the same page",
+    "at its core", "in today's", "it's worth noting", "interestingly,",
+    "importantly,", "crucially,", "at the end of the day", "when it comes to",
+    "in a world where", "the reality is", "hint:", "plot twist", "spoiler:",
+    "you already know this", "x is a feature, not a bug",
+    "marks a pivotal moment", "stands as a testament", "a testament to",
+    "plays a vital role", "underscores its significance", "solidifies its position",
+    "experts agree", "studies show", "widely regarded as", "many argue",
+    "what nobody tells you", "what no one tells you", "the part everyone misses",
+    "what most people get wrong", "what if i told you", "think about it:",
+    "in conclusion", "the future isn't coming", "this changes everything",
+    "this is huge"
+  ],
+  "banned_words": [
+    "delve", "foster", "leverage", "utilize", "facilitate", "empower",
+    "streamline", "robust", "cutting-edge", "paradigm shift", "tapestry",
+    "realm", "beacon", "multifaceted", "meticulous", "intricate", "paramount",
+    "transformative", "elevate", "embark", "supercharge", "harness",
+    "ever-evolving"
+  ],
+  "structural_patterns": [
+    {
+      "name": "binary-contrast",
+      "regex": "\\b(?:not|isn't|is not|wasn't|was not)\\b[^.!?]{1,80}[.!?]\\s+(?:it'?s|it is|this is|that'?s|it was)\\b",
+      "fix": "State Y directly. Drop the negation.",
+      "sources": ["stop-slop/structures.md", "no-ai-slop/SKILL.md"]
+    },
+    {
+      "name": "negative-listing",
+      "regex": "\\bnot a\\b[^.!?]{1,60}[.!?]\\s*[^.!?]*\\bnot a\\b",
+      "fix": "Just say Z. The reader doesn't need the runway.",
+      "sources": ["stop-slop/structures.md", "no-ai-slop/SKILL.md"]
+    },
+    {
+      "name": "colon-reveal",
+      "regex": "[\\w'\\)]+:\\s+[a-z]",
+      "fix": "Colons are for lists, labels, quotes — not fake drama.",
+      "sources": ["no-ai-slop/SKILL.md"]
+    },
+    {
+      "name": "dramatic-fragment",
+      "regex": "\\bthat'?s it\\.|\\bthat'?s the whole|\\bthat’s the\\b",
+      "fix": "Complete sentences. Trust content over presentation.",
+      "sources": ["stop-slop/structures.md", "no-ai-slop/SKILL.md"]
+    },
+    {
+      "name": "staccato-drama",
+      "regex": "[.!?]\\s+And\\s+\\w+[^.!?]{0,40}[.!?]\\s+And\\s+",
+      "fix": "X. And Y. And Z. is manufactured profundity.",
+      "sources": ["stop-slop/structures.md"]
+    },
+    {
+      "name": "rhetorical-setup",
+      "regex": "\\bwhat if\\b[^.!?]{1,60}\\?\\s|self-answered question",
+      "fix": "Drop the setup and make the point.",
+      "sources": ["stop-slop/structures.md", "no-ai-slop/SKILL.md"]
+    },
+    {
+      "name": "em-dash-crutch",
+      "regex": "—",
+      "fix": "Use commas or periods. No em dashes in game copy.",
+      "sources": ["stop-slop/structures.md", "no-ai-slop/SKILL.md"]
+    },
+    {
+      "name": "false-agency",
+      "regex": "\\b(?:the decision|the culture|the conversation|the data|the market)\\s+(?:emerges?|shifts?|moves?|tells us|rewards?)\\b",
+      "fix": "Name the actor. Inanimate things don't do human verbs.",
+      "sources": ["stop-slop/structures.md"]
+    },
+    {
+      "name": "narrator-from-a-distance",
+      "regex": "\\b(?:nobody designed this|this is why|people tend to)\\b",
+      "fix": "Put the reader in the room, not above the scene.",
+      "sources": ["stop-slop/structures.md"]
+    },
+    {
+      "name": "wh-opener",
+      "regex": "^(?:what|when|where|which|who|why|how)\\s+(?:makes|is|if)\\b",
+      "fix": "Lead with the subject or the verb.",
+      "sources": ["stop-slop/structures.md"]
+    }
+  ],
+  "scoring_rubric": {
+    "source": "stop-slop/README.md",
+    "dimensions": [
+      {"name": "Directness", "question": "Statements or announcements?"},
+      {"name": "Rhythm", "question": "Varied or metronomic?"},
+      {"name": "Trust", "question": "Respects reader intelligence?"},
+      {"name": "Authenticity", "question": "Sounds human?"},
+      {"name": "Density", "question": "Anything cuttable?"}
+    ],
+    "scale": "1-10 per dimension",
+    "revise_below": 35,
+    "note": "LLM judgment pass scores this rubric; the mechanical regex pass runs first at zero API cost."
+  }
+}

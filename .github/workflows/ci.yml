@@ -65,6 +65,7 @@ jobs:
           python test_provider_cli.py
           python test_keys_cli.py
           python test_ui.py
+          python test_slop_guardrails.py
 
       - name: "Quality gate (AGENTS.md §6 — aislop errors=0, fallow dead-code/dupes clean)"
         run: |

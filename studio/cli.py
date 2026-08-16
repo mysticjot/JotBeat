@@ -486,6 +486,21 @@ def cmd_route_set(role: str, chain: list[str]) -> int:
     return 0
 
 
+def cmd_route_add(role: str, chain: list[str], max_in: int, max_out: int) -> int:
+    import models
+    from tools import routing as routing_mod
+
+    routing = models.load_routing()
+    try:
+        routing_mod.add_role(routing, role, chain, max_in, max_out)
+    except routing_mod.RoutingError as e:
+        print(f"refused: {e}")
+        return 1
+    _save_routing(routing)
+    print(f"role added: {role} -> {' -> '.join(chain)} (caps {max_in}/{max_out})")
+    return 0
+
+
 # ------------------------------------------------------- keys (Addendum B)
 # The human never edits .env by hand. Masked input, atomic writes,
 # git-ignore guard — all enforced in tools/keys.py (shared with the UI).
@@ -629,6 +644,11 @@ def main(argv: list[str] | None = None) -> int:
     p_rset = route_sub.add_parser("set", help="replace a role's provider chain")
     p_rset.add_argument("role")
     p_rset.add_argument("providers", nargs="+")
+    p_radd = route_sub.add_parser("add", help="register a NEW role with chain + caps")
+    p_radd.add_argument("role")
+    p_radd.add_argument("providers", nargs="+")
+    p_radd.add_argument("--max-in", type=int, default=8000)
+    p_radd.add_argument("--max-out", type=int, default=2000)
 
     p_keys = sub.add_parser(
         "keys", help="manage .env keys (masked, atomic, git-ignore guarded)"
@@ -682,6 +702,8 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_provider_test(args.name)
     if args.command == "route" and args.route_command == "set":
         return cmd_route_set(args.role, args.providers)
+    if args.command == "route" and args.route_command == "add":
+        return cmd_route_add(args.role, args.providers, args.max_in, args.max_out)
     if args.command == "keys":
         if args.keys_command == "set":
             return cmd_keys_set(args.name)

@@ -16,6 +16,7 @@
 | auditor | 17,000 | 1,500 | receives evidence digests, never raw traces |
 | escalation | 17,000 | 4,500 | frontier model with shrunk context |
 | vision | 8,000 | 1,000 | screenshot review |
+| narrative | 8,000 | 2,000 | owns NARRATIVE_BIBLE.md + all player-facing text (CD directive 2026-08-16) |
 | publisher | 5,000 | 1,000 | |
 | producer | 4,000 | 1,000 | cost accounting, cap enforcement |
 | triage | 4,000 | 1,000 | cheapest classification model |

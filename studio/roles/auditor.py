@@ -36,6 +36,30 @@ def _ac_prose(acceptance_ids: list[str]) -> str:
 def audit(task: dict, build: dict, qa: dict) -> dict:
     """Return {"status": MET|FAILED|UNVERIFIED|SKIPPED, "evidence": [...],
     "patch_instructions": str}."""
+    from tools.slop import check_string, collect_strings
+
+    # SLOP GATE (Creative Director directive 2026-08-16): slop is a cert
+    # failure, same class as a broken AC. Mechanical pass FIRST — zero API
+    # cost. Any player-facing string matching the vendored pattern list =
+    # FAILED, offending line quoted, before the model is even called.
+    strings = collect_strings()
+    slop_hits = [
+        {"string": i["string"], "at": f"{i['file']}:{i['line']}", "findings": check_string(i["string"])}
+        for i in strings
+    ]
+    slop_hits = [h for h in slop_hits if h["findings"]]
+    if slop_hits:
+        quotes = "; ".join(f'"{h["string"]}" at {h["at"]} ({h["findings"][0]["pattern"]})' for h in slop_hits)
+        return {
+            "status": "FAILED",
+            "evidence": [f"slop gate: {len(slop_hits)} player-facing string(s) failed the mechanical check"],
+            "patch_instructions": (
+                f"SLOP — rewrite these player-facing strings (owner: narrative role): {quotes}. "
+                "Standard: studio/prompts/slop-standard.md; patterns: studio/guardrails/slop_patterns.json."
+            ),
+            "model_response": "[mechanical slop gate — no model call spent]",
+        }
+
     context = [
         f"task id: {task['id']}",
         f"acceptance criteria text:\n{_ac_prose(task.get('acceptance_ids', []))}",
@@ -45,10 +69,20 @@ def audit(task: dict, build: dict, qa: dict) -> dict:
         # hallucinate patch instructions. Tail-capped to keep context lean.
         f"build log tail:\n{build.get('log_tail', '')[-1200:]}",
         f"qa log tail:\n{qa.get('log_tail', '')[-1500:]}",
+        # LLM slop judgment pass: what the mechanical list can't catch
+        # (generic fantasy cadence, 'any AI game ever made' test). Canon-
+        # exempt lines are already filtered by tools/slop.
+        "player-facing strings (passed the mechanical slop screen; judge "
+        "these against the voice guide: spare, salt-rough, short "
+        "declaratives — if any reads as generic AI game output, verdict "
+        "FAILED and quote it in Patch):\n"
+        + "\n".join(f'- "{i["string"]}" ({i["file"]}:{i["line"]})' for i in strings),
     ]
     instructions = (
         "You are the JotBeat Auditor. You never saw the implementer's notes. "
         "Issue a verdict per acceptance criterion from the evidence only. "
+        "Slop is a cert failure, same class as a broken AC: any player-facing "
+        "string reading as generic AI output = FAILED, offending line quoted. "
         "Reply with EXACTLY this format, in this order:\n"
         "Reasoning: <one or two sentences grounded in the log tails above>\n"
         "Verdict: MET | FAILED | UNVERIFIED | SKIPPED\n"

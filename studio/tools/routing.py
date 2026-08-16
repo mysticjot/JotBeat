@@ -289,6 +289,32 @@ def remove_provider(routing: dict, name: str) -> None:
     del routing["providers"][name]
 
 
+def add_role(
+    routing: dict, role: str, chain: list[str], max_in: int, max_out: int
+) -> None:
+    """Register a NEW role with its chain and token caps. Refuses to
+    overwrite an existing role — re-chain those with set_role_chain."""
+    role = (role or "").strip()
+    if not role:
+        raise RoutingError("role name required")
+    if role in routing["roles"]:
+        raise RoutingError(
+            f"role '{role}' already exists — use route set to re-chain it"
+        )
+    missing = [n for n in chain if n not in routing["providers"]]
+    if missing:
+        raise RoutingError(f"unknown providers: {', '.join(missing)}")
+    if not chain:
+        raise RoutingError("chain must name at least one provider")
+    if max_in <= 0 or max_out <= 0:
+        raise RoutingError("token caps must be positive")
+    routing["roles"][role] = {
+        "chain": list(chain),
+        "max_tokens_in": max_in,
+        "max_tokens_out": max_out,
+    }
+
+
 def set_role_chain(routing: dict, role: str, chain: list[str]) -> list[str]:
     """Replace a role's chain. Returns diversification warnings (allowed)."""
     if role not in routing["roles"]:

@@ -21,7 +21,9 @@ export class Victory extends Scene
             stroke: '#0d0812', strokeThickness: 8,
         }).setOrigin(0.5);
 
-        const hint = this.add.text(320, 300, 'You escaped!', {
+        //  CANON (NARRATIVE_BIBLE.md, Game 1 arc beat 5) — fixed verbatim by
+        //  the Creative Director; narrative role owns this text. Do not edit.
+        const hint = this.add.text(320, 300, "The door you opened wasn't the exit. It was the lock.", {
             fontFamily: 'Arial', fontSize: 24, color: '#8f6b3a',
         }).setOrigin(0.5);
     }

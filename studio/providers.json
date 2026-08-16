@@ -338,6 +338,14 @@
       ],
       "max_tokens_in": 8000,
       "max_tokens_out": 2000
+    },
+    "narrative": {
+      "chain": [
+        "glm-4.7",
+        "glm-4.7-flash"
+      ],
+      "max_tokens_in": 8000,
+      "max_tokens_out": 2000
     }
   },
   "free_chain": [
