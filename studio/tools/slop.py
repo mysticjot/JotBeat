@@ -16,7 +16,9 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-PATTERNS_FILE = Path(__file__).resolve().parent.parent / "guardrails" / "slop_patterns.json"
+PATTERNS_FILE = (
+    Path(__file__).resolve().parent.parent / "guardrails" / "slop_patterns.json"
+)
 BIBLE_FILE = ROOT / "docs" / "NARRATIVE_BIBLE.md"
 GAME_SRC = ROOT / "game" / "src"
 
@@ -58,14 +60,20 @@ def check_string(s: str) -> list[dict]:
     for phrase in pats["banned_phrases"]:
         if phrase in low:
             findings.append(
-                {"pattern": "banned-phrase", "match": phrase,
-                 "fix": "Banned outright (slop_patterns.json)."}
+                {
+                    "pattern": "banned-phrase",
+                    "match": phrase,
+                    "fix": "Banned outright (slop_patterns.json).",
+                }
             )
     for word in pats["banned_words"]:
         if re.search(rf"\b{re.escape(word)}\b", low):
             findings.append(
-                {"pattern": "banned-word", "match": word,
-                 "fix": "Banned outright (slop_patterns.json)."}
+                {
+                    "pattern": "banned-word",
+                    "match": word,
+                    "fix": "Banned outright (slop_patterns.json).",
+                }
             )
     for sp in pats["structural_patterns"]:
         m = re.search(sp["regex"], s, re.IGNORECASE | re.MULTILINE)

@@ -12,7 +12,7 @@ Status: **Pre-production — Phase 0 (Foundation) complete.** See `JotBeat-Studi
 game/        Phaser 4 + TypeScript game (Phase 1+)
 studio/      Orchestration system (Python) — cli.py, providers.json, templates/
 docs/        The codified context: GDD, TEST_PLAN, ART_BIBLE, NARRATIVE_BIBLE,
-             BACKLOG, ADR, BUDGET, CHANGELOG
+             BACKLOG, ADR, DECISIONS, STUDIO_STATE, BUDGET, CHANGELOG
 state/       project-state.json, task-queue.json, events.jsonl (ledger)
 artifacts/   screenshots, audio, builds, traces (git-lfs)
 reports/     bvt, regression, cert, triage

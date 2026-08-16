@@ -23,7 +23,10 @@ FAILED = []
 
 
 def check(label: str, cond: bool, detail: str = "") -> None:
-    print(f"  {'PASS' if cond else 'FAIL'}  {label}" + (f"  ({detail})" if detail and not cond else ""))
+    print(
+        f"  {'PASS' if cond else 'FAIL'}  {label}"
+        + (f"  ({detail})" if detail and not cond else "")
+    )
     if not cond:
         FAILED.append(label)
 

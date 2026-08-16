@@ -34,7 +34,9 @@ def _load_prompts() -> tuple[str, str, str]:
         p = PROMPTS / name
         return p.read_text(encoding="utf-8") if p.exists() else ""
 
-    bible = Path(__file__).resolve().parent.parent.parent / "docs" / "NARRATIVE_BIBLE.md"
+    bible = (
+        Path(__file__).resolve().parent.parent.parent / "docs" / "NARRATIVE_BIBLE.md"
+    )
     return (
         read("narrative.md"),
         read("slop-standard.md"),
@@ -46,9 +48,7 @@ def review_strings(strings: list[str], task_id: str = "NARRATIVE-REVIEW") -> dic
     """Review player-facing strings. Mechanical pass first; anything the
     mechanical pass flags is reported WITHOUT spending a model call (it is
     already dead). Clean strings go to the judgment pass."""
-    mechanical = {
-        s: check_string(s) for s in strings
-    }
+    mechanical = {s: check_string(s) for s in strings}
     flagged = {s: f for s, f in mechanical.items() if f}
     clean = [s for s in strings if not mechanical[s]]
 
@@ -58,15 +58,20 @@ def review_strings(strings: list[str], task_id: str = "NARRATIVE-REVIEW") -> dic
         import json
 
         patterns = json.loads(
-            (PROMPTS.parent / "guardrails" / "slop_patterns.json").read_text(encoding="utf-8")
+            (PROMPTS.parent / "guardrails" / "slop_patterns.json").read_text(
+                encoding="utf-8"
+            )
         )
         instructions = (
             narrative_prompt
-            + "\n\n--- SLOP STANDARD ---\n" + slop_standard
+            + "\n\n--- SLOP STANDARD ---\n"
+            + slop_standard
             + "\n\n--- MACHINE PATTERN LIST (already applied mechanically; your job "
-              "is what it cannot catch — voice, generic fantasy cadence, "
-              "'any AI game ever made' test) ---\n"
-            + json.dumps({k: patterns[k] for k in ("banned_phrases", "banned_words")}, indent=1)
+            "is what it cannot catch — voice, generic fantasy cadence, "
+            "'any AI game ever made' test) ---\n"
+            + json.dumps(
+                {k: patterns[k] for k in ("banned_phrases", "banned_words")}, indent=1
+            )
             + "\n--- SCORING RUBRIC ---\n"
             + json.dumps(patterns["scoring_rubric"], indent=1)
         )
@@ -76,7 +81,9 @@ def review_strings(strings: list[str], task_id: str = "NARRATIVE-REVIEW") -> dic
             "--- STRINGS UNDER REVIEW ---",
             *[f"STRING: {s}" for s in clean],
         ]
-        text = ModelAdapter("narrative").complete(instructions, context, task_id=task_id)
+        text = ModelAdapter("narrative").complete(
+            instructions, context, task_id=task_id
+        )
         # Parse STRING/VERDICT/FIX blocks; match back to input strings by
         # quoted content so reordering can't silently misassign a verdict.
         by_string: dict[str, dict] = {}
@@ -88,15 +95,24 @@ def review_strings(strings: list[str], task_id: str = "NARRATIVE-REVIEW") -> dic
                 **({"fix": fix} if fix and m.group(2).upper() != "APPROVED" else {}),
             }
         for s in clean:
-            judgments[s] = by_string.get(s) or by_string.get(s.replace("${keys}", "1")) \
+            judgments[s] = (
+                by_string.get(s)
+                or by_string.get(s.replace("${keys}", "1"))
                 or {"verdict": "UNPARSED", "raw_tail": text[-400:]}
+            )
     elif clean:
         head = load_routing()["roles"]["narrative"]["chain"][0]
         log_call(
-            task_id=task_id, role="narrative", provider=head,
+            task_id=task_id,
+            role="narrative",
+            provider=head,
             model=load_routing()["providers"][head]["model"],
-            tokens_in=sum(len(s) for s in clean) // 4, tokens_out=8,
-            cached_in=0, retry=0, escalated=False, latency_ms=0,
+            tokens_in=sum(len(s) for s in clean) // 4,
+            tokens_out=8,
+            cached_in=0,
+            retry=0,
+            escalated=False,
+            latency_ms=0,
         )
         for s in clean:
             judgments[s] = {"verdict": "UNVERIFIED", "note": "no active providers"}

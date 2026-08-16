@@ -7,6 +7,7 @@ Commands:
     plan      parse docs/BACKLOG.md into state/task-queue.json
     run-next  run the orchestrator graph over ready backlog items
     verify    deterministic BVT + scripted QA (no model calls)
+    export    web zip + Electron/Capacitor shells into dist/ (DECISIONS D-0001)
     report    ledger cost report (per role, per provider, per verified task)
     provider  list / add / remove / test provider entries
     route     set a role's provider chain
@@ -556,6 +557,17 @@ def cmd_ui() -> int:
     return 0
 
 
+# ------------------------------------------------------- export contract (D-0001)
+
+
+def cmd_export() -> int:
+    """Web zip + desktop/mobile shells into dist/ (docs/DECISIONS.md D-0001)."""
+    import os
+    from tools.export import run_export
+
+    return run_export(os.environ.get("JOTBEAT_EXPORT_WRAPPERS", "1") != "0")
+
+
 # ------------------------------------------------------- quality gate (AGENTS.md §6)
 
 
@@ -583,6 +595,10 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("plan", help="parse docs/BACKLOG.md into the task queue")
     sub.add_parser("run-next", help="run the orchestrator over ready tasks")
     sub.add_parser("verify", help="deterministic BVT + scripted QA (no models)")
+    sub.add_parser(
+        "export",
+        help="export contract: dist/web zip + Electron/Capacitor shells (D-0001)",
+    )
     sub.add_parser("report", help="ledger cost report")
 
     p_prov = sub.add_parser(
@@ -689,6 +705,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_run_next()
     if args.command == "verify":
         return cmd_verify()
+    if args.command == "export":
+        return cmd_export()
     if args.command == "report":
         return cmd_report()
     if args.command == "provider":

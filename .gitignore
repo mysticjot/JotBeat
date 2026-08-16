@@ -6,6 +6,7 @@
 # Node / game build
 node_modules/
 dist/
+mobile/android/
 
 # Python
 __pycache__/

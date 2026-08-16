@@ -10,11 +10,18 @@
   // game/assets/style.css at runtime and lands in dist/. Fallow can't see the
   // publicDir mapping — suppress the false-positive pair.
   "ignoreUnresolvedImports": ["/style.css"],
-  "ignoreFindings": ["game/assets/style.css"],
+  // platform/ is the D-0002 adapter seam: wrappers inject implementations at
+  // boot; no game feature consumes it yet, so the graph has no edge to it.
+  // The unused-file finding is expected until the first platform feature lands.
+  "ignoreFindings": ["game/assets/style.css", "game/src/platform/index.ts"],
   // DebugState is the pinned Phase-4 QA contract (ADR-0001): consumed by the
   // Playwright harness via window.__game.state, not by TS imports. Keep exported.
+  // platform/ is the D-0002 wrapper seam: wrappers (Electron/Capacitor) inject
+  // implementations at boot; game code imports it only when a feature needs it.
   "ignoreExports": [
-    { "file": "game/src/debug.ts", "exports": ["DebugState"] }
+    { "file": "game/src/debug.ts", "exports": ["DebugState"] },
+    { "file": "game/src/platform/index.ts",
+      "exports": ["PlatformAdapter", "setPlatformAdapter", "save", "load", "requestFullscreen", "haptic"] }
   ],
   "duplicates": {
     // Hide pair-only clones; focus on widespread copy-paste worth refactoring.

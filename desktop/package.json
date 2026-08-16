@@ -1,0 +1,13 @@
+{
+  "name": "jotbeat-desktop",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SALTBOUND desktop shell — Electron wrapper around dist/web (D-0002)",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}

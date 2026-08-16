@@ -44,15 +44,24 @@ def audit(task: dict, build: dict, qa: dict) -> dict:
     # FAILED, offending line quoted, before the model is even called.
     strings = collect_strings()
     slop_hits = [
-        {"string": i["string"], "at": f"{i['file']}:{i['line']}", "findings": check_string(i["string"])}
+        {
+            "string": i["string"],
+            "at": f"{i['file']}:{i['line']}",
+            "findings": check_string(i["string"]),
+        }
         for i in strings
     ]
     slop_hits = [h for h in slop_hits if h["findings"]]
     if slop_hits:
-        quotes = "; ".join(f'"{h["string"]}" at {h["at"]} ({h["findings"][0]["pattern"]})' for h in slop_hits)
+        quotes = "; ".join(
+            f'"{h["string"]}" at {h["at"]} ({h["findings"][0]["pattern"]})'
+            for h in slop_hits
+        )
         return {
             "status": "FAILED",
-            "evidence": [f"slop gate: {len(slop_hits)} player-facing string(s) failed the mechanical check"],
+            "evidence": [
+                f"slop gate: {len(slop_hits)} player-facing string(s) failed the mechanical check"
+            ],
             "patch_instructions": (
                 f"SLOP — rewrite these player-facing strings (owner: narrative role): {quotes}. "
                 "Standard: studio/prompts/slop-standard.md; patterns: studio/guardrails/slop_patterns.json."

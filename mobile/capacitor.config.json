@@ -1,0 +1,6 @@
+{
+  "appId": "com.jotbeat.saltbound",
+  "appName": "SALTBOUND",
+  "webDir": "../dist/web",
+  "backgroundColor": "#0d0d0d"
+}

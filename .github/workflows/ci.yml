@@ -42,20 +42,28 @@ jobs:
           cache: npm
           cache-dependency-path: game/package-lock.json
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
       - name: Game build
         working-directory: game
         run: npm ci && npm run build-nolog
+
+      - name: "Export contract (D-0001 — web zip; wrappers scaffold-only in CI)"
+        env:
+          JOTBEAT_EXPORT_WRAPPERS: "0"
+        run: |
+          python studio/cli.py export
+          test -s dist/web/jotbeat-web.zip || { echo "dist/web/jotbeat-web.zip missing or empty"; exit 1; }
+          echo "web zip OK"
 
       - name: "Playwright BVT (Phase 1 gate — headless state assertions)"
         working-directory: game
         run: |
           npx playwright install --with-deps chromium
           npx playwright test
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
 
       - name: "Orchestrator live graph test (Phase 2 gate)"
         working-directory: studio

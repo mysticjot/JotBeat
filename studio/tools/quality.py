@@ -58,6 +58,14 @@ def _run(
 
 def run_quality(root: Path) -> int:
     """Run all quality gates. Returns 0 on pass, 1 on any failure."""
+    import sys
+
+    # Windows consoles are cp1252; fallow's report output is UTF-8 with
+    # box-drawing chars. Replace what the console can't encode instead of
+    # crashing mid-report (same class as the tools/shell.py cp1252 fix).
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(errors="replace")
+
     root = Path(root)
     failures: list[str] = []
 
