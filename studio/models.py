@@ -70,9 +70,12 @@ class ModelAdapter:
         task_id: str,
         output_schema: dict | None = None,
         escalation_level: int = 0,
+        images: list | None = None,
     ) -> str:
         prompt_in = instructions + "\n\n" + "\n\n".join(context)
         est_in = len(prompt_in) // 4  # rough token estimate; provider returns exact
+        # Images price by tiles, not characters — budget a flat 1000/image.
+        est_in += 1000 * len(images or [])
         if est_in > self.cap_in:
             raise BudgetExceeded(
                 f"[{self.role}] ~{est_in} input tokens exceeds cap {self.cap_in}. "
@@ -88,7 +91,9 @@ class ModelAdapter:
         for provider in chain:
             t0 = time.time()
             try:
-                resp = self._call(provider, instructions, context, output_schema)
+                resp = self._call(
+                    provider, instructions, context, output_schema, images
+                )
                 log_call(
                     task_id=task_id,
                     role=self.role,
@@ -124,36 +129,60 @@ class ModelAdapter:
                 continue
         raise AllProvidersExhausted(f"[{self.role}] all providers failed: {last_err}")
 
-    def _call(self, provider, instructions, context, output_schema) -> dict:
+    def _call(
+        self, provider, instructions, context, output_schema, images=None
+    ) -> dict:
         """Dispatch on the provider's API FAMILY — never on its name.
         Any OpenAI-compatible endpoint (hosted or self-hosted) is config-only."""
         family = provider.get("family")
         if family == "google":
+            if images:
+                raise AllProvidersExhausted(
+                    f"{provider['name']}: google family has no image path — "
+                    "route vision through an OpenAI-compatible provider"
+                )
             return self._call_google(provider, instructions, context)
         if family == "openai":
             return self._call_openai_compatible(
-                provider, instructions, context, output_schema
+                provider, instructions, context, output_schema, images
             )
         raise AllProvidersExhausted(
             f"{provider['name']}: unsupported or missing family {family!r}"
         )
 
     def _call_openai_compatible(
-        self, provider, instructions, context, output_schema
+        self, provider, instructions, context, output_schema, images=None
     ) -> dict:
         """One httpx client for every OpenAI-compatible endpoint —
-        base_url + env key swapped, nothing else."""
+        base_url + env key swapped, nothing else. `images` (file paths) become
+        base64 data-URI content parts (OpenAI vision message shape)."""
+        import base64
         import httpx
 
-        api_key = os.environ.get(provider["env_key"]) if provider.get("env_key") else None
+        api_key = (
+            os.environ.get(provider["env_key"]) if provider.get("env_key") else None
+        )
         if not api_key and not provider.get("free"):
             raise AllProvidersExhausted(f"missing env key {provider['env_key']}")
+
+        user_content: object = "\n\n".join(context)
+        if images:
+            parts: list[dict] = [{"type": "text", "text": "\n\n".join(context)}]
+            for img in images:
+                data = base64.b64encode(Path(img).read_bytes()).decode()
+                parts.append(
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/png;base64,{data}"},
+                    }
+                )
+            user_content = parts
 
         body: dict = {
             "model": provider["model"],
             "messages": [
                 {"role": "system", "content": instructions},
-                {"role": "user", "content": "\n\n".join(context)},
+                {"role": "user", "content": user_content},
             ],
             "max_tokens": self.cap_out,
         }
@@ -193,15 +222,13 @@ class ModelAdapter:
         # truncation/refusal — normalize; an empty completion is a failed
         # call so the chain falls through to the next provider.
         if isinstance(content, list):
-            content = "".join(
-                p.get("text", "") for p in content if isinstance(p, dict)
-            )
+            content = "".join(p.get("text", "") for p in content if isinstance(p, dict))
         if not content:
             ch0 = data["choices"][0]
             reasoning = ch0.get("message", {}).get("reasoning_content")
             hint = (
                 "reasoning model exhausted max_tokens on thinking — "
-                "disable thinking via the provider's \"body\" config"
+                'disable thinking via the provider\'s "body" config'
                 if reasoning
                 else "truncation or refusal"
             )

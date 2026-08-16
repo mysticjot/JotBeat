@@ -12,9 +12,7 @@ import re
 from ledger import log_call
 from models import ModelAdapter, active_providers, load_routing
 
-VERDICT_RE = re.compile(
-    r"verdict:\s*(MET|FAILED|UNVERIFIED|SKIPPED)", re.IGNORECASE
-)
+VERDICT_RE = re.compile(r"verdict:\s*(MET|FAILED|UNVERIFIED|SKIPPED)", re.IGNORECASE)
 PATCH_RE = re.compile(r"patch:\s*(.+)", re.IGNORECASE | re.DOTALL)
 
 AC_BLOCK_RE = re.compile(r"^## (AC-\d+):.*?(?=^## |\Z)", re.MULTILINE | re.DOTALL)

@@ -145,13 +145,19 @@ def main() -> int:
         # Keyless preset path (litellm — no server probe, CI-safe): preset
         # auto-fills, entry needs no env key, remove succeeds unchained.
         r = run("provider", "add", "litellm", "--model", "dummy-7b")
-        check("keyless preset add exits 0", r.returncode == 0, (r.stdout + r.stderr)[-300:])
+        check(
+            "keyless preset add exits 0",
+            r.returncode == 0,
+            (r.stdout + r.stderr)[-300:],
+        )
         entry = json.loads(PROVIDERS.read_text(encoding="utf-8"))["providers"].get(
             "litellm"
         )
         check(
             "keyless entry has empty env_key and free=true",
-            entry is not None and entry.get("env_key") == "" and entry.get("free") is True,
+            entry is not None
+            and entry.get("env_key") == ""
+            and entry.get("free") is True,
         )
         r = run("provider", "remove", "litellm")
         check("keyless remove succeeds", r.returncode == 0, r.stdout[-200:])

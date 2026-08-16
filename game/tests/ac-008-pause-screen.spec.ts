@@ -130,8 +130,19 @@ test.describe('AC-008 Pause Screen', () => {
     // Move to a safe open area (tile 3,7)
     await driveTo(page, 3 * 32 + 16, 7 * 32 + 16);
 
-    // Record starting position
-    const startPos = await page.evaluate(() => ({ ...(window as any).__game.state.position }));
+    // Let residual velocity flush before sampling: state.position is only
+    // refreshed on unpaused update() frames, so one post-keyup physics step
+    // can still move the player after driveTo returns (TRIAGE-0001 — the
+    // drift happens BEFORE pause, not during it; the world is genuinely
+    // frozen while paused). Sample until two reads 200ms apart match, then
+    // startPos is a stable reference and exact equality below is meaningful.
+    let startPos = await page.evaluate(() => ({ ...(window as any).__game.state.position }));
+    for (let i = 0; i < 10; i++) {
+      await page.waitForTimeout(200);
+      const cur = await page.evaluate(() => ({ ...(window as any).__game.state.position }));
+      if (cur.x === startPos.x && cur.y === startPos.y) break;
+      startPos = cur;
+    }
 
     // Press Spacebar to pause
     await page.keyboard.press('Space');

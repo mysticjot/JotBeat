@@ -574,14 +574,14 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
                         family=pick("family"),
                         tier=pick("tier"),
                         price_in=body.get("price_in")
-                            if body.get("price_in") is not None
-                            else pf.get("price_in", 0.0),
+                        if body.get("price_in") is not None
+                        else pf.get("price_in", 0.0),
                         price_out=body.get("price_out")
-                            if body.get("price_out") is not None
-                            else pf.get("price_out", 0.0),
+                        if body.get("price_out") is not None
+                        else pf.get("price_out", 0.0),
                         price_cached_in=body.get("price_cached_in")
-                            if body.get("price_cached_in") is not None
-                            else pf.get("price_cached_in"),
+                        if body.get("price_cached_in") is not None
+                        else pf.get("price_cached_in"),
                         free=bool(body.get("free")) or bool(pf.get("free")),
                         headers=body.get("headers"),
                         keyless=bool(pf.get("keyless")),

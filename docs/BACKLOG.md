@@ -117,3 +117,7 @@ Depends on: BL-006, BL-007
 Milestone: Vertical Slice
 Priority: P1
 Status: BACKLOG
+
+## Proposed (observer candidates — awaiting human approval)
+- [ ] PROPOSED: Add a short delay or wait for the physics system to complete its next update cycle before asserting the position after pausing.
+- [ ] PROPOSED: Modify the test to check the position in the first unpaused frame rather than immediately after the pause event.

@@ -11,9 +11,13 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 GAME_DIR = ROOT / "game"
 
 
-def run_ac_suite(acceptance_ids: list[str]) -> dict:
+def run_ac_suite(acceptance_ids: list[str], projects: list[str] | None = None) -> dict:
     """Run the Playwright suite, optionally filtered to tests whose names
-    carry the given AC ids. Returns {"passed": bool, "tests": [...]}."""
+    carry the given AC ids. Returns {"passed": bool, "tests": [...]}.
+
+    projects=None pins --project=chromium (desktop) — the loop's per-commit
+    gate stays fast. `jotbeat verify` passes the full viewport matrix
+    (HANDOFF-PHASE4 §2.1)."""
     env = dict(os.environ)
     # Browsers installed into game/node_modules (repo-local, gitignored).
     env.setdefault("PLAYWRIGHT_BROWSERS_PATH", "0")
@@ -26,6 +30,8 @@ def run_ac_suite(acceptance_ids: list[str]) -> dict:
     env["CI"] = "1"
 
     cmd = "npx playwright test --reporter=list"
+    for project in projects or ["chromium"]:
+        cmd += f" --project={project}"
     if acceptance_ids:
         cmd += " --grep " + "|".join(acceptance_ids)
 
@@ -36,7 +42,7 @@ def run_ac_suite(acceptance_ids: list[str]) -> dict:
         env=env,
         capture_output=True,
         text=True,
-        timeout=600,
+        timeout=1200,  # viewport matrix triples the suite; 600s is too tight
         encoding="utf-8",
         errors="replace",
     )

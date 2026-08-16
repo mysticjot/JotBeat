@@ -710,3 +710,9 @@
 {"ts": "2026-08-16T08:19:05.005083+00:00", "type": "model_call", "task": "BL-010", "role": "auditor", "provider": "glm-4.7-flash", "model": "glm-4.7-flash", "tokens_in": 782, "tokens_out": 57, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 1859, "cost_usd": 0.0}
 {"ts": "2026-08-16T08:19:05.006081+00:00", "type": "audit", "task": "BL-010", "status": "MET"}
 {"ts": "2026-08-16T08:19:05.453917+00:00", "type": "task_verified", "task": "BL-010"}
+{"ts": "2026-08-16T16:06:37.384259+00:00", "type": "provider_error", "task": "OBSERVER-SELFTEST", "role": "vision", "provider": "glm-4.6v-flash", "error": "glm-4.6v-flash: HTTP 429"}
+{"ts": "2026-08-16T16:06:38.268045+00:00", "type": "provider_error", "task": "OBSERVER-SELFTEST", "role": "vision", "provider": "glm-4.6v", "error": "glm-4.6v: HTTP 429"}
+{"ts": "2026-08-16T16:08:05.014532+00:00", "type": "provider_error", "task": "OBSERVER-SELFTEST", "role": "vision", "provider": "glm-4.6v-flash", "error": "glm-4.6v-flash: HTTP 429"}
+{"ts": "2026-08-16T16:08:05.838785+00:00", "type": "provider_error", "task": "OBSERVER-SELFTEST", "role": "vision", "provider": "glm-4.6v", "error": "glm-4.6v: HTTP 429"}
+{"ts": "2026-08-16T16:09:52.523085+00:00", "type": "model_call", "task": "OBSERVER-SELFTEST", "role": "vision", "provider": "glm-4.6v-flash", "model": "glm-4.6v-flash", "tokens_in": 1523, "tokens_out": 756, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 14989, "cost_usd": 0.0}
+{"ts": "2026-08-16T16:24:10.184367+00:00", "type": "model_call", "task": "TRIAGE-0001", "role": "vision", "provider": "glm-4.6v-flash", "model": "glm-4.6v-flash", "tokens_in": 1578, "tokens_out": 489, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 11270, "cost_usd": 0.0}

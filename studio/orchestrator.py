@@ -25,7 +25,7 @@ from typing import TypedDict
 from langgraph.graph import END, START, StateGraph
 
 from ledger import log_event
-from state import get_next_ready_task, set_task_status
+from state import ROOT, get_next_ready_task, set_task_status
 
 MAX_ATTEMPTS_BEFORE_ESCALATION = 2
 MAX_ESCALATIONS_BEFORE_HUMAN = 2
@@ -39,6 +39,7 @@ class StudioState(TypedDict, total=False):
     build_result: dict  # deterministic BVT output
     qa_result: dict  # Playwright suite output
     audit: dict  # auditor verdict: MET | FAILED | UNVERIFIED | SKIPPED
+    observer: dict  # AI observer: classification + hypothesis (advisory)
     attempts: int
     escalations: int
     done: bool
@@ -67,6 +68,7 @@ def select_task(state: StudioState) -> dict:
         "build_result": {},
         "qa_result": {},
         "audit": {},
+        "observer": {},
     }
 
 
@@ -82,7 +84,12 @@ def execute_role(state: StudioState) -> dict:
         # Provider-chain outage: do NOT let an empty result ride a green QA
         # suite into a hollow MET verdict. Force a build failure so the graph
         # takes patch -> escalate -> human_ticket and stops for a human.
-        log_event("provider_outage", task=state["task"]["id"], role=state["task"]["role"], error=str(e)[:300])
+        log_event(
+            "provider_outage",
+            task=state["task"]["id"],
+            role=state["task"]["role"],
+            error=str(e)[:300],
+        )
         return {
             "artifacts": [],
             "role_notes": f"provider outage: {e}",
@@ -127,7 +134,47 @@ def scripted_qa(state: StudioState) -> dict:
 
     result = run_ac_suite([])
     log_event("qa_run", task=state["task"]["id"], passed=result["passed"])
-    return {"qa_result": result}
+    update: dict = {"qa_result": result}
+    if not result["passed"]:
+        # AI observer (HANDOFF-PHASE4 §2.3): vision-classify the failure so
+        # the kickback evidence carries a layout/logic/timing/harness call.
+        update["observer"] = _observe_failure(state["task"]["id"], result)
+    return update
+
+
+def _latest_failure_screenshot() -> str | None:
+    """Newest Playwright failure screenshot, if any (ephemeral test-results)."""
+    import glob
+
+    shots = glob.glob(
+        str(ROOT / "game" / "test-results" / "**" / "test-failed-*.png"), recursive=True
+    )
+    if not shots:
+        return None
+    import os as _os
+
+    return max(shots, key=_os.path.getmtime)
+
+
+def _observe_failure(task_id: str, qa_result: dict) -> dict:
+    """Advisory: an observer outage must never block or crash the loop."""
+    try:
+        from roles.observer import classify_failure, file_proposals
+
+        obs = classify_failure(
+            task_id, qa_result.get("log_tail", "")[-2000:], _latest_failure_screenshot()
+        )
+        filed = file_proposals(obs.get("proposals", []))
+        log_event(
+            "observer",
+            task=task_id,
+            classification=obs["classification"],
+            proposals_filed=filed,
+        )
+        return obs
+    except Exception as e:
+        log_event("observer_error", task=task_id, error=str(e)[:300])
+        return {}
 
 
 def cert_audit(state: StudioState) -> dict:
@@ -182,11 +229,16 @@ def patch(state: StudioState) -> dict:
             f"build failed: {state['build_result'].get('log_tail', '')[-800:]}"
         )
     if state.get("qa_result") and not state["qa_result"].get("passed"):
-        evidence.append(
-            f"QA failed: {state['qa_result'].get('log_tail', '')[-800:]}"
-        )
+        evidence.append(f"QA failed: {state['qa_result'].get('log_tail', '')[-800:]}")
     if audit.get("patch_instructions"):
         evidence.append(f"auditor patch instructions: {audit['patch_instructions']}")
+    # AI observer (§2.3): classification + hypothesis from the vision chain —
+    # advisory, appended after the ground-truth logs, never a replacement.
+    observer = state.get("observer", {})
+    if observer.get("hypothesis"):
+        evidence.append(
+            f"observer ({observer.get('classification', '?')}): {observer['hypothesis']}"
+        )
     # The role's OWN notes (emission errors, refused artifact paths) — the
     # auditor must never see these, but the retrying role needs to know its
     # last output was rejected for FORMAT, not content.

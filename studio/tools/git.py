@@ -29,8 +29,17 @@ def commit_changes(task: dict, artifacts: list[str]) -> str | None:
     # earlier attempts' files on disk that no single artifacts list captured.
     # QA just validated the WHOLE tree, so sweep the studio-owned paths too —
     # otherwise we ship hollow commits that don't build (BL-004 regression).
-    _git(["add", "--", "game/src", "game/tests", "game/assets",
-          "game/package.json", "game/index.html"])
+    _git(
+        [
+            "add",
+            "--",
+            "game/src",
+            "game/tests",
+            "game/assets",
+            "game/package.json",
+            "game/index.html",
+        ]
+    )
 
     title = task.get("title", task["id"])
     msg = f"feat({task.get('role', 'studio')}): {title} [{task['id']}]"

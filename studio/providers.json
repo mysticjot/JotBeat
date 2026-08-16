@@ -40,19 +40,6 @@
       },
       "verified": true
     },
-    "kimi-k2.6": {
-      "name": "kimi-k2.6",
-      "provider": "moonshot",
-      "model": "kimi-k2.6",
-      "env_key": "KIMI_API_KEY",
-      "free": false,
-      "tier": "bulk",
-      "base_url": "https://api.moonshot.ai/v1",
-      "price_in": 0.95,
-      "price_out": 4.0,
-      "price_cached_in": 0.19,
-      "family": "openai"
-    },
     "glm-4.7": {
       "name": "glm-4.7",
       "provider": "z.ai",
@@ -292,8 +279,7 @@
     },
     "auditor": {
       "chain": [
-        "kimi-k2.6",
-        "glm-4.7",
+        "deepseek-v4-flash",
         "glm-4.7-flash"
       ],
       "max_tokens_in": 17000,

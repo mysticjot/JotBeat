@@ -5,6 +5,19 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 ## [Unreleased]
 
 ### Added
+- Phase 4 QA harness (HANDOFF-PHASE4): Playwright viewport matrix (chromium desktop/tablet/mobile projects in `game/playwright.config.ts`); `jotbeat verify` runs the full matrix while the per-commit loop gate stays desktop-only for speed (`run_ac_suite(..., projects=None)`).
+- Visual regression baseline (§2.2): `game/tests/visual.spec.ts` + `visual.config.ts` — pixelmatch compare against `game/tests/baseline/*.png` (git-LFS), desktop project only; `UPDATE_BASELINE=1` regenerates; diffs archive to `artifacts/visual-diffs/`. Thresholds documented in visual.config.ts.
+- AI observer (§2.3): `studio/roles/observer.py` — on scripted-QA failure the vision role (glm-4.6v-flash) classifies the failure (layout/logic/timing/harness) from log tail + failure screenshot; hypotheses ride the kickback evidence, proposals append to the BACKLOG Proposed section (never queued). Advisory by design: an observer outage logs `observer_error` and never blocks the loop. `models.py` gained `complete(..., images=)` (base64 data-URI parts; google family refuses images).
+- Cert report (§2.4): `studio/tools/cert.py` — `jotbeat verify` writes `reports/cert/cert-<stamp>.md` + `latest.md`: per-AC MET/FAILED verdicts with viewport breakdown, auditor status read from the ledger, patch-instruction pointers for FAILED sections. Deterministic — no model calls.
+- Bug schema (§2.6): `reports/triage/README.md` (severity ladder, repro/expected-vs-actual/evidence/owner, regression rule: every bugfix references a catching test; flake policy: no assertion widening, no retries) + first ticket TRIAGE-0001.
+- `JotBeat Game.bat` — one-click launcher for the game dev server (opens http://localhost:8080).
+
+### Fixed
+- TRIAGE-0001: AC-008 "player cannot move while paused" flake root-caused to a harness sampling race (state.position refreshes only on unpaused frames; startPos could be one frame stale after driveTo keyup) — NOT a game bug; pause freezes velocity + physics world correctly. Fix: settle-loop before the startPos sample; assertion unchanged (exact toBe, no retries). 6/6 green across the matrix after fix. Observer classification (timing) agreed.
+- `orchestrator.py` F821 undefined `ROOT` in `_latest_failure_screenshot` (import from state.py); caught by the aislop gate before commit.
+
+### Security
+- Adversarial gate exercise (§2.5): planted door bug (key check removed from `Game.openDoor`) was caught by AC-004 on ALL three viewports; cert run returned NOT CERTIFIED with a FAILED AC-004 section, failure-screenshot pointer, and patch-instruction fallback. Bug reverted uncommitted; suite re-verified green.
 - Phase 2 orchestrator: LangGraph task loop (`studio/orchestrator.py`, `state.py`, `ledger.py`, `models.py` integrated as-is from the brain handoff); `roles/` with `dispatch()` + 9 role modules + auditor; deterministic `tools/` (BVT shell, Playwright browser, git commit); CLI commands `brief` / `plan` / `run-next` / `verify` / `report`.
 - OpenAI-compatible provider client in `models.py._call` (httpx; DeepSeek/Qwen/Kimi/GLM/MiniMax/Groq share base_url+env-key swap; Gemini via google-genai); DeepSeek `prompt_cache_hit_tokens` mapped to `cached_in`.
 - `providers.json` v3 routing table (per-model entries, free tiers, base_urls); `task-queue.json` `{"items": []}` schema with underscore statuses incl. `BLOCKED_HUMAN`.

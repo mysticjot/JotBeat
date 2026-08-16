@@ -170,21 +170,26 @@ def cmd_brief(text: str) -> int:
     print(f"brief saved -> {out_file.relative_to(ROOT)}")
 
     # Split the Director's marked sections into the real docs (HANDOFF §4).
-    sections = re.split(r"^=== (GDD|TEST_PLAN) ===\s*$", result["notes"], flags=re.MULTILINE)
+    sections = re.split(
+        r"^=== (GDD|TEST_PLAN) ===\s*$", result["notes"], flags=re.MULTILINE
+    )
     # re.split with a capture group yields [pre, name, body, name, body, ...]
     named = {
-        sections[i]: sections[i + 1].strip()
-        for i in range(1, len(sections) - 1, 2)
+        sections[i]: sections[i + 1].strip() for i in range(1, len(sections) - 1, 2)
     }
     if "GDD" in named:
         (ROOT / "docs" / "GDD.md").write_text(named["GDD"] + "\n", encoding="utf-8")
         print("GDD written -> docs/GDD.md")
     if "TEST_PLAN" in named:
-        (ROOT / "docs" / "TEST_PLAN.md").write_text(named["TEST_PLAN"] + "\n", encoding="utf-8")
+        (ROOT / "docs" / "TEST_PLAN.md").write_text(
+            named["TEST_PLAN"] + "\n", encoding="utf-8"
+        )
         print("TEST_PLAN written -> docs/TEST_PLAN.md")
     if not named:
-        print("WARNING: Director output had no === GDD === / === TEST_PLAN === "
-              "markers — draft kept in docs/briefs/ only, docs unchanged")
+        print(
+            "WARNING: Director output had no === GDD === / === TEST_PLAN === "
+            "markers — draft kept in docs/briefs/ only, docs unchanged"
+        )
     return 0
 
 
@@ -256,8 +261,11 @@ def cmd_verify() -> int:
 
     build = run_bvt()
     print(f"BVT:     {'PASS' if build['passed'] else 'FAIL'}  steps={build['steps']}")
-    qa = run_ac_suite([])
-    print(f"QA:      {'PASS' if qa['passed'] else 'FAIL'}  tests={qa['tests']}")
+    # Phase 4 §2.1: cert runs the full viewport matrix (desktop/tablet/mobile).
+    qa = run_ac_suite([], projects=["chromium", "chromium-tablet", "chromium-mobile"])
+    print(
+        f"QA:      {'PASS' if qa['passed'] else 'FAIL'}  tests={qa['tests']} (viewport matrix)"
+    )
     if not build["passed"]:
         print("--- build log tail ---")
         print(build["log_tail"])
@@ -265,9 +273,19 @@ def cmd_verify() -> int:
         print("--- qa log tail ---")
         print(qa["log_tail"])
     quality = run_quality(ROOT)
-    print(f"QUALITY: {'PASS' if quality == 0 else 'FAIL'}  (aislop errors=0 + score floor, fallow dead-code/dupes)")
-    print(json.dumps({"bvt": build["passed"], "qa": qa["passed"],
-                      "quality": quality == 0}))
+    print(
+        f"QUALITY: {'PASS' if quality == 0 else 'FAIL'}  (aislop errors=0 + score floor, fallow dead-code/dupes)"
+    )
+    # Phase 4 §2.4: cert report — one section per AC, human-readable in 2 min.
+    from tools.cert import write_cert_report
+
+    cert = write_cert_report(build, qa, quality, ROOT)
+    print(f"CERT:    {cert.relative_to(ROOT)}")
+    print(
+        json.dumps(
+            {"bvt": build["passed"], "qa": qa["passed"], "quality": quality == 0}
+        )
+    )
     return 0 if build["passed"] and qa["passed"] and quality == 0 else 1
 
 
@@ -303,7 +321,11 @@ def cmd_provider_list() -> int:
     print(f"{'name':<28} {'tier':<10} {'family':<8} {'model':<34} {'roles':<22} key")
     for name, p in routing["providers"].items():
         roles = ",".join(roles_using(routing, name)) or "-"
-        key = "keyless" if not p.get("env_key") else ("set" if os.environ.get(p["env_key"]) else "MISSING")
+        key = (
+            "keyless"
+            if not p.get("env_key")
+            else ("set" if os.environ.get(p["env_key"]) else "MISSING")
+        )
         verified = "" if p.get("verified") else " (unverified)"
         print(
             f"{name:<28} {p.get('tier', '?'):<10} {p.get('family', '?'):<8} "
@@ -332,42 +354,58 @@ def cmd_provider_add(args) -> int:
     fields: dict = {}
     if preset:
         preset_name, fields = preset
-        print(f"preset '{preset_name}' detected — auto-filled "
-              f"family={fields['family']}, base={fields.get('base_url') or '(sdk)'}"
-              + (" (keyless local server)" if fields.get("keyless") else ""))
+        print(
+            f"preset '{preset_name}' detected — auto-filled "
+            f"family={fields['family']}, base={fields.get('base_url') or '(sdk)'}"
+            + (" (keyless local server)" if fields.get("keyless") else "")
+        )
     name = args.name or hint
     model = args.model or ""
     if preset and preset[0] == "ollama-local":
         available = routing_mod.ollama_models()
         if not available:
-            print("refused: Ollama is running but has no models — "
-                  "run `ollama pull <model>` first (e.g. ollama pull qwen3-coder)")
+            print(
+                "refused: Ollama is running but has no models — "
+                "run `ollama pull <model>` first (e.g. ollama pull qwen3-coder)"
+            )
             return 1
         if not model:
             model = available[0]
             print(f"model auto-picked: {model} (installed: {', '.join(available)})")
         elif model not in available:
-            print(f"refused: model '{model}' not installed — "
-                  f"available: {', '.join(available)}")
+            print(
+                f"refused: model '{model}' not installed — "
+                f"available: {', '.join(available)}"
+            )
             return 1
     elif not model and not preset:
-        print("refused: unknown provider hint and no --model given. "
-              f"Known presets: {', '.join(sorted(routing_mod.PRESETS))} "
-              "(everything else: pass --model, --base-url, --env-key, ...)")
+        print(
+            "refused: unknown provider hint and no --model given. "
+            f"Known presets: {', '.join(sorted(routing_mod.PRESETS))} "
+            "(everything else: pass --model, --base-url, --env-key, ...)"
+        )
         return 1
 
     routing = models.load_routing()
     try:
         entry = routing_mod.build_entry(
             name=name,
-            env_key=args.env_key if args.env_key is not None else fields.get("env_key", ""),
+            env_key=args.env_key
+            if args.env_key is not None
+            else fields.get("env_key", ""),
             base_url=args.base_url or fields.get("base_url") or None,
             model=model,
             family=args.family or fields.get("family", ""),
             tier=args.tier or fields.get("tier", ""),
-            price_in=args.price_in if args.price_in is not None else fields.get("price_in", 0.0),
-            price_out=args.price_out if args.price_out is not None else fields.get("price_out", 0.0),
-            price_cached_in=args.price_cached_in if args.price_cached_in is not None else fields.get("price_cached_in"),
+            price_in=args.price_in
+            if args.price_in is not None
+            else fields.get("price_in", 0.0),
+            price_out=args.price_out
+            if args.price_out is not None
+            else fields.get("price_out", 0.0),
+            price_cached_in=args.price_cached_in
+            if args.price_cached_in is not None
+            else fields.get("price_cached_in"),
             free=args.free or fields.get("free", False),
             headers=_parse_headers(args.header),
             keyless=bool(fields.get("keyless")),
@@ -378,7 +416,9 @@ def cmd_provider_add(args) -> int:
         return 1
 
     _save_routing(routing)
-    print(f"added provider '{entry['name']}' (family={entry['family']}, tier={entry['tier']}, model={entry['model']})")
+    print(
+        f"added provider '{entry['name']}' (family={entry['family']}, tier={entry['tier']}, model={entry['model']})"
+    )
     if entry["env_key"]:
         print(
             f"next: `jotbeat keys set {entry['env_key']}`, then `jotbeat provider test "
@@ -559,11 +599,11 @@ def main(argv: list[str] | None = None) -> int:
         help="provider name, or a preset to auto-fill (e.g. ollama, groq, opencode)",
     )
     p_add.add_argument("--name", default="", help="override the entry name")
-    p_add.add_argument(
-        "--env-key", default=None, help="env var NAME (never the value)"
-    )
+    p_add.add_argument("--env-key", default=None, help="env var NAME (never the value)")
     p_add.add_argument("--base-url", default="", help="required for family=openai")
-    p_add.add_argument("--model", default="", help="model id (auto-detected for ollama)")
+    p_add.add_argument(
+        "--model", default="", help="model id (auto-detected for ollama)"
+    )
     p_add.add_argument("--family", default="", choices=PROVIDER_FAMILIES)
     p_add.add_argument("--tier", default="", choices=PROVIDER_TIERS)
     p_add.add_argument("--price-in", type=float, default=None)

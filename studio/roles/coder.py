@@ -57,8 +57,7 @@ def _context(task: dict) -> list[str]:
     ]
     if task.get("_failure"):
         parts.append(
-            "PREVIOUS ATTEMPT FAILED — fix this, do not repeat it:\n"
-            + task["_failure"]
+            "PREVIOUS ATTEMPT FAILED — fix this, do not repeat it:\n" + task["_failure"]
         )
     for rel in ALWAYS_INCLUDE:
         p = GAME / rel
