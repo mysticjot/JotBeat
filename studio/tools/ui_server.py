@@ -142,7 +142,7 @@ and add it here as family "openai" pointing at http://localhost:4000/v1.</p>
 <div id="addform" style="display:none; border:1px solid #2a313a; padding:12px; border-radius:6px;">
   <p>1 · <select id="ppreset" onchange="presetFill()">
      <option value="">pick a provider…</option>
-     <option>ollama</option><option>litellm</option><option>openrouter</option>
+     <option>ollama</option><option>ollama-local</option><option>litellm</option><option>openrouter</option>
      <option>groq</option><option>deepseek</option><option>zai</option>
      <option>kimi</option><option>mistral</option><option>cerebras</option>
      <option>gemini</option><option>github-models</option><option>opencode</option>
@@ -505,7 +505,7 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
                 else:
                     pname, fields = pres
                     out = {"ok": True, "name": pname, "fields": fields}
-                    if pname == "ollama":
+                    if pname == "ollama-local":
                         try:
                             out["models"] = routing_mod.ollama_models()
                         except routing_mod.RoutingError as e:
@@ -552,7 +552,7 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
                         return v if v not in (None, "") else pf.get(key, default)
 
                     model = pick("model")
-                    if pres and pres[0] == "ollama":
+                    if pres and pres[0] == "ollama-local":
                         available = routing_mod.ollama_models()
                         if not available:
                             raise routing_mod.RoutingError(

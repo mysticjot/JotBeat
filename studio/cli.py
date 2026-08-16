@@ -337,7 +337,7 @@ def cmd_provider_add(args) -> int:
               + (" (keyless local server)" if fields.get("keyless") else ""))
     name = args.name or hint
     model = args.model or ""
-    if preset and preset[0] == "ollama":
+    if preset and preset[0] == "ollama-local":
         available = routing_mod.ollama_models()
         if not available:
             print("refused: Ollama is running but has no models — "

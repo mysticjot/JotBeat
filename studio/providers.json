@@ -221,6 +221,18 @@
       "base_url": "https://opencode.ai/zen/v1",
       "price_in": 0.0,
       "price_out": 0.0
+    },
+    "ollama": {
+      "name": "ollama",
+      "provider": "ollama",
+      "model": "gpt-oss:120b",
+      "env_key": "OLLAMA_API_KEY",
+      "free": true,
+      "tier": "free",
+      "family": "openai",
+      "base_url": "https://ollama.com/v1",
+      "price_in": 0.0,
+      "price_out": 0.0
     }
   },
   "roles": {

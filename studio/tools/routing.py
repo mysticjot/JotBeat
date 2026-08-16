@@ -22,6 +22,24 @@ PROVIDER_TIERS = ("free", "bulk", "escalation")
 # Prices for paid presets mirror the entries already in providers.json.
 PRESETS: dict[str, dict] = {
     "ollama": {
+        # Ollama CLOUD (ollama.com) — hosted models, no local install,
+        # needs an API key from ollama.com. OpenAI-compatible /v1 endpoint.
+        "base_url": "https://ollama.com/v1",
+        "env_key": "OLLAMA_API_KEY",
+        "family": "openai",
+        "tier": "free",
+        "free": True,
+        "models": [
+            "gpt-oss:120b", "gpt-oss:20b", "qwen3.5:397b",
+            "deepseek-v4-flash:0731", "deepseek-v4-pro:0813",
+            "kimi-k2.6", "kimi-k2.7-code", "kimi-k3",
+            "glm-5.1", "glm-5.2", "minimax-m2.7", "minimax-m3",
+            "mistral-large-3:675b", "nemotron-3-super", "nemotron-3-ultra",
+            "nemotron-3-nano:30b", "gemma4:31b",
+        ],
+    },
+    "ollama-local": {
+        # Local Ollama server (localhost:11434) — models must be pulled first.
         "base_url": "http://localhost:11434/v1",
         "env_key": "",
         "family": "openai",
