@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true  # visual baselines (game/tests/baseline/*.png) are LFS; pointer stubs break pngjs
 
       - name: Verify repository tree (Phase 0 gate)
         run: |
