@@ -27,6 +27,9 @@ export class Door extends Physics.Arcade.Sprite
         setDoorState(this.doorId, 'locked');
     }
 
+    //  Called from Game.openDoor via a GameObject->Door cast inside a physics
+    //  callback — fallow's member analysis can't resolve the cast. Not dead.
+    //  fallow-ignore-next-line unused-class-member
     open (): void
     {
         if (this.opened) return;

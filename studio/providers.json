@@ -14,7 +14,11 @@
       "price_out": 0.28,
       "price_cached_in": 0.0028,
       "family": "openai",
-      "body": {"thinking": {"type": "disabled"}},
+      "body": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
       "verified": true
     },
     "deepseek-v4-pro": {
@@ -29,7 +33,11 @@
       "price_out": 0.87,
       "price_cached_in": 0.003625,
       "family": "openai",
-      "body": {"thinking": {"type": "disabled"}},
+      "body": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
       "verified": true
     },
     "kimi-k2.6": {
@@ -56,7 +64,12 @@
       "price_in": 0.6,
       "price_out": 2.2,
       "price_cached_in": 0.11,
-      "family": "openai"
+      "family": "openai",
+      "body": {
+        "thinking": {
+          "type": "disabled"
+        }
+      }
     },
     "groq-free": {
       "name": "groq-free",
@@ -172,7 +185,12 @@
       "price_in": 0.0,
       "price_out": 0.0,
       "family": "openai",
-      "verified": true
+      "verified": true,
+      "body": {
+        "thinking": {
+          "type": "disabled"
+        }
+      }
     },
     "glm-4.6v-flash": {
       "name": "glm-4.6v-flash",

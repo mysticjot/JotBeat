@@ -73,9 +73,22 @@ def select_task(state: StudioState) -> dict:
 def execute_role(state: StudioState) -> dict:
     """Dispatch to the role module. Roles live in studio/roles/ and each
     receives ONLY its context slice (BUDGET.md context budgets)."""
+    from models import AllProvidersExhausted
     from roles import dispatch  # roles/director.py, coder.py, qa.py, ...
 
-    result = dispatch(state["task"], escalation_level=state.get("escalations", 0))
+    try:
+        result = dispatch(state["task"], escalation_level=state.get("escalations", 0))
+    except AllProvidersExhausted as e:
+        # Provider-chain outage: do NOT let an empty result ride a green QA
+        # suite into a hollow MET verdict. Force a build failure so the graph
+        # takes patch -> escalate -> human_ticket and stops for a human.
+        log_event("provider_outage", task=state["task"]["id"], role=state["task"]["role"], error=str(e)[:300])
+        return {
+            "artifacts": [],
+            "role_notes": f"provider outage: {e}",
+            "instructions": "",
+            "build_result": {"passed": False, "log_tail": f"all providers failed: {e}"},
+        }
     # UNION artifacts across attempts: a kickback retry often emits only the
     # file it fixed, while an earlier attempt wrote the rest. Committing only
     # the final attempt's list produces hollow commits that don't build
@@ -85,6 +98,7 @@ def execute_role(state: StudioState) -> dict:
         "artifacts": artifacts,
         "role_notes": result.get("notes", ""),
         "instructions": result["instructions"],
+        "build_result": {},  # clear any injected outage marker from a prior attempt
     }
 
 
@@ -92,6 +106,12 @@ def build_verify(state: StudioState) -> dict:
     """Deterministic BVT: install, compile, lint, bundle, asset validation.
     Pure subprocess. Zero model calls. Failure here short-circuits QA."""
     from tools.shell import run_bvt
+
+    injected = state.get("build_result")
+    if injected and not injected.get("passed"):
+        # Provider-outage marker from execute_role — do not mask it with a
+        # green BVT over an unchanged tree.
+        return {"build_result": injected}
 
     result = run_bvt()
     log_event("bvt", task=state["task"]["id"], passed=result["passed"])
@@ -113,13 +133,25 @@ def scripted_qa(state: StudioState) -> dict:
 def cert_audit(state: StudioState) -> dict:
     """Adversarial audit. Inputs: AC + build/qa EVIDENCE DIGESTS only.
     Explicitly excluded: role_notes (the coder's self-assessment)."""
+    from models import AllProvidersExhausted
     from roles.auditor import audit
 
-    verdict = audit(
-        task=state["task"],
-        build=state["build_result"],
-        qa=state["qa_result"],
-    )
+    try:
+        verdict = audit(
+            task=state["task"],
+            build=state["build_result"],
+            qa=state["qa_result"],
+        )
+    except AllProvidersExhausted as e:
+        # Auditor infra outage (401/429/exhaustion across the whole chain)
+        # must not crash the loop — an uncertifiable task routes to a human,
+        # same as the stub's no-providers path.
+        verdict = {
+            "status": "UNVERIFIED",
+            "evidence": [],
+            "patch_instructions": "",
+            "model_response": f"auditor unavailable: {e}",
+        }
     log_event("audit", task=state["task"]["id"], status=verdict["status"])
     return {"audit": verdict}
 

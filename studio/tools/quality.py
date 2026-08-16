@@ -49,6 +49,8 @@ def _run(
         cwd=root,
         capture_output=True,
         text=True,
+        encoding="utf-8",  # scanner output is UTF-8; Windows default cp1252 crashes on it
+        errors="replace",
         env=env,
         timeout=600,
     )

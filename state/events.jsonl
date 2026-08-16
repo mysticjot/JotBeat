@@ -440,3 +440,273 @@
 {"ts": "2026-08-16T03:50:00.928207+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
 {"ts": "2026-08-16T03:50:00.942208+00:00", "type": "kickback", "task": "BL-005", "attempt": 2}
 {"ts": "2026-08-16T03:50:00.954206+00:00", "type": "human_ticket", "task": "BL-005", "audit": {}}
+{"ts": "2026-08-16T04:01:40.236026+00:00", "type": "task_started", "task": "BL-005", "role": "coder"}
+{"ts": "2026-08-16T04:01:40.896026+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T04:03:11.988715+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=error; truncation or refusal)"}
+{"ts": "2026-08-16T04:03:24.317050+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 8661, "tokens_out": 2315, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 12328, "cost_usd": 0.001861}
+{"ts": "2026-08-16T04:03:36.981993+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T04:04:25.713239+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T04:04:25.726239+00:00", "type": "kickback", "task": "BL-005", "attempt": 1}
+{"ts": "2026-08-16T04:04:26.314649+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T04:04:58.756037+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=error; truncation or refusal)"}
+{"ts": "2026-08-16T04:05:04.356742+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 8930, "tokens_out": 843, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 5600, "cost_usd": 0.001486}
+{"ts": "2026-08-16T04:05:16.195632+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T04:06:03.974490+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T04:06:03.986489+00:00", "type": "kickback", "task": "BL-005", "attempt": 2}
+{"ts": "2026-08-16T04:06:03.987490+00:00", "type": "escalation", "task": "BL-005", "level": 1}
+{"ts": "2026-08-16T04:06:04.848997+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T04:09:42.359134+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 8471, "tokens_out": 4441, "cached_in": 0, "retry": 0, "escalated": true, "latency_ms": 217489, "cost_usd": 0.0}
+{"ts": "2026-08-16T04:09:57.793381+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T04:10:57.870457+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T04:10:57.885456+00:00", "type": "kickback", "task": "BL-005", "attempt": 1}
+{"ts": "2026-08-16T04:10:58.785994+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T04:14:22.470200+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T04:14:31.365995+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 8950, "tokens_out": 859, "cached_in": 1536, "retry": 0, "escalated": true, "latency_ms": 8894, "cost_usd": 0.001283}
+{"ts": "2026-08-16T04:14:43.387172+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T04:15:35.262588+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T04:15:35.274588+00:00", "type": "kickback", "task": "BL-005", "attempt": 2}
+{"ts": "2026-08-16T04:15:35.276589+00:00", "type": "escalation", "task": "BL-005", "level": 2}
+{"ts": "2026-08-16T04:15:35.892098+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T04:18:16.618148+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T04:18:21.667330+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 8945, "tokens_out": 832, "cached_in": 1536, "retry": 0, "escalated": true, "latency_ms": 5048, "cost_usd": 0.001275}
+{"ts": "2026-08-16T04:18:33.606749+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T04:19:25.650093+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T04:19:25.662088+00:00", "type": "kickback", "task": "BL-005", "attempt": 1}
+{"ts": "2026-08-16T04:19:26.248598+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T04:22:31.885698+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 8487, "tokens_out": 4495, "cached_in": 0, "retry": 0, "escalated": true, "latency_ms": 185636, "cost_usd": 0.0}
+{"ts": "2026-08-16T04:22:43.851074+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T04:23:36.332439+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T04:23:36.344439+00:00", "type": "kickback", "task": "BL-005", "attempt": 2}
+{"ts": "2026-08-16T04:23:36.357439+00:00", "type": "human_ticket", "task": "BL-005", "audit": {}}
+{"ts": "2026-08-16T05:56:42.497894+00:00", "type": "task_started", "task": "BL-005", "role": "coder"}
+{"ts": "2026-08-16T05:56:43.334211+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T05:59:07.606736+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T05:59:13.360364+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 8734, "tokens_out": 859, "cached_in": 1536, "retry": 0, "escalated": false, "latency_ms": 5753, "cost_usd": 0.001253}
+{"ts": "2026-08-16T05:59:26.245447+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T06:00:20.287418+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T06:00:20.301417+00:00", "type": "kickback", "task": "BL-005", "attempt": 1}
+{"ts": "2026-08-16T06:00:20.978928+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T06:00:38.343613+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 8526, "tokens_out": 267, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 17364, "cost_usd": 0.0}
+{"ts": "2026-08-16T06:00:50.151852+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T06:01:41.872058+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T06:01:41.884058+00:00", "type": "kickback", "task": "BL-005", "attempt": 2}
+{"ts": "2026-08-16T06:01:41.886058+00:00", "type": "escalation", "task": "BL-005", "level": 1}
+{"ts": "2026-08-16T06:01:42.456569+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T06:05:01.586189+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T06:05:17.026461+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 9005, "tokens_out": 3056, "cached_in": 1536, "retry": 0, "escalated": true, "latency_ms": 15439, "cost_usd": 0.001906}
+{"ts": "2026-08-16T06:05:28.856395+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T06:05:44.787189+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T06:05:44.800190+00:00", "type": "kickback", "task": "BL-005", "attempt": 1}
+{"ts": "2026-08-16T06:05:45.435698+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T06:08:00.170417+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T06:08:09.309863+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 9692, "tokens_out": 1775, "cached_in": 1536, "retry": 0, "escalated": true, "latency_ms": 9139, "cost_usd": 0.001643}
+{"ts": "2026-08-16T06:08:21.285167+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T06:09:20.874521+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T06:09:20.885548+00:00", "type": "kickback", "task": "BL-005", "attempt": 2}
+{"ts": "2026-08-16T06:09:20.887549+00:00", "type": "escalation", "task": "BL-005", "level": 2}
+{"ts": "2026-08-16T06:09:21.465464+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T06:13:04.510789+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T06:13:15.320591+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 9139, "tokens_out": 2088, "cached_in": 1536, "retry": 0, "escalated": true, "latency_ms": 10807, "cost_usd": 0.001653}
+{"ts": "2026-08-16T06:13:26.373618+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T06:14:16.405575+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T06:14:16.415575+00:00", "type": "kickback", "task": "BL-005", "attempt": 1}
+{"ts": "2026-08-16T06:14:17.024597+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T06:14:17.441597+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T06:14:23.021040+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 9143, "tokens_out": 894, "cached_in": 1536, "retry": 0, "escalated": true, "latency_ms": 5579, "cost_usd": 0.00132}
+{"ts": "2026-08-16T06:14:34.137983+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T06:15:23.893133+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T06:15:23.905133+00:00", "type": "kickback", "task": "BL-005", "attempt": 2}
+{"ts": "2026-08-16T06:15:23.916134+00:00", "type": "human_ticket", "task": "BL-005", "audit": {}}
+{"ts": "2026-08-16T06:48:54.694200+00:00", "type": "task_started", "task": "BL-005", "role": "coder"}
+{"ts": "2026-08-16T06:48:55.447709+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T06:48:55.878720+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T06:49:06.670800+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 9690, "tokens_out": 2006, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 10791, "cost_usd": 0.001918}
+{"ts": "2026-08-16T06:49:17.641689+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T06:49:52.119574+00:00", "type": "qa_run", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T06:49:52.931084+00:00", "type": "provider_error", "task": "BL-005", "role": "auditor", "provider": "kimi-k2.6", "error": "Client error '401 Unauthorized' for url 'https://api.moonshot.ai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401"}
+{"ts": "2026-08-16T06:49:53.981590+00:00", "type": "provider_error", "task": "BL-005", "role": "auditor", "provider": "glm-4.7", "error": "glm-4.7: HTTP 429"}
+{"ts": "2026-08-16T06:50:03.714045+00:00", "type": "model_call", "task": "BL-005", "role": "auditor", "provider": "glm-4.7-flash", "model": "glm-4.7-flash", "tokens_in": 808, "tokens_out": 759, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 9731, "cost_usd": 0.0}
+{"ts": "2026-08-16T06:50:03.715045+00:00", "type": "audit", "task": "BL-005", "status": "MET"}
+{"ts": "2026-08-16T06:50:04.324933+00:00", "type": "task_verified", "task": "BL-005"}
+{"ts": "2026-08-16T06:50:04.338934+00:00", "type": "task_started", "task": "BL-006", "role": "coder"}
+{"ts": "2026-08-16T06:50:04.898440+00:00", "type": "provider_error", "task": "BL-006", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T06:50:05.333441+00:00", "type": "provider_error", "task": "BL-006", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T06:50:22.435732+00:00", "type": "model_call", "task": "BL-006", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 8525, "tokens_out": 2822, "cached_in": 384, "retry": 0, "escalated": false, "latency_ms": 17102, "cost_usd": 0.001931}
+{"ts": "2026-08-16T06:50:33.502533+00:00", "type": "bvt", "task": "BL-006", "passed": true}
+{"ts": "2026-08-16T06:51:31.571331+00:00", "type": "qa_run", "task": "BL-006", "passed": false}
+{"ts": "2026-08-16T06:51:31.582332+00:00", "type": "kickback", "task": "BL-006", "attempt": 1}
+{"ts": "2026-08-16T06:51:32.190840+00:00", "type": "provider_error", "task": "BL-006", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T06:51:32.626840+00:00", "type": "provider_error", "task": "BL-006", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T06:51:41.412874+00:00", "type": "model_call", "task": "BL-006", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 10206, "tokens_out": 1531, "cached_in": 1536, "retry": 0, "escalated": false, "latency_ms": 8786, "cost_usd": 0.001647}
+{"ts": "2026-08-16T06:51:52.536684+00:00", "type": "bvt", "task": "BL-006", "passed": true}
+{"ts": "2026-08-16T06:52:50.437956+00:00", "type": "qa_run", "task": "BL-006", "passed": false}
+{"ts": "2026-08-16T06:52:50.448956+00:00", "type": "kickback", "task": "BL-006", "attempt": 2}
+{"ts": "2026-08-16T06:52:50.449957+00:00", "type": "escalation", "task": "BL-006", "level": 1}
+{"ts": "2026-08-16T06:52:51.044466+00:00", "type": "provider_error", "task": "BL-006", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T06:52:51.464308+00:00", "type": "provider_error", "task": "BL-006", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T06:52:58.350407+00:00", "type": "model_call", "task": "BL-006", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 10206, "tokens_out": 1157, "cached_in": 1792, "retry": 0, "escalated": true, "latency_ms": 6886, "cost_usd": 0.001507}
+{"ts": "2026-08-16T06:53:09.454899+00:00", "type": "bvt", "task": "BL-006", "passed": true}
+{"ts": "2026-08-16T06:54:07.314245+00:00", "type": "qa_run", "task": "BL-006", "passed": false}
+{"ts": "2026-08-16T06:54:07.326244+00:00", "type": "kickback", "task": "BL-006", "attempt": 1}
+{"ts": "2026-08-16T06:54:07.888752+00:00", "type": "provider_error", "task": "BL-006", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T06:54:08.294261+00:00", "type": "provider_error", "task": "BL-006", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T06:54:16.054288+00:00", "type": "model_call", "task": "BL-006", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 10206, "tokens_out": 1418, "cached_in": 1920, "retry": 0, "escalated": true, "latency_ms": 7760, "cost_usd": 0.001562}
+{"ts": "2026-08-16T06:54:27.240691+00:00", "type": "bvt", "task": "BL-006", "passed": true}
+{"ts": "2026-08-16T06:55:25.100947+00:00", "type": "qa_run", "task": "BL-006", "passed": false}
+{"ts": "2026-08-16T06:55:25.112947+00:00", "type": "kickback", "task": "BL-006", "attempt": 2}
+{"ts": "2026-08-16T06:55:25.113948+00:00", "type": "escalation", "task": "BL-006", "level": 2}
+{"ts": "2026-08-16T06:55:25.704456+00:00", "type": "provider_error", "task": "BL-006", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T06:55:26.100455+00:00", "type": "provider_error", "task": "BL-006", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T06:55:40.864357+00:00", "type": "model_call", "task": "BL-006", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 10207, "tokens_out": 2842, "cached_in": 1920, "retry": 0, "escalated": true, "latency_ms": 14762, "cost_usd": 0.001961}
+{"ts": "2026-08-16T06:55:51.935365+00:00", "type": "bvt", "task": "BL-006", "passed": true}
+{"ts": "2026-08-16T06:56:49.803442+00:00", "type": "qa_run", "task": "BL-006", "passed": false}
+{"ts": "2026-08-16T06:56:49.814441+00:00", "type": "kickback", "task": "BL-006", "attempt": 1}
+{"ts": "2026-08-16T06:56:50.398950+00:00", "type": "provider_error", "task": "BL-006", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T06:56:50.838965+00:00", "type": "provider_error", "task": "BL-006", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T06:56:57.589713+00:00", "type": "model_call", "task": "BL-006", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 10243, "tokens_out": 1157, "cached_in": 1920, "retry": 0, "escalated": true, "latency_ms": 6748, "cost_usd": 0.001495}
+{"ts": "2026-08-16T06:57:08.697196+00:00", "type": "bvt", "task": "BL-006", "passed": true}
+{"ts": "2026-08-16T06:58:06.624256+00:00", "type": "qa_run", "task": "BL-006", "passed": false}
+{"ts": "2026-08-16T06:58:06.635255+00:00", "type": "kickback", "task": "BL-006", "attempt": 2}
+{"ts": "2026-08-16T06:58:06.651256+00:00", "type": "human_ticket", "task": "BL-006", "audit": {}}
+{"ts": "2026-08-16T07:29:05.714210+00:00", "type": "task_started", "task": "BL-006", "role": "coder"}
+{"ts": "2026-08-16T07:29:06.328225+00:00", "type": "provider_error", "task": "BL-006", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T07:29:06.755226+00:00", "type": "provider_error", "task": "BL-006", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T07:29:13.469950+00:00", "type": "model_call", "task": "BL-006", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 10216, "tokens_out": 1154, "cached_in": 384, "retry": 0, "escalated": false, "latency_ms": 6713, "cost_usd": 0.001701}
+{"ts": "2026-08-16T07:29:24.802280+00:00", "type": "bvt", "task": "BL-006", "passed": true}
+{"ts": "2026-08-16T07:30:04.396504+00:00", "type": "qa_run", "task": "BL-006", "passed": true}
+{"ts": "2026-08-16T07:30:05.137016+00:00", "type": "provider_error", "task": "BL-006", "role": "auditor", "provider": "kimi-k2.6", "error": "Client error '401 Unauthorized' for url 'https://api.moonshot.ai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401"}
+{"ts": "2026-08-16T07:30:06.072032+00:00", "type": "provider_error", "task": "BL-006", "role": "auditor", "provider": "glm-4.7", "error": "glm-4.7: HTTP 429"}
+{"ts": "2026-08-16T07:30:12.647834+00:00", "type": "model_call", "task": "BL-006", "role": "auditor", "provider": "glm-4.7-flash", "model": "glm-4.7-flash", "tokens_in": 786, "tokens_out": 624, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 6574, "cost_usd": 0.0}
+{"ts": "2026-08-16T07:30:12.648835+00:00", "type": "audit", "task": "BL-006", "status": "MET"}
+{"ts": "2026-08-16T07:30:13.145947+00:00", "type": "task_verified", "task": "BL-006"}
+{"ts": "2026-08-16T07:30:13.157948+00:00", "type": "task_started", "task": "BL-007", "role": "coder"}
+{"ts": "2026-08-16T07:30:13.720445+00:00", "type": "provider_error", "task": "BL-007", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T07:30:14.134446+00:00", "type": "provider_error", "task": "BL-007", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T07:30:32.808092+00:00", "type": "model_call", "task": "BL-007", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 9067, "tokens_out": 3436, "cached_in": 1280, "retry": 0, "escalated": false, "latency_ms": 18673, "cost_usd": 0.002056}
+{"ts": "2026-08-16T07:30:44.771744+00:00", "type": "bvt", "task": "BL-007", "passed": true}
+{"ts": "2026-08-16T07:31:56.360105+00:00", "type": "qa_run", "task": "BL-007", "passed": false}
+{"ts": "2026-08-16T07:31:56.372106+00:00", "type": "kickback", "task": "BL-007", "attempt": 1}
+{"ts": "2026-08-16T07:31:57.049135+00:00", "type": "provider_error", "task": "BL-007", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T07:31:57.497649+00:00", "type": "provider_error", "task": "BL-007", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T07:32:13.631468+00:00", "type": "model_call", "task": "BL-007", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 10653, "tokens_out": 3080, "cached_in": 1664, "retry": 0, "escalated": false, "latency_ms": 16132, "cost_usd": 0.002126}
+{"ts": "2026-08-16T07:32:25.136623+00:00", "type": "bvt", "task": "BL-007", "passed": true}
+{"ts": "2026-08-16T07:33:35.721899+00:00", "type": "qa_run", "task": "BL-007", "passed": false}
+{"ts": "2026-08-16T07:33:35.732899+00:00", "type": "kickback", "task": "BL-007", "attempt": 2}
+{"ts": "2026-08-16T07:33:35.733898+00:00", "type": "escalation", "task": "BL-007", "level": 1}
+{"ts": "2026-08-16T07:33:36.369410+00:00", "type": "provider_error", "task": "BL-007", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T07:33:36.792410+00:00", "type": "provider_error", "task": "BL-007", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T07:33:59.536860+00:00", "type": "model_call", "task": "BL-007", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 10093, "tokens_out": 4500, "cached_in": 1920, "retry": 0, "escalated": true, "latency_ms": 22743, "cost_usd": 0.00241}
+{"ts": "2026-08-16T07:34:10.697463+00:00", "type": "bvt", "task": "BL-007", "passed": true}
+{"ts": "2026-08-16T07:34:25.004496+00:00", "type": "qa_run", "task": "BL-007", "passed": false}
+{"ts": "2026-08-16T07:34:25.016496+00:00", "type": "kickback", "task": "BL-007", "attempt": 1}
+{"ts": "2026-08-16T07:34:25.828005+00:00", "type": "provider_error", "task": "BL-007", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T07:34:26.188004+00:00", "type": "provider_error", "task": "BL-007", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T07:34:29.757692+00:00", "type": "model_call", "task": "BL-007", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 9916, "tokens_out": 417, "cached_in": 2048, "retry": 0, "escalated": true, "latency_ms": 3568, "cost_usd": 0.001224}
+{"ts": "2026-08-16T07:34:40.743262+00:00", "type": "bvt", "task": "BL-007", "passed": true}
+{"ts": "2026-08-16T07:35:29.382427+00:00", "type": "qa_run", "task": "BL-007", "passed": true}
+{"ts": "2026-08-16T07:35:30.329941+00:00", "type": "provider_error", "task": "BL-007", "role": "auditor", "provider": "kimi-k2.6", "error": "Client error '401 Unauthorized' for url 'https://api.moonshot.ai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401"}
+{"ts": "2026-08-16T07:35:31.293956+00:00", "type": "provider_error", "task": "BL-007", "role": "auditor", "provider": "glm-4.7", "error": "glm-4.7: HTTP 429"}
+{"ts": "2026-08-16T07:35:38.079381+00:00", "type": "provider_error", "task": "BL-007", "role": "auditor", "provider": "glm-4.7-flash", "error": "glm-4.7-flash: empty completion (finish_reason=stop; reasoning model exhausted max_tokens on thinking \u2014 disable thinking via the provider's \"body\" config)"}
+{"ts": "2026-08-16T07:47:34.460865+00:00", "type": "task_started", "task": "BL-007", "role": "coder"}
+{"ts": "2026-08-16T07:47:35.106884+00:00", "type": "provider_error", "task": "BL-007", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T07:47:35.535884+00:00", "type": "provider_error", "task": "BL-007", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T07:47:40.098657+00:00", "type": "model_call", "task": "BL-007", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 9870, "tokens_out": 717, "cached_in": 2048, "retry": 0, "escalated": false, "latency_ms": 4562, "cost_usd": 0.001302}
+{"ts": "2026-08-16T07:47:51.463319+00:00", "type": "bvt", "task": "BL-007", "passed": true}
+{"ts": "2026-08-16T07:48:41.776511+00:00", "type": "qa_run", "task": "BL-007", "passed": true}
+{"ts": "2026-08-16T07:48:42.494108+00:00", "type": "provider_error", "task": "BL-007", "role": "auditor", "provider": "kimi-k2.6", "error": "Client error '401 Unauthorized' for url 'https://api.moonshot.ai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401"}
+{"ts": "2026-08-16T07:48:43.434617+00:00", "type": "provider_error", "task": "BL-007", "role": "auditor", "provider": "glm-4.7", "error": "glm-4.7: HTTP 429"}
+{"ts": "2026-08-16T07:48:45.015410+00:00", "type": "model_call", "task": "BL-007", "role": "auditor", "provider": "glm-4.7-flash", "model": "glm-4.7-flash", "tokens_in": 782, "tokens_out": 51, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 1579, "cost_usd": 0.0}
+{"ts": "2026-08-16T07:48:45.015410+00:00", "type": "audit", "task": "BL-007", "status": "MET"}
+{"ts": "2026-08-16T07:48:45.567449+00:00", "type": "task_verified", "task": "BL-007"}
+{"ts": "2026-08-16T07:48:45.581450+00:00", "type": "task_started", "task": "BL-008", "role": "coder"}
+{"ts": "2026-08-16T07:48:46.126958+00:00", "type": "provider_error", "task": "BL-008", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T07:48:46.540467+00:00", "type": "provider_error", "task": "BL-008", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T07:49:05.273500+00:00", "type": "model_call", "task": "BL-008", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 9454, "tokens_out": 3444, "cached_in": 1664, "retry": 0, "escalated": false, "latency_ms": 18733, "cost_usd": 0.00206}
+{"ts": "2026-08-16T07:49:16.381779+00:00", "type": "bvt", "task": "BL-008", "passed": true}
+{"ts": "2026-08-16T07:50:13.796794+00:00", "type": "qa_run", "task": "BL-008", "passed": false}
+{"ts": "2026-08-16T07:50:13.809795+00:00", "type": "kickback", "task": "BL-008", "attempt": 1}
+{"ts": "2026-08-16T07:50:14.422810+00:00", "type": "provider_error", "task": "BL-008", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T07:50:14.854247+00:00", "type": "provider_error", "task": "BL-008", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T07:50:32.459856+00:00", "type": "model_call", "task": "BL-008", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 11042, "tokens_out": 3452, "cached_in": 1664, "retry": 0, "escalated": false, "latency_ms": 17604, "cost_usd": 0.002284}
+{"ts": "2026-08-16T07:50:43.528297+00:00", "type": "bvt", "task": "BL-008", "passed": true}
+{"ts": "2026-08-16T07:51:41.901602+00:00", "type": "qa_run", "task": "BL-008", "passed": false}
+{"ts": "2026-08-16T07:51:41.912603+00:00", "type": "kickback", "task": "BL-008", "attempt": 2}
+{"ts": "2026-08-16T07:51:41.913604+00:00", "type": "escalation", "task": "BL-008", "level": 1}
+{"ts": "2026-08-16T07:51:42.488111+00:00", "type": "provider_error", "task": "BL-008", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T07:51:42.915184+00:00", "type": "provider_error", "task": "BL-008", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T07:51:57.957323+00:00", "type": "model_call", "task": "BL-008", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 11042, "tokens_out": 2875, "cached_in": 2048, "retry": 0, "escalated": true, "latency_ms": 15041, "cost_usd": 0.00207}
+{"ts": "2026-08-16T07:52:09.062868+00:00", "type": "bvt", "task": "BL-008", "passed": true}
+{"ts": "2026-08-16T07:53:06.561237+00:00", "type": "qa_run", "task": "BL-008", "passed": false}
+{"ts": "2026-08-16T07:53:06.572238+00:00", "type": "kickback", "task": "BL-008", "attempt": 1}
+{"ts": "2026-08-16T07:53:07.160747+00:00", "type": "provider_error", "task": "BL-008", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T07:53:07.605746+00:00", "type": "provider_error", "task": "BL-008", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T07:53:17.740081+00:00", "type": "model_call", "task": "BL-008", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 11142, "tokens_out": 1835, "cached_in": 2048, "retry": 0, "escalated": true, "latency_ms": 10133, "cost_usd": 0.001793}
+{"ts": "2026-08-16T07:53:28.849257+00:00", "type": "bvt", "task": "BL-008", "passed": true}
+{"ts": "2026-08-16T07:54:28.156886+00:00", "type": "qa_run", "task": "BL-008", "passed": true}
+{"ts": "2026-08-16T07:54:28.979904+00:00", "type": "provider_error", "task": "BL-008", "role": "auditor", "provider": "kimi-k2.6", "error": "Client error '401 Unauthorized' for url 'https://api.moonshot.ai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401"}
+{"ts": "2026-08-16T07:54:30.118170+00:00", "type": "provider_error", "task": "BL-008", "role": "auditor", "provider": "glm-4.7", "error": "glm-4.7: HTTP 429"}
+{"ts": "2026-08-16T07:54:31.627698+00:00", "type": "model_call", "task": "BL-008", "role": "auditor", "provider": "glm-4.7-flash", "model": "glm-4.7-flash", "tokens_in": 793, "tokens_out": 47, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 1509, "cost_usd": 0.0}
+{"ts": "2026-08-16T07:54:31.628699+00:00", "type": "audit", "task": "BL-008", "status": "MET"}
+{"ts": "2026-08-16T07:54:32.114288+00:00", "type": "task_verified", "task": "BL-008"}
+{"ts": "2026-08-16T07:54:32.126289+00:00", "type": "task_started", "task": "BL-009", "role": "coder"}
+{"ts": "2026-08-16T07:54:32.927395+00:00", "type": "provider_error", "task": "BL-009", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T07:54:33.333903+00:00", "type": "provider_error", "task": "BL-009", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T07:54:56.722710+00:00", "type": "model_call", "task": "BL-009", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 9783, "tokens_out": 4015, "cached_in": 1664, "retry": 0, "escalated": false, "latency_ms": 23387, "cost_usd": 0.002266}
+{"ts": "2026-08-16T07:55:07.764390+00:00", "type": "bvt", "task": "BL-009", "passed": true}
+{"ts": "2026-08-16T07:56:12.105780+00:00", "type": "qa_run", "task": "BL-009", "passed": false}
+{"ts": "2026-08-16T07:56:12.117779+00:00", "type": "kickback", "task": "BL-009", "attempt": 1}
+{"ts": "2026-08-16T07:56:12.739288+00:00", "type": "provider_error", "task": "BL-009", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T07:56:13.170804+00:00", "type": "provider_error", "task": "BL-009", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T07:56:23.068130+00:00", "type": "model_call", "task": "BL-009", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 12287, "tokens_out": 1654, "cached_in": 1664, "retry": 0, "escalated": false, "latency_ms": 9896, "cost_usd": 0.001955}
+{"ts": "2026-08-16T07:56:34.182763+00:00", "type": "bvt", "task": "BL-009", "passed": true}
+{"ts": "2026-08-16T07:57:39.866306+00:00", "type": "qa_run", "task": "BL-009", "passed": false}
+{"ts": "2026-08-16T07:57:39.878306+00:00", "type": "kickback", "task": "BL-009", "attempt": 2}
+{"ts": "2026-08-16T07:57:39.879305+00:00", "type": "escalation", "task": "BL-009", "level": 1}
+{"ts": "2026-08-16T07:57:40.501067+00:00", "type": "provider_error", "task": "BL-009", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T07:57:40.952577+00:00", "type": "provider_error", "task": "BL-009", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T07:57:49.975147+00:00", "type": "model_call", "task": "BL-009", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 11843, "tokens_out": 1654, "cached_in": 2048, "retry": 0, "escalated": true, "latency_ms": 9021, "cost_usd": 0.00184}
+{"ts": "2026-08-16T07:58:01.143765+00:00", "type": "bvt", "task": "BL-009", "passed": true}
+{"ts": "2026-08-16T07:59:05.231556+00:00", "type": "qa_run", "task": "BL-009", "passed": false}
+{"ts": "2026-08-16T07:59:05.245557+00:00", "type": "kickback", "task": "BL-009", "attempt": 1}
+{"ts": "2026-08-16T07:59:05.850066+00:00", "type": "provider_error", "task": "BL-009", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T07:59:06.286066+00:00", "type": "provider_error", "task": "BL-009", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T07:59:16.199676+00:00", "type": "model_call", "task": "BL-009", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 11842, "tokens_out": 1742, "cached_in": 2048, "retry": 0, "escalated": true, "latency_ms": 9913, "cost_usd": 0.001865}
+{"ts": "2026-08-16T07:59:27.352630+00:00", "type": "bvt", "task": "BL-009", "passed": true}
+{"ts": "2026-08-16T08:00:31.532282+00:00", "type": "qa_run", "task": "BL-009", "passed": false}
+{"ts": "2026-08-16T08:00:31.543283+00:00", "type": "kickback", "task": "BL-009", "attempt": 2}
+{"ts": "2026-08-16T08:00:31.544283+00:00", "type": "escalation", "task": "BL-009", "level": 2}
+{"ts": "2026-08-16T08:00:32.164790+00:00", "type": "provider_error", "task": "BL-009", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T08:00:32.600302+00:00", "type": "provider_error", "task": "BL-009", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T08:00:42.997548+00:00", "type": "model_call", "task": "BL-009", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 11931, "tokens_out": 1919, "cached_in": 2048, "retry": 0, "escalated": true, "latency_ms": 10397, "cost_usd": 0.001927}
+{"ts": "2026-08-16T08:00:54.109538+00:00", "type": "bvt", "task": "BL-009", "passed": true}
+{"ts": "2026-08-16T08:01:58.115826+00:00", "type": "qa_run", "task": "BL-009", "passed": false}
+{"ts": "2026-08-16T08:01:58.127827+00:00", "type": "kickback", "task": "BL-009", "attempt": 1}
+{"ts": "2026-08-16T08:01:58.719854+00:00", "type": "provider_error", "task": "BL-009", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T08:01:59.157369+00:00", "type": "provider_error", "task": "BL-009", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T08:02:09.049532+00:00", "type": "model_call", "task": "BL-009", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 12107, "tokens_out": 1713, "cached_in": 2048, "retry": 0, "escalated": true, "latency_ms": 9892, "cost_usd": 0.001894}
+{"ts": "2026-08-16T08:02:20.145470+00:00", "type": "bvt", "task": "BL-009", "passed": true}
+{"ts": "2026-08-16T08:03:24.283018+00:00", "type": "qa_run", "task": "BL-009", "passed": false}
+{"ts": "2026-08-16T08:03:24.294016+00:00", "type": "kickback", "task": "BL-009", "attempt": 2}
+{"ts": "2026-08-16T08:03:24.305016+00:00", "type": "human_ticket", "task": "BL-009", "audit": {}}
+{"ts": "2026-08-16T08:16:07.681492+00:00", "type": "task_started", "task": "BL-009", "role": "coder"}
+{"ts": "2026-08-16T08:16:08.320000+00:00", "type": "provider_error", "task": "BL-009", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T08:16:08.755511+00:00", "type": "provider_error", "task": "BL-009", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T08:16:17.524831+00:00", "type": "model_call", "task": "BL-009", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 11760, "tokens_out": 1597, "cached_in": 1280, "retry": 0, "escalated": false, "latency_ms": 8768, "cost_usd": 0.001918}
+{"ts": "2026-08-16T08:16:28.845409+00:00", "type": "bvt", "task": "BL-009", "passed": true}
+{"ts": "2026-08-16T08:17:34.075285+00:00", "type": "qa_run", "task": "BL-009", "passed": true}
+{"ts": "2026-08-16T08:17:34.980817+00:00", "type": "provider_error", "task": "BL-009", "role": "auditor", "provider": "kimi-k2.6", "error": "Client error '401 Unauthorized' for url 'https://api.moonshot.ai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401"}
+{"ts": "2026-08-16T08:17:36.125174+00:00", "type": "provider_error", "task": "BL-009", "role": "auditor", "provider": "glm-4.7", "error": "glm-4.7: HTTP 429"}
+{"ts": "2026-08-16T08:17:37.873696+00:00", "type": "model_call", "task": "BL-009", "role": "auditor", "provider": "glm-4.7-flash", "model": "glm-4.7-flash", "tokens_in": 790, "tokens_out": 60, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 1747, "cost_usd": 0.0}
+{"ts": "2026-08-16T08:17:37.873696+00:00", "type": "audit", "task": "BL-009", "status": "MET"}
+{"ts": "2026-08-16T08:17:38.358493+00:00", "type": "task_verified", "task": "BL-009"}
+{"ts": "2026-08-16T08:17:38.371493+00:00", "type": "task_started", "task": "BL-010", "role": "coder"}
+{"ts": "2026-08-16T08:17:38.950002+00:00", "type": "provider_error", "task": "BL-010", "role": "coder", "provider": "groq-free", "error": "Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413"}
+{"ts": "2026-08-16T08:17:39.440537+00:00", "type": "provider_error", "task": "BL-010", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: HTTP 429"}
+{"ts": "2026-08-16T08:17:45.206930+00:00", "type": "model_call", "task": "BL-010", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 10125, "tokens_out": 721, "cached_in": 1408, "retry": 0, "escalated": false, "latency_ms": 5765, "cost_usd": 0.001426}
+{"ts": "2026-08-16T08:17:56.106961+00:00", "type": "bvt", "task": "BL-010", "passed": true}
+{"ts": "2026-08-16T08:19:01.564978+00:00", "type": "qa_run", "task": "BL-010", "passed": true}
+{"ts": "2026-08-16T08:19:02.141490+00:00", "type": "provider_error", "task": "BL-010", "role": "auditor", "provider": "kimi-k2.6", "error": "Client error '401 Unauthorized' for url 'https://api.moonshot.ai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401"}
+{"ts": "2026-08-16T08:19:03.144996+00:00", "type": "provider_error", "task": "BL-010", "role": "auditor", "provider": "glm-4.7", "error": "glm-4.7: HTTP 429"}
+{"ts": "2026-08-16T08:19:05.005083+00:00", "type": "model_call", "task": "BL-010", "role": "auditor", "provider": "glm-4.7-flash", "model": "glm-4.7-flash", "tokens_in": 782, "tokens_out": 57, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 1859, "cost_usd": 0.0}
+{"ts": "2026-08-16T08:19:05.006081+00:00", "type": "audit", "task": "BL-010", "status": "MET"}
+{"ts": "2026-08-16T08:19:05.453917+00:00", "type": "task_verified", "task": "BL-010"}

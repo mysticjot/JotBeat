@@ -17,6 +17,13 @@ def run_ac_suite(acceptance_ids: list[str]) -> dict:
     env = dict(os.environ)
     # Browsers installed into game/node_modules (repo-local, gitignored).
     env.setdefault("PLAYWRIGHT_BROWSERS_PATH", "0")
+    # Never reuse an existing webServer: playwright.config sets
+    # reuseExistingServer when CI is unset, which silently tests STALE bytes
+    # if a previous `vite preview` is still on the port (blocked BL-005 four
+    # times against a pre-relocation build while the code was already fixed).
+    # With CI set, playwright always runs the configured command (fresh build
+    # + preview) and fails loudly if the port is occupied.
+    env["CI"] = "1"
 
     cmd = "npx playwright test --reporter=list"
     if acceptance_ids:
