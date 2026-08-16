@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { setPosition, setScene, addToInventory, removeFromInventory } from '../debug';
+import { setPosition, setScene, addToInventory, removeFromInventory, setVictory } from '../debug';
 import { Player } from '../entities/Player';
 import { Key } from '../entities/Key';
 import { Door } from '../entities/Door';
@@ -29,6 +29,11 @@ export class Game extends Scene
         //  Greybox tileset: gid 1 = floor, gid 2 = wall.
         map.setCollisionBetween(2, 2, true, false, 'Dungeon');
 
+        //  Arcade world bounds default to the CANVAS size (640x480), not the
+        //  map — with collideWorldBounds the player hits an invisible wall at
+        //  x=630 and can never reach the exit at x=656 (blocked BL-006).
+        this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
         this.player = new Player(this, 5 * 32 + 16, 5 * 32 + 16);
         // Key on the row-8 main corridor (fully open floor, crosses the
         // col-9 wall strip through its only gap) — human-approved greybox
@@ -46,6 +51,15 @@ export class Game extends Scene
         this.physics.add.collider(this.player, layer);
         this.physics.add.collider(this.player, this.door, this.openDoor, undefined, this);
         this.physics.add.overlap(this.player, this.key, this.pickUpKey, undefined, this);
+
+        // Exit trigger: an invisible zone on the far east of the map.
+        // Choose a wide-open floor tile not blocked by any wall — tile (20, 8)
+        // is on the row-8 corridor, far past the door at (12, 8) and fully open.
+        const exitTileCol = 20;
+        const exitTileRow = 8;
+        const exitZone = this.add.zone(exitTileCol * 32 + 16, exitTileRow * 32 + 16, 32, 32);
+        this.physics.add.existing(exitZone, true);  // immovable static body
+        this.physics.add.overlap(this.player, exitZone, this.triggerVictory, undefined, this);
 
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
@@ -85,5 +99,16 @@ export class Game extends Scene
                 removeFromInventory('keys');
             }
         }
+    }
+
+    private triggerVictory (player: Phaser.GameObjects.GameObject, exit: Phaser.GameObjects.GameObject)
+    {
+        if (!this.doorOpened) {
+            // The exit should only trigger after the door is unlocked/open.
+            return;
+        }
+        // Transition to the Victory scene and mark it in the debug state.
+        setVictory();
+        this.scene.start('Victory');
     }
 }

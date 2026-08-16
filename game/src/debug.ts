@@ -55,6 +55,11 @@ export function setScene (scene: string): void
     state.scene = scene;
 }
 
+export function setVictory (): void
+{
+    state.scene = 'Victory';
+}
+
 export function setPosition (x: number, y: number): void
 {
     state.position.x = Math.round(x * 100) / 100;

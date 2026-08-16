@@ -1,6 +1,7 @@
 import { Boot } from './scenes/Boot';
 import { Game as MainGame } from './scenes/Game';
 import { Title } from './scenes/Title';
+import { Victory } from './scenes/Victory';
 import { AUTO, Game } from 'phaser';
 import { getSeed, installDebugHook } from './debug';
 
@@ -24,7 +25,8 @@ const config: Phaser.Types.Core.GameConfig = {
     scene: [
         Boot,
         Title,
-        MainGame
+        MainGame,
+        Victory
     ]
 };
 
