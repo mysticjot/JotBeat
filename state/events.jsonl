@@ -114,3 +114,329 @@
 {"ts": "2026-08-16T00:39:17.782002+00:00", "type": "model_call", "task": "provider-test", "role": "provider_test", "provider": "glm-4.6v-flash", "model": "glm-4.6v-flash", "tokens_in": 15, "tokens_out": 16, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 14143, "cost_usd": 0.0}
 {"ts": "2026-08-16T00:39:18.929619+00:00", "type": "model_call", "task": "provider-test", "role": "provider_test", "provider": "openrouter-free", "model": "nvidia/nemotron-3-super-120b-a12b:free", "tokens_in": 23, "tokens_out": 16, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 1007, "cost_usd": 0.0}
 {"ts": "2026-08-16T00:39:20.839300+00:00", "type": "model_call", "task": "provider-test", "role": "provider_test", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 7, "tokens_out": 16, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 1753, "cost_usd": 0.0}
+{"ts": "2026-08-16T00:53:26.965306+00:00", "type": "task_started", "task": "BL-001", "role": "coder"}
+{"ts": "2026-08-16T00:53:28.053891+00:00", "type": "model_call", "task": "BL-001", "role": "coder", "provider": "groq-free", "model": "llama-3.3-70b-versatile", "tokens_in": 74, "tokens_out": 228, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 1078, "cost_usd": 0.0}
+{"ts": "2026-08-16T00:53:40.531736+00:00", "type": "bvt", "task": "BL-001", "passed": true}
+{"ts": "2026-08-16T00:53:56.558742+00:00", "type": "qa_run", "task": "BL-001", "passed": false}
+{"ts": "2026-08-16T00:53:56.580776+00:00", "type": "kickback", "task": "BL-001", "attempt": 1}
+{"ts": "2026-08-16T00:54:09.393049+00:00", "type": "bvt", "task": "BL-001", "passed": true}
+{"ts": "2026-08-16T00:54:26.466836+00:00", "type": "qa_run", "task": "BL-001", "passed": false}
+{"ts": "2026-08-16T00:54:26.482868+00:00", "type": "kickback", "task": "BL-001", "attempt": 2}
+{"ts": "2026-08-16T00:54:39.074815+00:00", "type": "bvt", "task": "BL-001", "passed": true}
+{"ts": "2026-08-16T00:54:54.970586+00:00", "type": "qa_run", "task": "BL-001", "passed": false}
+{"ts": "2026-08-16T00:54:54.975588+00:00", "type": "kickback", "task": "BL-001", "attempt": 3}
+{"ts": "2026-08-16T00:55:07.336508+00:00", "type": "bvt", "task": "BL-001", "passed": true}
+{"ts": "2026-08-16T00:55:23.011788+00:00", "type": "qa_run", "task": "BL-001", "passed": false}
+{"ts": "2026-08-16T00:55:23.016306+00:00", "type": "kickback", "task": "BL-001", "attempt": 4}
+{"ts": "2026-08-16T00:55:34.853407+00:00", "type": "bvt", "task": "BL-001", "passed": true}
+{"ts": "2026-08-16T00:55:50.489720+00:00", "type": "qa_run", "task": "BL-001", "passed": false}
+{"ts": "2026-08-16T00:55:50.493719+00:00", "type": "kickback", "task": "BL-001", "attempt": 5}
+{"ts": "2026-08-16T00:56:02.906593+00:00", "type": "bvt", "task": "BL-001", "passed": true}
+{"ts": "2026-08-16T00:56:20.028249+00:00", "type": "qa_run", "task": "BL-001", "passed": false}
+{"ts": "2026-08-16T00:56:20.032254+00:00", "type": "kickback", "task": "BL-001", "attempt": 6}
+{"ts": "2026-08-16T00:56:32.314208+00:00", "type": "bvt", "task": "BL-001", "passed": true}
+{"ts": "2026-08-16T00:56:48.172649+00:00", "type": "qa_run", "task": "BL-001", "passed": false}
+{"ts": "2026-08-16T00:56:48.177649+00:00", "type": "kickback", "task": "BL-001", "attempt": 7}
+{"ts": "2026-08-16T00:57:00.603731+00:00", "type": "bvt", "task": "BL-001", "passed": true}
+{"ts": "2026-08-16T00:57:17.715378+00:00", "type": "qa_run", "task": "BL-001", "passed": false}
+{"ts": "2026-08-16T00:57:17.720892+00:00", "type": "kickback", "task": "BL-001", "attempt": 8}
+{"ts": "2026-08-16T00:57:30.413510+00:00", "type": "bvt", "task": "BL-001", "passed": true}
+{"ts": "2026-08-16T00:57:46.259416+00:00", "type": "qa_run", "task": "BL-001", "passed": false}
+{"ts": "2026-08-16T00:57:46.263416+00:00", "type": "kickback", "task": "BL-001", "attempt": 9}
+{"ts": "2026-08-16T00:58:00.038120+00:00", "type": "bvt", "task": "BL-001", "passed": true}
+{"ts": "2026-08-16T00:58:05.794914+00:00", "type": "qa_run", "task": "BL-001", "passed": false}
+{"ts": "2026-08-16T00:58:05.799914+00:00", "type": "kickback", "task": "BL-001", "attempt": 10}
+{"ts": "2026-08-16T01:08:11.698074+00:00", "type": "task_started", "task": "BL-001", "role": "coder"}
+{"ts": "2026-08-16T01:08:14.144604+00:00", "type": "model_call", "task": "BL-001", "role": "coder", "provider": "groq-free", "model": "llama-3.3-70b-versatile", "tokens_in": 6254, "tokens_out": 375, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 1797, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:08:26.283383+00:00", "type": "bvt", "task": "BL-001", "passed": true}
+{"ts": "2026-08-16T01:08:47.391012+00:00", "type": "qa_run", "task": "BL-001", "passed": true}
+{"ts": "2026-08-16T01:08:53.126498+00:00", "type": "model_call", "task": "BL-001", "role": "auditor", "provider": "glm-4.7-flash", "model": "glm-4.7-flash", "tokens_in": 88, "tokens_out": 283, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 3930, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:08:53.127498+00:00", "type": "audit", "task": "BL-001", "status": "UNVERIFIED"}
+{"ts": "2026-08-16T01:08:53.139499+00:00", "type": "human_ticket", "task": "BL-001", "audit": {"status": "UNVERIFIED", "evidence": ["task id: BL-001", "acceptance criteria: AC-001", "build digest: passed=True steps=['build']", "qa digest: passed=True tests=['AC-001']"], "patch_instructions": "", "model_response": "Verdict: MET"}}
+{"ts": "2026-08-16T01:11:49.663787+00:00", "type": "task_started", "task": "BL-001", "role": "coder"}
+{"ts": "2026-08-16T01:11:51.526764+00:00", "type": "model_call", "task": "BL-001", "role": "coder", "provider": "groq-free", "model": "llama-3.3-70b-versatile", "tokens_in": 6265, "tokens_out": 273, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 1660, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:12:04.042971+00:00", "type": "bvt", "task": "BL-001", "passed": true}
+{"ts": "2026-08-16T01:12:21.601537+00:00", "type": "qa_run", "task": "BL-001", "passed": true}
+{"ts": "2026-08-16T01:12:31.740943+00:00", "type": "model_call", "task": "BL-001", "role": "auditor", "provider": "glm-4.7-flash", "model": "glm-4.7-flash", "tokens_in": 206, "tokens_out": 764, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 8578, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:12:31.741944+00:00", "type": "audit", "task": "BL-001", "status": "MET"}
+{"ts": "2026-08-16T01:12:32.344580+00:00", "type": "task_verified", "task": "BL-001"}
+{"ts": "2026-08-16T01:12:32.358578+00:00", "type": "task_started", "task": "BL-002", "role": "coder"}
+{"ts": "2026-08-16T01:12:33.905110+00:00", "type": "model_call", "task": "BL-002", "role": "coder", "provider": "groq-free", "model": "llama-3.3-70b-versatile", "tokens_in": 6266, "tokens_out": 211, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 1343, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:12:46.176423+00:00", "type": "bvt", "task": "BL-002", "passed": true}
+{"ts": "2026-08-16T01:13:06.249964+00:00", "type": "qa_run", "task": "BL-002", "passed": true}
+{"ts": "2026-08-16T01:13:13.992422+00:00", "type": "model_call", "task": "BL-002", "role": "auditor", "provider": "glm-4.7-flash", "model": "glm-4.7-flash", "tokens_in": 207, "tokens_out": 512, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 6118, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:13:13.993421+00:00", "type": "audit", "task": "BL-002", "status": "MET"}
+{"ts": "2026-08-16T01:13:14.466877+00:00", "type": "task_verified", "task": "BL-002"}
+{"ts": "2026-08-16T01:13:14.478877+00:00", "type": "task_started", "task": "BL-003", "role": "coder"}
+{"ts": "2026-08-16T01:16:15.552848+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 5622, "tokens_out": 4500, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 180478, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:17:53.576489+00:00", "type": "task_started", "task": "BL-003", "role": "coder"}
+{"ts": "2026-08-16T01:17:58.631628+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "groq-free", "model": "llama-3.3-70b-versatile", "tokens_in": 6284, "tokens_out": 1232, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 4845, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:18:10.883752+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:18:29.146635+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:18:29.151634+00:00", "type": "kickback", "task": "BL-003", "attempt": 1}
+{"ts": "2026-08-16T01:18:41.449856+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:18:59.382081+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:18:59.401103+00:00", "type": "kickback", "task": "BL-003", "attempt": 2}
+{"ts": "2026-08-16T01:19:11.692258+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:19:29.663881+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:19:29.667882+00:00", "type": "kickback", "task": "BL-003", "attempt": 3}
+{"ts": "2026-08-16T01:19:41.887443+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:19:59.884142+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:19:59.888142+00:00", "type": "kickback", "task": "BL-003", "attempt": 4}
+{"ts": "2026-08-16T01:20:12.197438+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:20:30.264052+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:20:30.269052+00:00", "type": "kickback", "task": "BL-003", "attempt": 5}
+{"ts": "2026-08-16T01:20:42.664929+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:21:00.629097+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:21:00.633097+00:00", "type": "kickback", "task": "BL-003", "attempt": 6}
+{"ts": "2026-08-16T01:21:12.977226+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:21:30.938683+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:21:30.941684+00:00", "type": "kickback", "task": "BL-003", "attempt": 7}
+{"ts": "2026-08-16T01:21:43.243379+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:22:01.212927+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:22:01.218927+00:00", "type": "kickback", "task": "BL-003", "attempt": 8}
+{"ts": "2026-08-16T01:22:13.608459+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:22:31.604874+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:22:31.608873+00:00", "type": "kickback", "task": "BL-003", "attempt": 9}
+{"ts": "2026-08-16T01:22:32.777920+00:00", "type": "bvt", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:22:32.782919+00:00", "type": "kickback", "task": "BL-003", "attempt": 10}
+{"ts": "2026-08-16T01:29:21.446098+00:00", "type": "task_started", "task": "BL-003", "role": "coder"}
+{"ts": "2026-08-16T01:29:23.513116+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "groq-free", "model": "llama-3.3-70b-versatile", "tokens_in": 6501, "tokens_out": 259, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 1841, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:29:35.819813+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:29:55.205213+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:29:55.218214+00:00", "type": "kickback", "task": "BL-003", "attempt": 1}
+{"ts": "2026-08-16T01:29:56.890795+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "groq-free", "model": "llama-3.3-70b-versatile", "tokens_in": 6551, "tokens_out": 192, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 1469, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:30:09.191659+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:30:27.878641+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:30:27.883643+00:00", "type": "kickback", "task": "BL-003", "attempt": 2}
+{"ts": "2026-08-16T01:30:27.884642+00:00", "type": "escalation", "task": "BL-003", "level": 1}
+{"ts": "2026-08-16T01:30:51.057684+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 5891, "tokens_out": 859, "cached_in": 0, "retry": 0, "escalated": true, "latency_ms": 22602, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:32:10.942034+00:00", "type": "task_started", "task": "BL-003", "role": "coder"}
+{"ts": "2026-08-16T01:32:13.283364+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "groq-free", "model": "llama-3.3-70b-versatile", "tokens_in": 6501, "tokens_out": 221, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 2129, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:32:25.992618+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:32:45.079609+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:32:45.083608+00:00", "type": "kickback", "task": "BL-003", "attempt": 1}
+{"ts": "2026-08-16T01:32:47.086937+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "groq-free", "model": "llama-3.3-70b-versatile", "tokens_in": 6551, "tokens_out": 301, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 1800, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:32:59.417770+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:33:18.095614+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:33:18.098615+00:00", "type": "kickback", "task": "BL-003", "attempt": 2}
+{"ts": "2026-08-16T01:33:18.100615+00:00", "type": "escalation", "task": "BL-003", "level": 1}
+{"ts": "2026-08-16T01:34:42.023006+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 5891, "tokens_out": 3832, "cached_in": 0, "retry": 0, "escalated": true, "latency_ms": 83351, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:34:54.416169+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:35:13.044855+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:35:13.047854+00:00", "type": "kickback", "task": "BL-003", "attempt": 1}
+{"ts": "2026-08-16T01:35:14.663363+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "groq-free", "model": "llama-3.3-70b-versatile", "tokens_in": 6551, "tokens_out": 206, "cached_in": 0, "retry": 0, "escalated": true, "latency_ms": 1411, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:35:26.947712+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:35:45.529584+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:35:45.534096+00:00", "type": "kickback", "task": "BL-003", "attempt": 2}
+{"ts": "2026-08-16T01:35:45.535096+00:00", "type": "escalation", "task": "BL-003", "level": 2}
+{"ts": "2026-08-16T01:35:47.400838+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "groq-free", "model": "llama-3.3-70b-versatile", "tokens_in": 6551, "tokens_out": 236, "cached_in": 0, "retry": 0, "escalated": true, "latency_ms": 1664, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:35:59.737814+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:36:20.765708+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:36:20.774708+00:00", "type": "kickback", "task": "BL-003", "attempt": 1}
+{"ts": "2026-08-16T01:36:22.772164+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "groq-free", "model": "llama-3.3-70b-versatile", "tokens_in": 6551, "tokens_out": 272, "cached_in": 0, "retry": 0, "escalated": true, "latency_ms": 1797, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:36:34.951870+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:37:21.591675+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:37:21.595675+00:00", "type": "kickback", "task": "BL-003", "attempt": 2}
+{"ts": "2026-08-16T01:37:21.599676+00:00", "type": "human_ticket", "task": "BL-003", "audit": {"status": "MET", "evidence": ["task id: BL-002", "acceptance criteria text:\n## AC-002: Wall Collision\nGiven the player is adjacent to a wall tile,\nwhen the player moves in the direction of the wall,\nthen the player's position remains unchanged and does not clip.\n\nVerification: scripted browser test\nEvidence: `window.__game.state.position` is constant after blocked input\nTest: game/tests/ac-002-wall-collision.spec.ts\nStatus: UNVERIFIED", "build digest: passed=True steps=['build']", "qa digest: passed=True tests=['AC-002']"], "patch_instructions": "N/A\n\nThe build passed successfully, and the scripted QA test for AC-002 explicitly passed, confirming the player's position remains constant when attempting to move into a wall.", "model_response": "Verdict: MET\n\nPatch: N/A\n\nThe build passed successfully, and the scripted QA test for AC-002 explicitly passed, confirming the player's position remains constant when attempting to move into a wall."}}
+{"ts": "2026-08-16T01:40:04.788420+00:00", "type": "task_started", "task": "BL-003", "role": "coder"}
+{"ts": "2026-08-16T01:46:34.446513+00:00", "type": "task_started", "task": "BL-003", "role": "coder"}
+{"ts": "2026-08-16T01:46:35.066023+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T01:49:36.988100+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (truncation or refusal)"}
+{"ts": "2026-08-16T01:50:11.618656+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "deepseek-v4-flash", "error": "deepseek-v4-flash: empty completion (truncation or refusal)"}
+{"ts": "2026-08-16T01:54:59.504610+00:00", "type": "task_started", "task": "BL-003", "role": "coder"}
+{"ts": "2026-08-16T01:55:00.141143+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T01:55:22.080929+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 6488, "tokens_out": 694, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 21938, "cost_usd": 0.0}
+{"ts": "2026-08-16T01:55:34.151702+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T01:56:20.613934+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T01:56:20.618934+00:00", "type": "kickback", "task": "BL-003", "attempt": 1}
+{"ts": "2026-08-16T01:56:21.181447+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T01:59:00.175978+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=error; truncation or refusal)"}
+{"ts": "2026-08-16T01:59:05.794001+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 7109, "tokens_out": 934, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 5618, "cost_usd": 0.001257}
+{"ts": "2026-08-16T01:59:17.648934+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T02:00:04.109893+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T02:00:04.121892+00:00", "type": "kickback", "task": "BL-003", "attempt": 2}
+{"ts": "2026-08-16T02:00:04.122892+00:00", "type": "escalation", "task": "BL-003", "level": 1}
+{"ts": "2026-08-16T02:00:04.737916+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T02:02:31.612892+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 6778, "tokens_out": 3087, "cached_in": 0, "retry": 0, "escalated": true, "latency_ms": 146872, "cost_usd": 0.0}
+{"ts": "2026-08-16T02:02:43.516750+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T02:03:30.120925+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T02:03:30.133925+00:00", "type": "kickback", "task": "BL-003", "attempt": 1}
+{"ts": "2026-08-16T02:03:30.963942+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T02:06:05.720952+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 7079, "tokens_out": 4498, "cached_in": 0, "retry": 0, "escalated": true, "latency_ms": 154757, "cost_usd": 0.0}
+{"ts": "2026-08-16T02:10:49.853668+00:00", "type": "task_started", "task": "BL-003", "role": "coder"}
+{"ts": "2026-08-16T02:10:50.532177+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T02:13:13.341794+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T02:13:17.487794+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 7219, "tokens_out": 605, "cached_in": 512, "retry": 0, "escalated": false, "latency_ms": 4145, "cost_usd": 0.00111}
+{"ts": "2026-08-16T02:13:29.474419+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T02:14:15.958834+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T02:14:15.971835+00:00", "type": "kickback", "task": "BL-003", "attempt": 1}
+{"ts": "2026-08-16T02:14:16.565346+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T02:16:59.601892+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T02:17:07.004154+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 7480, "tokens_out": 1154, "cached_in": 640, "retry": 0, "escalated": false, "latency_ms": 7401, "cost_usd": 0.001283}
+{"ts": "2026-08-16T02:17:18.948570+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T02:18:05.538525+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T02:18:05.552525+00:00", "type": "kickback", "task": "BL-003", "attempt": 2}
+{"ts": "2026-08-16T02:18:05.553525+00:00", "type": "escalation", "task": "BL-003", "level": 1}
+{"ts": "2026-08-16T02:18:06.339036+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T02:20:33.904025+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T02:20:37.289113+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 7385, "tokens_out": 479, "cached_in": 896, "retry": 0, "escalated": true, "latency_ms": 3383, "cost_usd": 0.001045}
+{"ts": "2026-08-16T02:20:49.280194+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T02:21:35.896490+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T02:21:35.907489+00:00", "type": "kickback", "task": "BL-003", "attempt": 1}
+{"ts": "2026-08-16T02:21:36.502511+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T02:24:15.887782+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 6968, "tokens_out": 4496, "cached_in": 0, "retry": 0, "escalated": true, "latency_ms": 159385, "cost_usd": 0.0}
+{"ts": "2026-08-16T02:24:27.890692+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T02:25:14.300112+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T02:25:14.312112+00:00", "type": "kickback", "task": "BL-003", "attempt": 2}
+{"ts": "2026-08-16T02:25:14.313113+00:00", "type": "escalation", "task": "BL-003", "level": 2}
+{"ts": "2026-08-16T02:25:14.915620+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T02:27:41.253633+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T02:27:47.582770+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 7356, "tokens_out": 1135, "cached_in": 896, "retry": 0, "escalated": true, "latency_ms": 6328, "cost_usd": 0.001225}
+{"ts": "2026-08-16T02:27:59.844098+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T02:28:46.905738+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T02:28:46.915738+00:00", "type": "kickback", "task": "BL-003", "attempt": 1}
+{"ts": "2026-08-16T02:28:47.530250+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T02:31:21.316899+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T02:31:28.093317+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 7366, "tokens_out": 1086, "cached_in": 896, "retry": 0, "escalated": true, "latency_ms": 6773, "cost_usd": 0.001212}
+{"ts": "2026-08-16T02:31:40.828063+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T02:32:28.052774+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T02:32:28.066774+00:00", "type": "kickback", "task": "BL-003", "attempt": 2}
+{"ts": "2026-08-16T02:32:28.080774+00:00", "type": "human_ticket", "task": "BL-003", "audit": {}}
+{"ts": "2026-08-16T02:35:28.434758+00:00", "type": "task_started", "task": "BL-003", "role": "coder"}
+{"ts": "2026-08-16T02:35:29.163265+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T02:37:29.062306+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=error; truncation or refusal)"}
+{"ts": "2026-08-16T02:37:33.759268+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 7605, "tokens_out": 636, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 4695, "cost_usd": 0.001243}
+{"ts": "2026-08-16T02:37:45.559636+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T02:38:17.688509+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T02:38:17.701509+00:00", "type": "kickback", "task": "BL-003", "attempt": 1}
+{"ts": "2026-08-16T02:38:18.305526+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T02:42:15.394446+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T02:42:26.722044+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 8067, "tokens_out": 1523, "cached_in": 256, "retry": 0, "escalated": false, "latency_ms": 11326, "cost_usd": 0.001521}
+{"ts": "2026-08-16T02:42:38.844524+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T02:43:10.893759+00:00", "type": "qa_run", "task": "BL-003", "passed": false}
+{"ts": "2026-08-16T02:43:10.906759+00:00", "type": "kickback", "task": "BL-003", "attempt": 2}
+{"ts": "2026-08-16T02:43:10.907760+00:00", "type": "escalation", "task": "BL-003", "level": 1}
+{"ts": "2026-08-16T02:43:11.518104+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T02:46:28.928492+00:00", "type": "provider_error", "task": "BL-003", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=error; truncation or refusal)"}
+{"ts": "2026-08-16T02:46:37.459774+00:00", "type": "model_call", "task": "BL-003", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 8954, "tokens_out": 1481, "cached_in": 1408, "retry": 0, "escalated": true, "latency_ms": 8529, "cost_usd": 0.001475}
+{"ts": "2026-08-16T02:46:49.415078+00:00", "type": "bvt", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T02:47:08.253631+00:00", "type": "qa_run", "task": "BL-003", "passed": true}
+{"ts": "2026-08-16T02:47:09.047648+00:00", "type": "provider_error", "task": "BL-003", "role": "auditor", "provider": "kimi-k2.6", "error": "Client error '401 Unauthorized' for url 'https://api.moonshot.ai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401"}
+{"ts": "2026-08-16T02:47:10.027671+00:00", "type": "provider_error", "task": "BL-003", "role": "auditor", "provider": "glm-4.7", "error": "glm-4.7: HTTP 429"}
+{"ts": "2026-08-16T02:48:17.150086+00:00", "type": "model_call", "task": "BL-003", "role": "auditor", "provider": "glm-4.7-flash", "model": "glm-4.7-flash", "tokens_in": 610, "tokens_out": 639, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 67120, "cost_usd": 0.0}
+{"ts": "2026-08-16T02:48:17.150086+00:00", "type": "audit", "task": "BL-003", "status": "MET"}
+{"ts": "2026-08-16T02:48:17.722191+00:00", "type": "task_verified", "task": "BL-003"}
+{"ts": "2026-08-16T02:48:17.734191+00:00", "type": "task_started", "task": "BL-004", "role": "coder"}
+{"ts": "2026-08-16T02:48:18.365701+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T02:52:19.023432+00:00", "type": "model_call", "task": "BL-004", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 6873, "tokens_out": 4498, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 240656, "cost_usd": 0.0}
+{"ts": "2026-08-16T02:52:30.873019+00:00", "type": "bvt", "task": "BL-004", "passed": true}
+{"ts": "2026-08-16T02:52:46.638750+00:00", "type": "qa_run", "task": "BL-004", "passed": false}
+{"ts": "2026-08-16T02:52:46.650749+00:00", "type": "kickback", "task": "BL-004", "attempt": 1}
+{"ts": "2026-08-16T02:52:47.232162+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T02:53:03.432481+00:00", "type": "model_call", "task": "BL-004", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 7055, "tokens_out": 567, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 16199, "cost_usd": 0.0}
+{"ts": "2026-08-16T02:53:15.354259+00:00", "type": "bvt", "task": "BL-004", "passed": true}
+{"ts": "2026-08-16T02:53:31.040125+00:00", "type": "qa_run", "task": "BL-004", "passed": false}
+{"ts": "2026-08-16T02:53:31.053126+00:00", "type": "kickback", "task": "BL-004", "attempt": 2}
+{"ts": "2026-08-16T02:53:31.054126+00:00", "type": "escalation", "task": "BL-004", "level": 1}
+{"ts": "2026-08-16T02:53:31.857150+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T02:57:29.655716+00:00", "type": "model_call", "task": "BL-004", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 7055, "tokens_out": 4486, "cached_in": 0, "retry": 0, "escalated": true, "latency_ms": 237798, "cost_usd": 0.0}
+{"ts": "2026-08-16T02:57:41.508402+00:00", "type": "bvt", "task": "BL-004", "passed": true}
+{"ts": "2026-08-16T02:57:57.170498+00:00", "type": "qa_run", "task": "BL-004", "passed": false}
+{"ts": "2026-08-16T02:57:57.182496+00:00", "type": "kickback", "task": "BL-004", "attempt": 1}
+{"ts": "2026-08-16T02:57:57.785402+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T02:59:56.629948+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=error; truncation or refusal)"}
+{"ts": "2026-08-16T03:00:03.093614+00:00", "type": "model_call", "task": "BL-004", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 7433, "tokens_out": 940, "cached_in": 256, "retry": 0, "escalated": true, "latency_ms": 6461, "cost_usd": 0.001269}
+{"ts": "2026-08-16T03:00:14.994784+00:00", "type": "bvt", "task": "BL-004", "passed": true}
+{"ts": "2026-08-16T03:00:32.028860+00:00", "type": "qa_run", "task": "BL-004", "passed": false}
+{"ts": "2026-08-16T03:00:32.041861+00:00", "type": "kickback", "task": "BL-004", "attempt": 2}
+{"ts": "2026-08-16T03:00:32.042861+00:00", "type": "escalation", "task": "BL-004", "level": 2}
+{"ts": "2026-08-16T03:00:32.636970+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T03:03:52.793031+00:00", "type": "model_call", "task": "BL-004", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 8018, "tokens_out": 4492, "cached_in": 0, "retry": 0, "escalated": true, "latency_ms": 200155, "cost_usd": 0.0}
+{"ts": "2026-08-16T03:04:04.696403+00:00", "type": "bvt", "task": "BL-004", "passed": true}
+{"ts": "2026-08-16T03:04:20.487040+00:00", "type": "qa_run", "task": "BL-004", "passed": false}
+{"ts": "2026-08-16T03:04:20.499040+00:00", "type": "kickback", "task": "BL-004", "attempt": 1}
+{"ts": "2026-08-16T03:04:21.115546+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T03:07:08.901854+00:00", "type": "model_call", "task": "BL-004", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 8012, "tokens_out": 4496, "cached_in": 0, "retry": 0, "escalated": true, "latency_ms": 167784, "cost_usd": 0.0}
+{"ts": "2026-08-16T03:07:20.679369+00:00", "type": "bvt", "task": "BL-004", "passed": true}
+{"ts": "2026-08-16T03:07:36.538236+00:00", "type": "qa_run", "task": "BL-004", "passed": false}
+{"ts": "2026-08-16T03:07:36.550235+00:00", "type": "kickback", "task": "BL-004", "attempt": 2}
+{"ts": "2026-08-16T03:07:36.564236+00:00", "type": "human_ticket", "task": "BL-004", "audit": {}}
+{"ts": "2026-08-16T03:10:43.300293+00:00", "type": "task_started", "task": "BL-004", "role": "coder"}
+{"ts": "2026-08-16T03:10:43.928804+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T03:13:51.486763+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T03:14:03.097630+00:00", "type": "model_call", "task": "BL-004", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 8249, "tokens_out": 2297, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 11609, "cost_usd": 0.001798}
+{"ts": "2026-08-16T03:14:15.020778+00:00", "type": "bvt", "task": "BL-004", "passed": true}
+{"ts": "2026-08-16T03:14:42.017909+00:00", "type": "qa_run", "task": "BL-004", "passed": false}
+{"ts": "2026-08-16T03:14:42.029909+00:00", "type": "kickback", "task": "BL-004", "attempt": 1}
+{"ts": "2026-08-16T03:14:42.675416+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T03:17:50.229374+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T03:17:57.077527+00:00", "type": "model_call", "task": "BL-004", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 8778, "tokens_out": 1094, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 6848, "cost_usd": 0.001535}
+{"ts": "2026-08-16T03:18:08.950422+00:00", "type": "bvt", "task": "BL-004", "passed": true}
+{"ts": "2026-08-16T03:18:36.118239+00:00", "type": "qa_run", "task": "BL-004", "passed": false}
+{"ts": "2026-08-16T03:18:36.130239+00:00", "type": "kickback", "task": "BL-004", "attempt": 2}
+{"ts": "2026-08-16T03:18:36.131238+00:00", "type": "escalation", "task": "BL-004", "level": 1}
+{"ts": "2026-08-16T03:18:36.899317+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T03:22:19.499266+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T03:22:30.096122+00:00", "type": "model_call", "task": "BL-004", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 8926, "tokens_out": 1953, "cached_in": 1408, "retry": 0, "escalated": true, "latency_ms": 10595, "cost_usd": 0.001603}
+{"ts": "2026-08-16T03:22:30.817798+00:00", "type": "bvt", "task": "BL-004", "passed": false}
+{"ts": "2026-08-16T03:22:30.829797+00:00", "type": "kickback", "task": "BL-004", "attempt": 1}
+{"ts": "2026-08-16T03:22:31.434820+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T03:25:21.278174+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T03:25:32.196125+00:00", "type": "model_call", "task": "BL-004", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 9270, "tokens_out": 1976, "cached_in": 1536, "retry": 0, "escalated": true, "latency_ms": 10917, "cost_usd": 0.00164}
+{"ts": "2026-08-16T03:25:44.187300+00:00", "type": "bvt", "task": "BL-004", "passed": true}
+{"ts": "2026-08-16T03:26:11.308225+00:00", "type": "qa_run", "task": "BL-004", "passed": false}
+{"ts": "2026-08-16T03:26:11.322224+00:00", "type": "kickback", "task": "BL-004", "attempt": 2}
+{"ts": "2026-08-16T03:26:11.323225+00:00", "type": "escalation", "task": "BL-004", "level": 2}
+{"ts": "2026-08-16T03:26:11.931735+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T03:29:31.053470+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T03:29:39.033221+00:00", "type": "model_call", "task": "BL-004", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 9009, "tokens_out": 1281, "cached_in": 1536, "retry": 0, "escalated": true, "latency_ms": 7978, "cost_usd": 0.001409}
+{"ts": "2026-08-16T03:29:51.071292+00:00", "type": "bvt", "task": "BL-004", "passed": true}
+{"ts": "2026-08-16T03:30:18.165378+00:00", "type": "qa_run", "task": "BL-004", "passed": false}
+{"ts": "2026-08-16T03:30:18.183379+00:00", "type": "kickback", "task": "BL-004", "attempt": 1}
+{"ts": "2026-08-16T03:30:18.792891+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T03:31:28.688713+00:00", "type": "provider_error", "task": "BL-004", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=error; truncation or refusal)"}
+{"ts": "2026-08-16T03:31:37.319185+00:00", "type": "model_call", "task": "BL-004", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 9196, "tokens_out": 1271, "cached_in": 1536, "retry": 0, "escalated": true, "latency_ms": 8628, "cost_usd": 0.001433}
+{"ts": "2026-08-16T03:31:50.210903+00:00", "type": "bvt", "task": "BL-004", "passed": true}
+{"ts": "2026-08-16T03:32:13.695017+00:00", "type": "qa_run", "task": "BL-004", "passed": true}
+{"ts": "2026-08-16T03:32:14.801613+00:00", "type": "provider_error", "task": "BL-004", "role": "auditor", "provider": "kimi-k2.6", "error": "Client error '401 Unauthorized' for url 'https://api.moonshot.ai/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401"}
+{"ts": "2026-08-16T03:32:15.892119+00:00", "type": "provider_error", "task": "BL-004", "role": "auditor", "provider": "glm-4.7", "error": "glm-4.7: HTTP 429"}
+{"ts": "2026-08-16T03:32:22.655121+00:00", "type": "model_call", "task": "BL-004", "role": "auditor", "provider": "glm-4.7-flash", "model": "glm-4.7-flash", "tokens_in": 609, "tokens_out": 563, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 6762, "cost_usd": 0.0}
+{"ts": "2026-08-16T03:32:22.656120+00:00", "type": "audit", "task": "BL-004", "status": "MET"}
+{"ts": "2026-08-16T03:32:23.192310+00:00", "type": "task_verified", "task": "BL-004"}
+{"ts": "2026-08-16T03:32:23.203310+00:00", "type": "task_started", "task": "BL-005", "role": "coder"}
+{"ts": "2026-08-16T03:32:23.864820+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T03:34:51.447278+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 7288, "tokens_out": 4492, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 147582, "cost_usd": 0.0}
+{"ts": "2026-08-16T03:35:03.547723+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T03:35:19.267640+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T03:35:19.279641+00:00", "type": "kickback", "task": "BL-005", "attempt": 1}
+{"ts": "2026-08-16T03:35:19.875018+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T03:38:33.647020+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 7489, "tokens_out": 4492, "cached_in": 0, "retry": 0, "escalated": false, "latency_ms": 193770, "cost_usd": 0.0}
+{"ts": "2026-08-16T03:38:45.665018+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T03:39:01.653711+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T03:39:01.666712+00:00", "type": "kickback", "task": "BL-005", "attempt": 2}
+{"ts": "2026-08-16T03:39:01.667713+00:00", "type": "escalation", "task": "BL-005", "level": 1}
+{"ts": "2026-08-16T03:39:02.241220+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T03:39:36.532998+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 7519, "tokens_out": 861, "cached_in": 0, "retry": 0, "escalated": true, "latency_ms": 34290, "cost_usd": 0.0}
+{"ts": "2026-08-16T03:39:48.591409+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T03:40:04.455520+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T03:40:04.469520+00:00", "type": "kickback", "task": "BL-005", "attempt": 1}
+{"ts": "2026-08-16T03:40:05.052908+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T03:42:40.382483+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "model": "cohere/north-mini-code:free", "tokens_in": 8353, "tokens_out": 4494, "cached_in": 0, "retry": 0, "escalated": true, "latency_ms": 155328, "cost_usd": 0.0}
+{"ts": "2026-08-16T03:42:52.506402+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T03:43:08.250514+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T03:43:08.263514+00:00", "type": "kickback", "task": "BL-005", "attempt": 2}
+{"ts": "2026-08-16T03:43:08.264515+00:00", "type": "escalation", "task": "BL-005", "level": 2}
+{"ts": "2026-08-16T03:43:08.879021+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T03:46:10.486551+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T03:46:15.962689+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 8820, "tokens_out": 812, "cached_in": 0, "retry": 0, "escalated": true, "latency_ms": 5475, "cost_usd": 0.001462}
+{"ts": "2026-08-16T03:46:27.705033+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T03:46:43.464888+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T03:46:43.478890+00:00", "type": "kickback", "task": "BL-005", "attempt": 1}
+{"ts": "2026-08-16T03:46:44.057400+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "groq-free", "error": "groq-free: HTTP 429"}
+{"ts": "2026-08-16T03:49:23.669794+00:00", "type": "provider_error", "task": "BL-005", "role": "coder", "provider": "openrouter-qwen3-coder-free", "error": "openrouter-qwen3-coder-free: empty completion (finish_reason=length; truncation or refusal)"}
+{"ts": "2026-08-16T03:49:32.985522+00:00", "type": "model_call", "task": "BL-005", "role": "coder", "provider": "deepseek-v4-flash", "model": "deepseek-v4-flash", "tokens_in": 8932, "tokens_out": 1661, "cached_in": 1152, "retry": 0, "escalated": true, "latency_ms": 9315, "cost_usd": 0.001558}
+{"ts": "2026-08-16T03:49:45.010177+00:00", "type": "bvt", "task": "BL-005", "passed": true}
+{"ts": "2026-08-16T03:50:00.928207+00:00", "type": "qa_run", "task": "BL-005", "passed": false}
+{"ts": "2026-08-16T03:50:00.942208+00:00", "type": "kickback", "task": "BL-005", "attempt": 2}
+{"ts": "2026-08-16T03:50:00.954206+00:00", "type": "human_ticket", "task": "BL-005", "audit": {}}

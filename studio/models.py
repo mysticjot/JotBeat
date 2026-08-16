@@ -16,7 +16,7 @@ import os
 import time
 from pathlib import Path
 
-from ledger import log_call
+from ledger import log_call, log_event
 
 ROOT = Path(__file__).resolve().parent.parent
 PROVIDERS_FILE = ROOT / "studio" / "providers.json"
@@ -104,9 +104,23 @@ class ModelAdapter:
                 return resp["text"]
             except RateLimited as e:
                 last_err = e
+                log_event(
+                    "provider_error",
+                    task=task_id,
+                    role=self.role,
+                    provider=provider["name"],
+                    error=str(e)[:300],
+                )
                 continue  # fall through the chain — never sleep and wait
             except Exception as e:
                 last_err = e
+                log_event(
+                    "provider_error",
+                    task=task_id,
+                    role=self.role,
+                    provider=provider["name"],
+                    error=str(e)[:300],
+                )
                 continue
         raise AllProvidersExhausted(f"[{self.role}] all providers failed: {last_err}")
 
@@ -145,6 +159,11 @@ class ModelAdapter:
         }
         if output_schema:
             body["response_format"] = {"type": "json_object"}
+        # Optional per-provider extra body params (providers.json "body" object)
+        # — e.g. disabling a reasoning model's thinking so the token budget
+        # goes to the answer, not to hidden reasoning_content. Config, not code.
+        for bk, bv in (provider.get("body") or {}).items():
+            body[bk] = bv
 
         headers = {"Content-Type": "application/json"}
         if api_key:
@@ -169,8 +188,29 @@ class ModelAdapter:
         data = resp.json()
 
         usage = data.get("usage", {})
+        content = data["choices"][0]["message"].get("content")
+        # Some providers return content as a list of parts, or null on
+        # truncation/refusal — normalize; an empty completion is a failed
+        # call so the chain falls through to the next provider.
+        if isinstance(content, list):
+            content = "".join(
+                p.get("text", "") for p in content if isinstance(p, dict)
+            )
+        if not content:
+            ch0 = data["choices"][0]
+            reasoning = ch0.get("message", {}).get("reasoning_content")
+            hint = (
+                "reasoning model exhausted max_tokens on thinking — "
+                "disable thinking via the provider's \"body\" config"
+                if reasoning
+                else "truncation or refusal"
+            )
+            raise AllProvidersExhausted(
+                f"{provider['name']}: empty completion "
+                f"(finish_reason={ch0.get('finish_reason')}; {hint})"
+            )
         return {
-            "text": data["choices"][0]["message"]["content"],
+            "text": content,
             "tokens_in": usage.get("prompt_tokens", 0),
             "tokens_out": usage.get("completion_tokens", 0),
             # OpenAI-compatible cache-hit field -> cached_in (BUDGET.md cost model)

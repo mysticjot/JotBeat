@@ -53,7 +53,21 @@ def select_task(state: StudioState) -> dict:
         return {"done": True}
     set_task_status(task["id"], "IN_DEVELOPMENT")
     log_event("task_started", task=task["id"], role=task["role"])
-    return {"task": task, "attempts": 0, "escalations": 0, "done": False}
+    # Reset ALL per-task fields — the checkpointer persists state across
+    # tasks AND across CLI invocations (fixed thread_id), so without this
+    # a previous task's audit/build/qa leaks into the next task's gates.
+    return {
+        "task": task,
+        "attempts": 0,
+        "escalations": 0,
+        "done": False,
+        "instructions": "",
+        "artifacts": [],
+        "role_notes": "",
+        "build_result": {},
+        "qa_result": {},
+        "audit": {},
+    }
 
 
 def execute_role(state: StudioState) -> dict:
@@ -62,8 +76,13 @@ def execute_role(state: StudioState) -> dict:
     from roles import dispatch  # roles/director.py, coder.py, qa.py, ...
 
     result = dispatch(state["task"], escalation_level=state.get("escalations", 0))
+    # UNION artifacts across attempts: a kickback retry often emits only the
+    # file it fixed, while an earlier attempt wrote the rest. Committing only
+    # the final attempt's list produces hollow commits that don't build
+    # (BL-004's commit shipped a spec without the Door entity it tested).
+    artifacts = sorted(set(state.get("artifacts", [])) | set(result["artifacts"]))
     return {
-        "artifacts": result["artifacts"],
+        "artifacts": artifacts,
         "role_notes": result.get("notes", ""),
         "instructions": result["instructions"],
     }
@@ -80,11 +99,13 @@ def build_verify(state: StudioState) -> dict:
 
 
 def scripted_qa(state: StudioState) -> dict:
-    """Playwright suite for this task's acceptance criteria.
-    Fake input + window.__game.state assertions + screenshots. $0 infra."""
+    """Playwright suite. Fake input + window.__game.state assertions +
+    screenshots. $0 infra. Runs the FULL suite, not just this task's ACs:
+    the commit node sweeps the whole game/ tree, so a green commit must
+    mean the whole suite is green — no cross-AC regressions slip through."""
     from tools.browser import run_ac_suite
 
-    result = run_ac_suite(state["task"].get("acceptance_ids", []))
+    result = run_ac_suite([])
     log_event("qa_run", task=state["task"]["id"], passed=result["passed"])
     return {"qa_result": result}
 
@@ -113,18 +134,40 @@ def commit(state: StudioState) -> dict:
 
 
 def patch(state: StudioState) -> dict:
-    """Kickback: same role tries again with the auditor's patch instructions.
-    Bounded — the escalation ceiling lives in the edges below.
-    Note: patch is also reached from build/QA gate failures, before any audit
-    exists — hence the defensive .get on state["audit"]."""
+    """Kickback: same role tries again with the failure evidence (build/QA
+    digest or the auditor's patch instructions) in its context.
+    Bounded — the escalation ceiling lives in the after_patch edge.
+    Note: patch is also reached from build/QA failure without an audit record
+    — hence the defensive .get on state["audit"]."""
     attempts = state.get("attempts", 0) + 1
-    set_task_status(
-        state["task"]["id"],
-        "KICKED_BACK",
-        reason=state.get("audit", {}).get("patch_instructions", ""),
-    )
+    audit = state.get("audit", {})
+    # Ground truth first: the build/QA log tails are what actually failed.
+    # Auditor patch instructions are advisory and appended, never a
+    # replacement — they can hallucinate, the logs cannot.
+    evidence = []
+    if state.get("build_result") and not state["build_result"].get("passed"):
+        evidence.append(
+            f"build failed: {state['build_result'].get('log_tail', '')[-800:]}"
+        )
+    if state.get("qa_result") and not state["qa_result"].get("passed"):
+        evidence.append(
+            f"QA failed: {state['qa_result'].get('log_tail', '')[-800:]}"
+        )
+    if audit.get("patch_instructions"):
+        evidence.append(f"auditor patch instructions: {audit['patch_instructions']}")
+    # The role's OWN notes (emission errors, refused artifact paths) — the
+    # auditor must never see these, but the retrying role needs to know its
+    # last output was rejected for FORMAT, not content.
+    notes = state.get("role_notes", "")
+    if "emission error" in notes or "refused" in notes:
+        evidence.append(f"your previous emission was rejected: {notes}")
+    reason = "\n\n".join(evidence)
+    set_task_status(state["task"]["id"], "KICKED_BACK", reason=reason[:200])
     log_event("kickback", task=state["task"]["id"], attempt=attempts)
-    return {"attempts": attempts}
+    # Re-entering execute_role needs the failure in the task's context slice.
+    task = dict(state["task"])
+    task["_failure"] = reason
+    return {"attempts": attempts, "task": task}
 
 
 def escalate(state: StudioState) -> dict:
@@ -172,6 +215,17 @@ def after_audit(state: StudioState) -> str:
     return "human_ticket"
 
 
+def after_patch(state: StudioState) -> str:
+    """Kickback routing — the SAME ceilings as after_audit, applied to
+    build/QA failures too (previously patch re-entered build_verify directly,
+    which retested unchanged artifacts in a no-op spin)."""
+    if state.get("attempts", 0) < MAX_ATTEMPTS_BEFORE_ESCALATION:
+        return "execute_role"
+    if state.get("escalations", 0) < MAX_ESCALATIONS_BEFORE_HUMAN:
+        return "escalate"
+    return "human_ticket"
+
+
 def after_commit(state: StudioState) -> str:
     return "select_task"  # loop to the next ready backlog item
 
@@ -212,7 +266,15 @@ def build_graph(checkpointer=None):
             "human_ticket": "human_ticket",
         },
     )
-    g.add_edge("patch", "build_verify")  # retry re-enters at the gate, not the model
+    g.add_conditional_edges(
+        "patch",
+        after_patch,
+        {
+            "execute_role": "execute_role",
+            "escalate": "escalate",
+            "human_ticket": "human_ticket",
+        },
+    )  # kickback re-runs the role WITH the failure evidence; ceilings in after_patch
     g.add_edge(
         "escalate", "execute_role"
     )  # escalation re-runs the role with shrunk context
