@@ -19,3 +19,11 @@ The web build is the single artifact and always works standalone; wrappers are t
 - **Desktop: Electron.** Tauri was considered only if a Rust toolchain (`cargo`) is present; Electron is the locked default because it needs nothing beyond npm. Wrapper deps live in repo-root `desktop/`, never in `game/package.json` (would bloat every CI `npm ci`).
 - **Mobile: Capacitor** (`@capacitor/core` + `cli` + `android` in repo-root `mobile/`), `webDir` pointing at the web build. Same rule: not in `game/package.json`.
 - **Platform adapter rule:** game code must NEVER import wrapper APIs (Electron, Capacitor) directly. All platform features go through `game/src/platform/` (`save`, `load`, `requestFullscreen`, `haptic`), whose WEB implementation (localStorage, Fullscreen API, `navigator.vibrate`) is the always-working default fallback. Wrappers inject their own implementation via `setPlatformAdapter()` at boot. The adapter is the contract.
+
+## D-0003 — Door-threshold: opening a door requires a square approach (2026-08-16, locked)
+
+**Decision:** The locked door's physics body stays a full-tile static blocker, but the open trigger is gated: `Game.openDoor` only fires when the player's center is aligned with the door's center within `DOOR_APPROACH_TOLERANCE` (12px) on the approach axis. A diagonal graze clipping the door body's corner no longer consumes the key. On open, the door swaps to the `door-open` texture and its body disables cleanly.
+
+## D-0004 — Map layout is generated, not hand-edited (2026-08-16, locked)
+
+**Decision:** `game/maps/build_map.py` is the single source of truth for the dungeon layout (floor rects + derived wall shell + gameplay anchors) and emits BOTH `game/maps/dungeon.ldtk` (LDtk 1.5.3, for viewing) and `game/assets/maps/dungeon.json` (Tiled, for Phaser) — the two cannot drift. Hand-editing either output is void. Gameplay anchors move only by moving them in the generator and syncing `LAYOUT` in `Game.ts` and the spec waypoints.

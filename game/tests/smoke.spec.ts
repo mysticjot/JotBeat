@@ -43,14 +43,14 @@ test.describe('Phase 1 scaffold', () => {
         const after = await page.evaluate(() => ({ ...(window as any).__game.state.position }));
         expect(after.x).toBeGreaterThan(before.x);
 
-        //  Wall collision: player spawns left of the wall column at x=10;
-        //  holding Right long enough must stop at the wall, not pass it.
+        //  Wall collision: corridor 1 (spawn row 19) runs east to the col-27
+        //  wall; holding Right long enough must stop there, not pass it.
         await page.keyboard.down('ArrowRight');
-        await page.waitForTimeout(3000);
+        await page.waitForTimeout(6000);
         await page.keyboard.up('ArrowRight');
 
         const stopped = await page.evaluate(() => ({ ...(window as any).__game.state.position }));
-        expect(stopped.x).toBeLessThan(10 * 32);  // wall column starts at x=320
+        expect(stopped.x).toBeLessThan(29 * 32);  // corridor 1 ends at col 27 (x=928)
     });
 
 });

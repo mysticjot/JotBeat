@@ -100,10 +100,17 @@ test.describe('visual regression baseline', () => {
     await page.waitForTimeout(600);  // camera follow lerp settles on spawn
     await shot(page, 'gameplay');
 
-    //  Full start-to-victory run for the victory baseline.
-    await driveTo(page, 240, 272);   // key
+    //  Full start-to-victory run for the victory baseline. Route follows
+    //  the corridors of the generated map (game/maps/build_map.py):
+    //  corridor 1 -> connector -> Room B (key) -> corridor 2 -> vault door.
+    await driveTo(page, 27 * 32 + 16, 19 * 32 + 16);  // corridor 1 east end
+    await driveTo(page, 27 * 32 + 16, 9 * 32 + 16);   // up the connector
+    await driveTo(page, 31 * 32 + 16, 8 * 32 + 16);   // key
     await page.waitForFunction(() => (window as any).__game?.state?.inventory?.keys === 1);
-    await driveTo(page, 368, 272);   // door-adjacent
+    await driveTo(page, 25 * 32 + 16, 12 * 32 + 16);  // corridor 2 mouth
+    await driveTo(page, 25 * 32 + 16, 27 * 32 + 16);  // corridor 2 bottom
+    await driveTo(page, 28 * 32 + 16, 27 * 32 + 16);  // vault west half
+    await driveTo(page, 32 * 32 + 16, 31 * 32 + 16);  // door-adjacent
     await page.keyboard.down('ArrowRight');
     await page.waitForFunction(() => (window as any).__game?.state?.scene === 'Victory', undefined, { timeout: 10000 });
     await page.keyboard.up('ArrowRight');

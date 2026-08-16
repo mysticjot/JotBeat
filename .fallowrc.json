@@ -2,6 +2,10 @@
   // This file is JSONC: fallow reads these comments; generic JSON tools may not.
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
   // Our TS/JS lives under game/ (Phaser 4 + Vite); studio/ is Python (aislop covers it).
+  // artifacts/asset-src/ is vendored third-party asset SOURCE (e.g. the Kenney
+  // pack), not project code — its sample files (sampleSheet.tsx) are not ours
+  // to lint and are unreachable from any entry by design.
+  "ignorePatterns": ["artifacts/**"],
   "entry": [
     "game/index.html",
     "game/src/main.ts"

@@ -70,8 +70,8 @@ test.describe('AC-008 Pause Screen', () => {
   test('AC-008: Spacebar pauses the game and stops oxygen drain', async ({ page }) => {
     await startGame(page);
 
-    // Move to a safe open area (tile 3,7) so we're away from walls and the key
-    await driveTo(page, 3 * 32 + 16, 7 * 32 + 16);
+    // Move to a safe open area (tile 7, 17 — middle of Room A) so we're away from walls and the key
+    await driveTo(page, 7 * 32 + 16, 17 * 32 + 16);
 
     // Wait for at least one oxygen tick with fastOxygen=1
     await page.waitForTimeout(1200);
@@ -127,8 +127,8 @@ test.describe('AC-008 Pause Screen', () => {
     await page.keyboard.press('Enter');
     await page.waitForFunction(() => (window as any).__game?.state?.scene === 'Game');
 
-    // Move to a safe open area (tile 3,7)
-    await driveTo(page, 3 * 32 + 16, 7 * 32 + 16);
+    // Move to a safe open area (tile 7, 17 — middle of Room A)
+    await driveTo(page, 7 * 32 + 16, 17 * 32 + 16);
 
     // Let residual velocity flush before sampling: state.position is only
     // refreshed on unpaused update() frames, so one post-keyup physics step

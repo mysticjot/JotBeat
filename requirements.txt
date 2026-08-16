@@ -5,3 +5,5 @@ langgraph-checkpoint-sqlite>=3.1
 httpx>=0.27
 # Gemini client (the one non-OpenAI-compatible provider)
 google-genai>=1.0
+# Asset/map generators (game/tools/build_kenney_assets.py, game/maps imagery)
+Pillow>=10.0

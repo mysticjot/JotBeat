@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
 
 // AC-004: Locked door blocks the player when they have 0 keys.
-// The locked door is at tile (12, 8) => pixel (400, 272); key at (7, 8).
-// Player spawns at tile (5, 5).
-// This test must NOT pick up the key, so we route around the key tile.
+// Map: game/maps/build_map.py — the locked vault door is at tile (34, 31)
+// => pixel (1104, 1008); key at tile (31, 8); player spawns at tile (7, 19).
+// This test must NOT pick up the key, so the route stays west of it:
+// corridor 1 -> connector -> Room B southwest -> corridor 2 -> vault west.
 
 async function driveTo(page: any, tx: number, ty: number, budgetMs = 15000) {
   // tx/ty in PIXELS. Corridor-safe: keeps the cross axis within 4px of the
@@ -64,32 +65,34 @@ test.describe('AC-004', () => {
     const doors = await page.evaluate(() => ({ ...(window as any).__game.state.doors }));
     expect(doors.main).toBe('locked');
 
-    // Navigate to just above the locked door at (12, 8) via the top corridor:
-    // up col 5 to row 2, right to col 12, down to row 7 — avoids the key at (7, 8).
-    await driveTo(page, 5 * 32 + 16, 2 * 32 + 16);  // up to the corridor
-    await driveTo(page, 12 * 32 + 16, 2 * 32 + 16); // right along the top
-    await driveTo(page, 12 * 32 + 16, 7 * 32 + 16); // down to row 7 (above door)
+    // Route to the vault door's west side without crossing the key tile:
+    // east along corridor 1, north up the connector, across Room B's south
+    // edge to corridor 2, south to the vault, then east to the door.
+    await driveTo(page, 27 * 32 + 16, 19 * 32 + 16);  // east end of corridor 1
+    await driveTo(page, 25 * 32 + 16, 12 * 32 + 16);  // Room B south-west (corridor 2 mouth)
+    await driveTo(page, 25 * 32 + 16, 27 * 32 + 16);  // south down corridor 2
+    await driveTo(page, 28 * 32 + 16, 27 * 32 + 16);  // into the vault west half
+    await driveTo(page, 32 * 32 + 16, 31 * 32 + 16);  // squarely west of the door
 
-    // Verify we are directly above the door
-    const aboveDoor = await page.evaluate(() => ({ ...(window as any).__game.state.position }));
-    expect(Math.abs(aboveDoor.x - (12 * 32 + 16))).toBeLessThan(12);
-    expect(Math.abs(aboveDoor.y - (7 * 32 + 16))).toBeLessThan(12);
+    // Verify we are directly west of the door, aligned with its row
+    const besideDoor = await page.evaluate(() => ({ ...(window as any).__game.state.position }));
+    expect(Math.abs(besideDoor.x - (32 * 32 + 16))).toBeLessThan(12);
+    expect(Math.abs(besideDoor.y - (31 * 32 + 16))).toBeLessThan(12);
 
-    // Attempt to walk down INTO the locked door tile (12, 8)
+    // Attempt to walk right INTO the locked door tile (34, 31)
     const before = await page.evaluate(() => ({ ...(window as any).__game.state.position }));
 
-    await page.keyboard.down('ArrowDown');
+    await page.keyboard.down('ArrowRight');
     await page.waitForTimeout(1200);
-    await page.keyboard.up('ArrowDown');
+    await page.keyboard.up('ArrowRight');
 
     const after = await page.evaluate(() => ({ ...(window as any).__game.state.position }));
 
-    // Player should be blocked: y must not reach the door row (y < 8*32+16)
-    // x stays centered on the column
-    expect(after.x).toBeGreaterThanOrEqual(before.x - 5);
-    expect(after.x).toBeLessThanOrEqual(before.x + 5);
+    // Player should be blocked: x must not reach the door column center
+    // (34*32+16 = 1104); contact happens ~26px west of it.
     expect(after.y).toBeGreaterThanOrEqual(before.y - 5);
-    expect(after.y).toBeLessThan(8 * 32 + 16 - 12);  // definitely NOT past the door center
+    expect(after.y).toBeLessThanOrEqual(before.y + 5);
+    expect(after.x).toBeLessThan(34 * 32 + 16 - 12);  // definitely NOT past the door center
 
     // Door must still report 'locked'
     const doorsAfter = await page.evaluate(() => ({ ...(window as any).__game.state.doors }));

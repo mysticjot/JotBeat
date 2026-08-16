@@ -51,16 +51,23 @@ test.describe('BL-006: Exit Triggers Victory Scene', () => {
         //  Title → Game
         await page.waitForFunction(() => (window as any).__game?.state?.scene === 'Game');
 
-        //  Collect the key at tile (7, 8) — center (7*32+16, 8*32+16) = (240, 272).
-        //  Player spawns at tile (5, 5) — center (176, 176).
-        await driveTo(page, 240, 272);
+        //  Collect the key at tile (31, 8) — center (1008, 272). Route:
+        //  east along corridor 1, north up the connector into Room B
+        //  (map: game/maps/build_map.py). Player spawns at tile (7, 19).
+        await driveTo(page, 27 * 32 + 16, 19 * 32 + 16);
+        await driveTo(page, 27 * 32 + 16, 9 * 32 + 16);
+        await driveTo(page, 31 * 32 + 16, 8 * 32 + 16);
         let inventory = await page.evaluate(() => ({ ...(window as any).__game.state.inventory }));
         expect(inventory.keys).toBe(1);
 
-        //  Move to the tile just before the door: door is at (12, 8) and blocks that tile;
-        //  drive to the tile to the left of it, (11, 8) — center (368, 272).
-        await driveTo(page, 11 * 32 + 16, 8 * 32 + 16);
-        //  The player is at (368±, 272±). Hold Right through the door tile to trigger the open.
+        //  Move to the tile squarely west of the vault door: door is at
+        //  (34, 31) and blocks that tile; drive to (32, 31) via corridor 2
+        //  and the vault west half — center (1040, 1008).
+        await driveTo(page, 25 * 32 + 16, 12 * 32 + 16);
+        await driveTo(page, 25 * 32 + 16, 27 * 32 + 16);
+        await driveTo(page, 28 * 32 + 16, 27 * 32 + 16);
+        await driveTo(page, 32 * 32 + 16, 31 * 32 + 16);
+        //  The player is at (1040±, 1008±). Hold Right through the door tile to trigger the open.
         await page.keyboard.down('ArrowRight');
         await page.waitForTimeout(600);
         await page.keyboard.up('ArrowRight');
@@ -71,10 +78,10 @@ test.describe('BL-006: Exit Triggers Victory Scene', () => {
         const doors = await page.evaluate(() => ({ ...(window as any).__game.state.doors }));
         expect(doors['main']).toBe('open');
 
-        //  The exit zone at tile (20, 8) fires its overlap on EDGE contact
-        //  (player x≈630), and the scene transition freezes the player
-        //  mid-corridor — so NEVER driveTo a point past the zone: hold
-        //  Right and wait for the scene flip instead.
+        //  The exit zone at tile (37, 31) fires its overlap on EDGE contact
+        //  and the scene transition freezes the player mid-stride — so NEVER
+        //  driveTo a point past the zone: hold Right and wait for the scene
+        //  flip instead.
         await page.keyboard.down('ArrowRight');
         await page.waitForFunction(() => (window as any).__game?.state?.scene === 'Victory', undefined, { timeout: 10000 });
         await page.keyboard.up('ArrowRight');

@@ -8,7 +8,7 @@ export class Door extends Physics.Arcade.Sprite
 
     constructor (scene: Scene, x: number, y: number, doorId = 'main')
     {
-        super(scene, x, y, 'greybox');
+        super(scene, x, y, 'door-closed');
         this.doorId = doorId;
         scene.add.existing(this);
         scene.physics.add.existing(this);
@@ -19,8 +19,6 @@ export class Door extends Physics.Arcade.Sprite
         this.body.setSize(32, 32);
         this.body.setOffset(0, 0);
         
-        this.setDisplaySize(32, 32);
-        this.setTint(0x8b0000); // Dark red door color
         this.setImmovable(true);
 
         // Ensure the door starts locked in the debug state
@@ -34,7 +32,7 @@ export class Door extends Physics.Arcade.Sprite
     {
         if (this.opened) return;
         this.opened = true;
-        this.setTint(0x3a3a3a);  // dim the door to show it's open
+        this.setTexture('door-open');
         this.disableBody(true, false);  // deactivate collision + physics on the next step
         setDoorState(this.doorId, 'open');
     }

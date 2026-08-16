@@ -1,0 +1,15 @@
+# aislop project config — deterministic scanner (no LLM at runtime).
+# Gate: score must not regress below the baseline. Ratchet up as
+# warnings burn down; never lower it to make CI pass.
+ci:
+  failBelow: 30  # baseline set when the quality gate itself landed (score was 32)
+
+rules:
+  # cli.py / test_*.py are a CLI and its harnesses — print() IS the interface,
+  # not leftover debug output. Libraries still get swallowed-error scrutiny.
+  ai-slop/python-print-debug: "off"
+
+# Vendored third-party asset sources (e.g. the Kenney pack) are not project
+# code: their sample files are excluded from scanning, not suppressed.
+exclude:
+  - "artifacts/asset-src/**"

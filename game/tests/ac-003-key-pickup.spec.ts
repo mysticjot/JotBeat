@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test';
 
 // AC-003: Player picks up a key on the ground and inventory updates
-// The key is at tile (9, 10) => pixel (304, 336)
-// Player spawns at tile (5, 5)
+// Map: game/maps/build_map.py — key at tile (31, 8) => pixel (1008, 272);
+// player spawns at tile (7, 19). Route follows the corridors:
+// east along corridor 1, north up the connector, then to the key.
 
 async function driveTo(page: any, tx: number, ty: number, budgetMs = 10000) {
   const start = Date.now();
@@ -37,8 +38,10 @@ test.describe('AC-003', () => {
     const inventoryBefore = await page.evaluate(() => ({ ...(window as any).__game.state.inventory }));
     expect(inventoryBefore.keys || 0).toBe(0);
 
-    // Navigate to key at tile (9, 10) => pixel (304, 336)
-    await driveTo(page, 9 * 32 + 16, 10 * 32 + 16);
+    // Navigate to the key via the corridor route (see header comment)
+    await driveTo(page, 27 * 32 + 16, 19 * 32 + 16);  // east end of corridor 1
+    await driveTo(page, 27 * 32 + 16, 9 * 32 + 16);   // north up the connector into Room B
+    await driveTo(page, 31 * 32 + 16, 8 * 32 + 16);   // the key tile
 
     // Press space (or any action) to pick up? The implementation uses overlap detection; we just need to be on the tile and the key disappears.
     // The test does not specify key press; just drive and then check inventory.

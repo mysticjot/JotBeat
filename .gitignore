@@ -32,4 +32,6 @@ playwright-report/
 state/graph-checkpoints.db
 state/ui-debug.log
 .fallow/
-.aislop/
+# .aislop/config.yml is tracked: AGENTS.md §6 pins ci.failBelow there
+.aislop/*
+!.aislop/config.yml

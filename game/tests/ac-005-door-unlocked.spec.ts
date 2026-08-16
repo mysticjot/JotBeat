@@ -59,8 +59,10 @@ test.describe('AC-005: Key Unlocks Door, Key Consumed', () => {
         expect(initialState.inventory).toEqual({});
         expect(initialState.doors.main).toBe('locked');
 
-        // drive to key (located at (7, 8) in map coordinates)
-        await driveTo(page, 7, 8);
+        // drive to the key at tile (31, 8): east along corridor 1, then
+        // north up the connector into Room B (map: game/maps/build_map.py)
+        await driveTo(page, 27, 19);
+        await driveTo(page, 31, 8);
 
         // overlap picks up key -> inventory.keys becomes 1
         await page.waitForFunction(() => (window as any).__game?.state?.inventory?.keys === 1);
@@ -68,10 +70,14 @@ test.describe('AC-005: Key Unlocks Door, Key Consumed', () => {
         const afterPickup = await page.evaluate(() => ({ ...(window as any).__game.state }));
         expect(afterPickup.inventory.keys).toBe(1);
 
-        // drive to the tile ADJACENT to the door (12, 8): the door body blocks
-        // its own tile, so its center is unreachable by design — driveTo
-        // targets (11, 8), then we bump right into the door to trigger unlock.
-        await driveTo(page, 11, 8, 15000);
+        // drive to the tile squarely WEST of the vault door (34, 31): south
+        // down corridor 2, into the vault west half, up to the door row. The
+        // door body blocks its own tile, so we target (32, 31) then bump
+        // right into the door to trigger the unlock.
+        await driveTo(page, 25, 12, 15000);
+        await driveTo(page, 25, 27, 15000);
+        await driveTo(page, 28, 27, 15000);
+        await driveTo(page, 32, 31, 15000);
         await page.keyboard.down('ArrowRight');
         await page.waitForTimeout(1200);
         await page.keyboard.up('ArrowRight');

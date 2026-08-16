@@ -35,9 +35,10 @@ test.describe('AC-010 Title Screen With Start Flow', () => {
         const postState = await page.evaluate(() => (window as any).__game.state);
         expect(postState.scene).toBe('Game');
         
-        // Verify reset state: player at start position (5,5) tile center
-        expect(postState.position.x).toBeCloseTo(5 * 32 + 16, 1);
-        expect(postState.position.y).toBeCloseTo(5 * 32 + 16, 1);
+        // Verify reset state: player at start position (7,19) tile center
+        // (map: game/maps/build_map.py)
+        expect(postState.position.x).toBeCloseTo(7 * 32 + 16, 1);
+        expect(postState.position.y).toBeCloseTo(19 * 32 + 16, 1);
 
         // Inventory should be empty/reset
         expect(postState.inventory).toEqual({});

@@ -63,11 +63,12 @@ test.describe('AC-009 HUD Key Count', () => {
         await page.keyboard.press('Enter');
         await page.waitForFunction(() => (window as any).__game?.state?.scene === 'Game');
 
-        // Player starts at tile (5,5) center = (176, 176)
-        // Key at tile (7,8) center = (240, 272)
-        // Route: go down to row 8, then right to col 7
-        await driveTo(page, 176, 272);  // down to row 8 at col 5
-        await driveTo(page, 240, 272);  // right to key column
+        // Player spawns at tile (7,19); key at tile (31,8) center (1008, 272)
+        // (map: game/maps/build_map.py). Route: east along corridor 1,
+        // north up the connector into Room B, then to the key.
+        await driveTo(page, 27 * 32 + 16, 19 * 32 + 16);  // corridor 1 east end
+        await driveTo(page, 27 * 32 + 16, 9 * 32 + 16);   // up the connector
+        await driveTo(page, 1008, 272);                   // the key tile
 
         // Wait for key pickup (overlap triggers on contact)
         await page.waitForFunction(() => (window as any).__game.state.inventory.keys === 1, null, { timeout: 5000 });
@@ -92,9 +93,11 @@ test.describe('AC-009 HUD Key Count', () => {
         await page.waitForFunction(() => (window as any).__game?.state?.scene === 'Game');
 
         // Pick up the key NATURALLY — injecting state.inventory.keys and then
-        // driving over the real key tile (7,8), which sits on the ONLY
-        // corridor to the door, double-counts and the assertion never lands.
-        await driveTo(page, 240, 272);
+        // driving over the real key tile (31,8) double-counts and the
+        // assertion never lands. Route: corridor 1, connector, Room B.
+        await driveTo(page, 27 * 32 + 16, 19 * 32 + 16);
+        await driveTo(page, 27 * 32 + 16, 9 * 32 + 16);
+        await driveTo(page, 1008, 272);
         await page.waitForFunction(() => (window as any).__game.state.inventory.keys === 1, null, { timeout: 5000 });
         const hudWithKey = await page.evaluate(() => {
             const game: any = (window as any).__game?.game;
@@ -102,8 +105,12 @@ test.describe('AC-009 HUD Key Count', () => {
         });
         expect(hudWithKey).toContain('Keys: 1');
 
-        // Door at tile (12,8); drive to the approach tile (11,8) and bump in.
-        await driveTo(page, 368, 272);
+        // Vault door at tile (34,31); drive corridor 2 to the approach tile
+        // (32,31) and bump right into the door.
+        await driveTo(page, 25 * 32 + 16, 12 * 32 + 16);
+        await driveTo(page, 25 * 32 + 16, 27 * 32 + 16);
+        await driveTo(page, 28 * 32 + 16, 27 * 32 + 16);
+        await driveTo(page, 32 * 32 + 16, 31 * 32 + 16);
         await page.keyboard.down('ArrowRight');
         // removeFromInventory DELETES the property — wait for undefined, not 0.
         await page.waitForFunction(() => (window as any).__game.state.inventory.keys === undefined, null, { timeout: 5000 });

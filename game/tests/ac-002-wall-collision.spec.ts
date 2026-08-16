@@ -12,11 +12,15 @@ test.describe('AC-002: Wall Collision', () => {
 
         const before = await page.evaluate(() => ({ ...(window as any).__game.state.position }));
 
-        await page.keyboard.down('ArrowRight');
+        //  Map: game/maps/build_map.py — spawn (7,19) in Room A; the west
+        //  wall column is x=1. Holding Left must stop at that wall.
+        await page.keyboard.down('ArrowLeft');
         await page.waitForTimeout(3000);
-        await page.keyboard.up('ArrowRight');
+        await page.keyboard.up('ArrowLeft');
 
         const after = await page.evaluate(() => ({ ...(window as any).__game.state.position }));
-        expect(after.x).toBeLessThan(10 * 32);
+        expect(after.x).toBeLessThan(before.x);      // moved
+        expect(after.x).toBeGreaterThan(2 * 32);     // never entered the wall column
+        expect(after.x).toBeLessThan(4 * 32);        // stopped at the wall, not through it
     });
 });

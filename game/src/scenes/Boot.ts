@@ -11,9 +11,14 @@ export class Boot extends Scene
     //  fallow-ignore-next-line unused-class-member
     preload ()
     {
-        //  Greybox assets only — real art arrives in Phase 5 behind the manifest.
-        this.load.image('greybox', 'tiles/greybox.png');
+        //  Kenney Tiny Dungeon (CC0) — provenance in assets/manifest.json.
+        //  Rebuild from the pack with game/tools/build_kenney_assets.py.
+        this.load.image('dungeon-tiles', 'tilemaps/dungeon.png');
         this.load.image('player', 'sprites/player.png');
+        this.load.image('key', 'sprites/key.png');
+        this.load.image('door-closed', 'sprites/door-closed.png');
+        this.load.image('door-open', 'sprites/door-open.png');
+        this.load.image('exit-doorway', 'sprites/exit-doorway.png');
         this.load.tilemapTiledJSON('dungeon', 'maps/dungeon.json');
     }
 
