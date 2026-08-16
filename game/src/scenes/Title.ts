@@ -16,9 +16,14 @@ export class Title extends Scene
 
         this.cameras.main.setBackgroundColor('#1b1026');
 
-        this.add.text(320, 180, 'JotBeat', {
+        this.add.text(320, 160, 'SALTBOUND', {
             fontFamily: 'Arial Black', fontSize: 64, color: '#d6ba6e',
             stroke: '#0d0812', strokeThickness: 8,
+        }).setOrigin(0.5);
+
+        this.add.text(320, 225, 'The Sunken Seal', {
+            fontFamily: 'Arial', fontSize: 28, color: '#8fb8c9',
+            stroke: '#0d0812', strokeThickness: 4,
         }).setOrigin(0.5);
 
         const hint = this.add.text(320, 300, 'Press ENTER to start', {

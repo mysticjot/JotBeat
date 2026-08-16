@@ -1,4 +1,4 @@
-# JotBeat Project GDD: Sunken Vault (Phase 1)
+# SALTBOUND: The Sunken Seal — GDD (Phase 1)
 
 ## Pillars
 *   **Tactile Simplicity:** Crisp, grid-aligned 16-bit movement and collision.
@@ -6,7 +6,7 @@
 *   **System Transparency:** A robust global state hook for easy programmatic validation.
 
 ## Pitch
-You are a master thief navigating a silent, sunken vault. In this 16-bit top-down dungeon crawler, you must slip through flooded corridors, locate the glowing seal-key, unlock the heavy iron door, and reach the exit before your air runs out.
+You are Maren, a tide-thief navigating a silent, sunken vault of drowned Asterfell. In this 16-bit top-down dungeon crawler, you must slip through flooded corridors, locate the glowing seal-key, unlock the heavy iron door, and reach the exit before your lungstone runs dry. (Canon: `docs/NARRATIVE_BIBLE.md`)
 
 ## Scope
 *   **Mechanics:** Top-down grid movement, solid wall collisions, item pickup, locked door consumption, exit victory zone, and a basic oxygen timer.

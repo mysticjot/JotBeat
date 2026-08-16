@@ -5,6 +5,8 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 ## [Unreleased]
 
 ### Added
+- **SALTBOUND: The Sunken Seal** — title named (Creative Director, 2026-08-16). Title screen, GDD pitch (Maren, tide-thief, lungstone), and docs updated; visual baselines re-shot.
+- `docs/NARRATIVE_BIBLE.md` written from approved canon (the Drowning, Maren, the Curator, lungstone-as-oxygen-timer, Game 1 arc beats, saga spine, naming/voice rules). Awaits human approval before Phase 5 art starts.
 - Phase 4 QA harness (HANDOFF-PHASE4): Playwright viewport matrix (chromium desktop/tablet/mobile projects in `game/playwright.config.ts`); `jotbeat verify` runs the full matrix while the per-commit loop gate stays desktop-only for speed (`run_ac_suite(..., projects=None)`).
 - Visual regression baseline (§2.2): `game/tests/visual.spec.ts` + `visual.config.ts` — pixelmatch compare against `game/tests/baseline/*.png` (git-LFS), desktop project only; `UPDATE_BASELINE=1` regenerates; diffs archive to `artifacts/visual-diffs/`. Thresholds documented in visual.config.ts.
 - AI observer (§2.3): `studio/roles/observer.py` — on scripted-QA failure the vision role (glm-4.6v-flash) classifies the failure (layout/logic/timing/harness) from log tail + failure screenshot; hypotheses ride the kickback evidence, proposals append to the BACKLOG Proposed section (never queued). Advisory by design: an observer outage logs `observer_error` and never blocks the loop. `models.py` gained `complete(..., images=)` (base64 data-URI parts; google family refuses images).
@@ -40,6 +42,7 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 - `orchestrator.py patch()` KeyError when reached from build/QA failure without an audit record.
 
 ### Changed
+- Roadmap §12.2 amended (Creative Director): CC0 library art (Kenney packs) is legal at any phase; provenance (pack, author, license, source URL) mandatory in the asset manifest.
 - `jotbeat verify` is now the phase-end endpoint (AGENTS.md §1): BVT + scripted QA + the §6 quality gate (aislop + fallow) in one command; all three must pass or it exits 1. A phase gate declared without a green quality run is void.
 - Provider routing correction (HANDOFF-PHASE3 §2): triage diversification restored via `groq-free-8b` (llama-3.1-8b-instant); producer → gemini-free → deepseek-v4-flash; auditor chain kimi-k2.6 → glm-4.7 → glm-4.7-flash; vision glm-4.6v-flash → glm-4.6v (`ZAI_API_KEY`); MiniMax removed (M-series is text-only); prices synced to the verified table (HANDOFF-PHASE2 §4, Aug 15 2026).
 - Qwen routing: DashScope entries removed; coder model now routes through OpenRouter free tier (`qwen/qwen3-coder:free`, `OPENROUTER_API_KEY`). Coder chain: groq-free → openrouter-qwen3-coder-free → deepseek-v4-flash.

@@ -571,6 +571,8 @@ Style lock is machine-checkable, not a mood board:
 
 Art and Sound start as stub roles emitting manifests + greybox/proxy assets + jsfxr scratch audio. The pipeline proves itself on placeholders before touching the GPU. Real assets swap in behind the same manifest interface.
 
+**Amendment (2026-08-16, Creative Director):** CC0 library art (e.g. Kenney packs) is legal at ANY phase — it is not "real asset generation" and does not wait for the GPU pipeline. Provenance is mandatory: every CC0 asset records pack name, author, license, and source URL in the asset manifest.
+
 ### 12.3 Audio event map
 
 ```json
