@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { setPosition, setScene, addToInventory, removeFromInventory, setVictory, setGameOver, setOxygen, debugSetOxygen } from '../debug';
+import { setPosition, setScene, addToInventory, removeFromInventory, setVictory, setGameOver, setOxygen, debugSetOxygen, setPaused } from '../debug';
 import { Player } from '../entities/Player';
 import { Key } from '../entities/Key';
 import { Door } from '../entities/Door';
@@ -12,6 +12,7 @@ export class Game extends Scene
     private doorOpened = false;
     private oxygen = 100;
     private oxygenTimer!: Phaser.Time.TimerEvent;
+    private isPaused = false;
 
     constructor ()
     {
@@ -25,7 +26,9 @@ export class Game extends Scene
         setScene('Game');
         setOxygen(100);
         debugSetOxygen(100);
+        setPaused(false);
         this.oxygen = 100;
+        this.isPaused = false;
 
         const map = this.make.tilemap({ key: 'dungeon' });
         const tiles = map.addTilesetImage('greybox', 'greybox');
@@ -70,6 +73,10 @@ export class Game extends Scene
         this.oxygenTimer = this.time.addEvent({
             delay: 1000,
             callback: () => {
+                // Do not drain oxygen while paused
+                if (this.isPaused) {
+                    return;
+                }
                 const query = new URLSearchParams(window.location.search);
                 const fastOxygen = query.get('fastOxygen');
                 const drainRate = fastOxygen === '1' ? 10 : 1;
@@ -83,6 +90,15 @@ export class Game extends Scene
             loop: true
         });
 
+        // Spacebar toggles pause
+        this.input.keyboard!.on('keydown-SPACE', () => {
+            if (this.isPaused) {
+                this.resumeGame();
+            } else {
+                this.pauseGame();
+            }
+        });
+
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     }
@@ -91,15 +107,39 @@ export class Game extends Scene
     //  fallow-ignore-next-line unused-class-member
     update (): void
     {
+        // Still update the player (so input state stays fresh), but
+        // freeze movement and world updates while paused.
+        if (this.isPaused) {
+            const body = this.player.body as Phaser.Physics.Arcade.Body;
+            body.setVelocity(0, 0);
+            return;
+        }
         this.player.update();
         this.key.update();
         this.door.update();
         setPosition(this.player.x, this.player.y);
     }
 
+    private pauseGame (): void
+    {
+        this.isPaused = true;
+        setPaused(true);
+        // Freeze the player immediately
+        const body = this.player.body as Phaser.Physics.Arcade.Body;
+        body.setVelocity(0, 0);
+        this.physics.world.pause();
+    }
+
+    private resumeGame (): void
+    {
+        this.isPaused = false;
+        setPaused(false);
+        this.physics.world.resume();
+    }
+
     private pickUpKey (player: Phaser.GameObjects.GameObject, key: Phaser.GameObjects.GameObject)
     {
-        if (!key.active) {
+        if (!key.active || this.isPaused) {
             return;
         }
         key.destroy();
@@ -109,7 +149,7 @@ export class Game extends Scene
     private openDoor (player: Phaser.GameObjects.GameObject, door: Phaser.GameObjects.GameObject)
     {
         const doorSprite = door as Door;
-        if (doorSprite.active && !this.doorOpened)
+        if (doorSprite.active && !this.doorOpened && !this.isPaused)
         {
             // Check if the player has a key
             const state = (window as any).__game?.state;
@@ -125,12 +165,13 @@ export class Game extends Scene
 
     private triggerVictory (player: Phaser.GameObjects.GameObject, exit: Phaser.GameObjects.GameObject)
     {
-        if (!this.doorOpened) {
+        if (!this.doorOpened || this.isPaused) {
             // The exit should only trigger after the door is unlocked/open.
             return;
         }
         // Stop the oxygen timer when the game ends
         this.oxygenTimer.remove();
+        setPaused(false);
         // Transition to the Victory scene and mark it in the debug state.
         setVictory();
         this.scene.start('Victory');
@@ -140,6 +181,7 @@ export class Game extends Scene
     {
         // Stop the oxygen timer to prevent re-triggering
         this.oxygenTimer.remove();
+        setPaused(false);
         setGameOver();
         this.scene.start('GameOver');
     }

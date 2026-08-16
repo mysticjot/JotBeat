@@ -104,3 +104,8 @@ export function debugSetOxygen (oxygen: number): void
 {
     state.oxygen = Math.round(oxygen * 100) / 100;
 }
+
+export function setPaused (paused: boolean): void
+{
+    state.paused = paused;
+}
