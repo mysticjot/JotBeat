@@ -22,9 +22,26 @@ LOOPBACK = ("127.0.0.1", "::1", "localhost")
 
 # Bump on every UI change — shown at the top of the page so a stale cached
 # page (or an orphan server) is immediately recognizable.
-BUILD = "2026-08-15-6"
+BUILD = "2026-08-17-1"
 
 NO_STORE = ("Cache-Control", "no-store")
+
+# Console evidence file serving (read-only). Hard rules: repo-rooted,
+# whitelisted prefixes only, no dotfiles, .env is unreachable.
+FILE_ROOTS = ("artifacts/", "reports/", "game/maps/", "game/assets/")
+FILE_TYPES = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".webp": "image/webp",
+    ".svg": "image/svg+xml",
+    ".mp3": "audio/mpeg",
+    ".ogg": "audio/ogg",
+    ".wav": "audio/wav",
+    ".json": "application/json; charset=utf-8",
+    ".ldtk": "application/json; charset=utf-8",
+}
 
 
 def _log(root: Path, line: str) -> None:
@@ -34,7 +51,7 @@ def _log(root: Path, line: str) -> None:
     with suppress(OSError):
         log_path = Path(root) / "state" / "ui-debug.log"
         log_path.parent.mkdir(parents=True, exist_ok=True)
-        stamp = datetime.datetime.now().isoformat(timespec="seconds")
+        stamp = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
         with log_path.open("a", encoding="utf-8") as f:
             f.write(f"{stamp} {line}\n")
 
@@ -396,10 +413,428 @@ refresh();
 """
 
 
+CONSOLE_PAGE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>JotBeat Console</title>
+<style>
+  :root {
+    --bg:#0f1216; --panel:#161b22; --panel2:#1d232c; --border:#2a323d;
+    --text:#e2e8f0; --muted:#8b96a3; --accent:#4f7cff; --accent-hi:#6b91ff;
+    --ok:#3fb950; --warn:#d29922; --fail:#f85149;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+         background: var(--bg); color: var(--text);
+         max-width: 1180px; margin: 24px auto; padding: 0 18px; }
+  h1 { font-size: 21px; letter-spacing: .2px; margin: 0 0 4px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em;
+       color: var(--muted); margin: 0 0 12px; }
+  .card { background: var(--panel); border: 1px solid var(--border);
+          border-radius: 10px; padding: 16px 20px; margin-top: 16px;
+          box-shadow: 0 1px 2px rgba(0,0,0,.45), 0 10px 28px rgba(0,0,0,.28); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid #232a33;
+           vertical-align: top; }
+  tbody tr:last-child td { border-bottom: 0; }
+  th { color: var(--muted); font-weight: 600; font-size: 11px;
+       text-transform: uppercase; letter-spacing: .06em; }
+  button { background: var(--accent); color: #fff; border: 0; border-radius: 6px;
+           padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer;
+           transition: background .12s ease; }
+  button:hover { background: var(--accent-hi); }
+  button.sec { background: var(--panel2); border: 1px solid #39424e; }
+  button.danger { background: #5a2326; border: 1px solid #8c3a3e; }
+  button.danger:hover { background: #71292d; }
+  .muted { color: var(--muted); font-size: 12px; }
+  .ok { color: var(--ok); } .fail { color: var(--fail); } .warn { color: var(--warn); }
+  #stackline { font-size: 13px; color: var(--muted); margin: 0 0 14px; }
+  #stackline b { color: var(--text); font-weight: 600; }
+  nav.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border);
+             margin-top: 8px; }
+  nav.tabs button { background: none; border: 0; color: var(--muted);
+                    border-radius: 8px 8px 0 0; padding: 9px 16px;
+                    font-size: 14px; font-weight: 600; }
+  nav.tabs button:hover { color: var(--text); background: var(--panel2); }
+  nav.tabs button.active { color: var(--text); background: var(--panel);
+                           border: 1px solid var(--border); border-bottom-color: var(--panel);
+                           margin-bottom: -1px; }
+  .chip { display: inline-block; padding: 2px 9px; border-radius: 20px;
+          font-size: 11px; font-weight: 700; border: 1px solid var(--border);
+          background: var(--panel2); color: var(--muted); }
+  .chip.ok { color: var(--ok); border-color: rgba(63,185,80,.5); }
+  .chip.fail { color: var(--fail); border-color: rgba(248,81,73,.5); }
+  .chip.warn { color: var(--warn); border-color: rgba(210,153,34,.5); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+          gap: 12px; }
+  .grid .shot { background: var(--panel2); border: 1px solid var(--border);
+                border-radius: 8px; padding: 8px; }
+  .grid .shot img { width: 100%; border-radius: 5px; display: block;
+                    background: #0a0c10; }
+  .grid .shot .cap { font-size: 11px; color: var(--muted); margin-top: 6px;
+                     word-break: break-all; }
+  pre.preview { background: #0a0c10; border: 1px solid var(--border);
+                border-radius: 8px; padding: 12px; font-size: 12px;
+                max-height: 420px; overflow: auto; white-space: pre-wrap;
+                word-break: break-word; }
+  .stat { display: inline-block; background: var(--panel2); border: 1px solid var(--border);
+          border-radius: 8px; padding: 10px 16px; margin: 0 10px 10px 0; }
+  .stat .v { font-size: 18px; font-weight: 700; }
+  .stat .k { font-size: 11px; color: var(--muted); text-transform: uppercase;
+             letter-spacing: .06em; }
+  iframe.settings { width: 100%; min-height: 1500px; border: 0; background: var(--bg); }
+  #dead { display:none; position:fixed; inset:0; background:rgba(10,12,16,.92);
+          z-index:99; text-align:center; padding-top:18vh; }
+  #dead .box { display:inline-block; background: var(--panel);
+               border:1px solid var(--fail); border-radius:10px;
+               padding:24px 32px; max-width:520px; }
+  a { color: var(--accent-hi); }
+</style>
+</head>
+<body>
+<div id="dead"><div class="box">
+  <h2 class="fail">Console server is not running</h2>
+  <p>This tab is talking to a server that has already exited.<br>
+  Relaunch via <b>JotBeat Studio.bat</b> or <b>python studio/cli.py ui</b>.</p>
+  <p><button onclick="location.reload()">Retry</button></p>
+</div></div>
+
+<h1>JotBeat Console <span class="muted">· build __BUILD__</span></h1>
+<p id="stackline">stack: loading…</p>
+
+<nav class="tabs">
+  <button data-tab="pipeline" class="active">Pipeline</button>
+  <button data-tab="gates">Gates</button>
+  <button data-tab="costs">Costs</button>
+  <button data-tab="artifacts">Artifacts</button>
+  <button data-tab="backlog">Backlog</button>
+  <button data-tab="settings">Settings</button>
+</nav>
+
+<main>
+  <section id="tab-pipeline" class="tabpage"></section>
+  <section id="tab-gates" class="tabpage" style="display:none"></section>
+  <section id="tab-costs" class="tabpage" style="display:none"></section>
+  <section id="tab-artifacts" class="tabpage" style="display:none"></section>
+  <section id="tab-backlog" class="tabpage" style="display:none"></section>
+  <section id="tab-settings" class="tabpage" style="display:none">
+    <div class="card"><h2>Settings — keys · providers · routing</h2>
+    <iframe class="settings" src="/settings" title="Settings"></iframe></div>
+  </section>
+</main>
+
+<script>
+let ACTIVE = 'pipeline';
+let TIMER = null;
+
+async function api(path, body) {
+  try {
+    const r = await fetch(path, {method: body ? 'POST' : 'GET',
+      headers: {'Content-Type': 'application/json'},
+      body: body ? JSON.stringify(body) : undefined});
+    document.getElementById('dead').style.display = 'none';
+    return await r.json();
+  } catch (e) {
+    document.getElementById('dead').style.display = 'block';
+    return {ok: false, error: 'cannot reach the console server.'};
+  }
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"]/g,
+    c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+function ago(ts) {
+  if (!ts) return '';
+  const s = (Date.now() - new Date(ts).getTime()) / 1000;
+  if (s < 60) return Math.floor(s) + 's ago';
+  if (s < 3600) return Math.floor(s / 60) + 'm ago';
+  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+  return Math.floor(s / 86400) + 'd ago';
+}
+function money(v) { return '$' + Number(v || 0).toFixed(4); }
+function int(v) { return Number(v || 0).toLocaleString(); }
+
+async function loadStack() {
+  const d = await api('/api/console/stack');
+  if (!d || d.error) { document.getElementById('stackline').textContent =
+    'stack: unavailable — see docs/DECISIONS.md D-0005'; return; }
+  document.getElementById('stackline').innerHTML = '<b>Stack (D-0005):</b> ' +
+    d.lines.map(l => '<b>' + esc(l.label) + '</b> ' + esc(l.value)).join(' · ');
+}
+
+/* ------------------------------------------------------------ pipeline */
+async function renderPipeline() {
+  const d = await api('/api/console/pipeline');
+  const el = document.getElementById('tab-pipeline');
+  if (!d || d.error) { el.innerHTML = '<div class="card fail">pipeline data unavailable</div>'; return; }
+  let h = '<div class="card"><h2>Roles — most recent ledger activity</h2>';
+  h += '<p class="muted">Phase ' + esc(d.phase) + ' (' + esc(d.phase_name) + ') · current task: ' +
+    esc(d.current_task || 'none') + ' · ' + int(d.event_count) + ' ledger events · updated ' +
+    new Date().toLocaleTimeString() + '</p>';
+  if (!d.roles.length) {
+    h += '<p class="muted">No role activity in state/events.jsonl yet.</p>';
+  } else {
+    h += '<table><thead><tr><th>Role</th><th>Last event</th><th>Task</th>' +
+      '<th>Model</th><th>Provider</th><th>When</th></tr></thead><tbody>';
+    for (const r of d.roles) {
+      const typeCls = r.type === 'provider_error' ? 'fail' : '';
+      h += '<tr><td><b>' + esc(r.role) + '</b></td>' +
+        '<td class="' + typeCls + '">' + esc(r.type) + (r.detail ? ' — ' + esc(r.detail) : '') + '</td>' +
+        '<td>' + esc(r.task || '—') + '</td><td>' + esc(r.model || '—') + '</td>' +
+        '<td>' + esc(r.provider || '—') + '</td>' +
+        '<td class="muted">' + esc(ago(r.ts)) + '</td></tr>';
+    }
+    h += '</tbody></table>';
+    if (d.roles_without_events.length)
+      h += '<p class="muted">no events yet: ' + d.roles_without_events.map(esc).join(', ') + '</p>';
+  }
+  h += '</div><div class="card"><h2>Latest events</h2>';
+  if (!d.feed.length) h += '<p class="muted">The ledger is empty.</p>';
+  else {
+    h += '<table><thead><tr><th>When</th><th>Type</th><th>Task</th><th>Role</th>' +
+      '<th>Detail</th></tr></thead><tbody>';
+    for (const e of d.feed) {
+      let detail = e.model || e.provider || '';
+      if (e.passed === true) detail += (detail ? ' · ' : '') + '<span class="ok">PASS</span>';
+      if (e.passed === false) detail += (detail ? ' · ' : '') + '<span class="fail">FAIL</span>';
+      if (e.detail) detail += (detail ? ' · ' : '') + '<span class="fail">' + esc(e.detail) + '</span>';
+      if (e.cost_usd) detail += (detail ? ' · ' : '') + money(e.cost_usd);
+      h += '<tr><td class="muted">' + esc(ago(e.ts)) + '</td><td>' + esc(e.type) + '</td>' +
+        '<td>' + esc(e.task || '—') + '</td><td>' + esc(e.role || '—') + '</td>' +
+        '<td>' + (detail || '—') + '</td></tr>';
+    }
+    h += '</tbody></table>';
+  }
+  el.innerHTML = h + '</div>';
+}
+
+/* --------------------------------------------------------------- gates */
+async function renderGates() {
+  const d = await api('/api/console/gates');
+  const el = document.getElementById('tab-gates');
+  if (!d || d.error) { el.innerHTML = '<div class="card fail">gate data unavailable</div>'; return; }
+  let h = '';
+  if (!d.pending.length) {
+    h += '<div class="card"><h2>Pending gates</h2>' +
+      '<p><span class="chip ok">none pending</span></p>' +
+      '<p class="muted">No phase gates are waiting on a Creative Director decision.</p>';
+    if (d.last_decided) {
+      const g = d.last_decided;
+      h += '<p>Most recent decided gate: <b>' + esc(g.gate) + '</b> — ' +
+        '<span class="chip ' + (g.status === 'passed' ? 'ok' : 'fail') + '">' + esc(g.status) + '</span>' +
+        (g.ts ? ' · ' + esc(ago(g.ts)) : '') +
+        ' <span class="muted">(source: ' + esc(g.source) + ')</span></p>';
+    }
+    h += '</div>';
+  }
+  for (const g of d.pending) {
+    const ev = g.evidence || {};
+    h += '<div class="card"><h2>Gate: ' + esc(g.gate) + '</h2>';
+    if (ev.cert_summary && ev.cert_summary.exists) {
+      const c = ev.cert_summary;
+      h += '<p>Latest cert (' + esc(c.date || c.file) + '): ' +
+        '<span class="chip ' + (c.overall === 'CERTIFIED' ? 'ok' : 'fail') + '">' +
+        esc(c.overall || '?') + '</span> · ACs ' + c.acs_met + '/' + c.acs_total + ' MET · ' +
+        '<a href="/files/' + esc(c.file) + '" target="_blank">open cert</a></p>';
+    } else {
+      h += '<p class="warn">No cert report yet — evidence is incomplete.</p>';
+    }
+    if (ev.counters)
+      h += '<p class="muted">counters: ' + int(ev.counters.tasks_completed) + ' completed · ' +
+        int(ev.counters.tasks_failed) + ' failed · ' + money(ev.counters.total_cost_usd) + '</p>';
+    if (ev.screenshots && ev.screenshots.length) {
+      h += '<div class="grid">';
+      for (const s of ev.screenshots)
+        h += '<div class="shot"><img loading="lazy" src="/files/' + esc(s.path) + '">' +
+          '<div class="cap">' + esc(s.name) + '</div></div>';
+      h += '</div>';
+    } else h += '<p class="muted">No screenshots captured yet.</p>';
+    h += '<p style="margin-top:14px">' +
+      '<button onclick="decideGate(\\'' + esc(g.gate) + '\\',\\'passed\\')">Approve (passed)</button> ' +
+      '<button class="danger" onclick="decideGate(\\'' + esc(g.gate) + '\\',\\'failed\\')">Reject (failed)</button>' +
+      ' <span class="muted">writes project-state.json + a gate_decision ledger event</span></p></div>';
+  }
+  if (d.pending.length) {
+    const all = Object.entries(d.all || {})
+      .map(([k, v]) => esc(k) + ': ' + esc(v)).join(' · ');
+    h += '<div class="card"><h2>All gates</h2><p class="muted">' + all + '</p></div>';
+  }
+  el.innerHTML = h;
+}
+
+async function decideGate(gate, decision) {
+  const verb = decision === 'passed' ? 'APPROVE' : 'REJECT';
+  if (!confirm(verb + ' gate ' + gate + '?\\n\\nThis writes state/project-state.json and appends a gate_decision event to state/events.jsonl.')) return;
+  const r = await api('/api/console/gates/decide', {gate: gate, decision: decision});
+  if (r.ok) renderGates();
+  else alert('gate decision refused: ' + (r.error || '?'));
+}
+
+/* --------------------------------------------------------------- costs */
+async function renderCosts() {
+  const d = await api('/api/console/costs');
+  const el = document.getElementById('tab-costs');
+  if (!d || d.error) { el.innerHTML = '<div class="card fail">cost data unavailable</div>'; return; }
+  const b = d.budget || {};
+  let h = '<div class="card"><h2>Per-game ledger</h2>';
+  h += '<span class="stat"><span class="v">' + money(d.total_usd) + '</span><br>' +
+    '<span class="k">total cost' +
+    (b.target_cost_per_game != null ? ' · target ' + money(b.target_cost_per_game) + '/game' : '') +
+    (b.worst_case_per_game != null ? ' · worst case ' + money(b.worst_case_per_game) : '') +
+    '</span></span>';
+  const tokTotal = d.tokens_in + d.tokens_out;
+  h += '<span class="stat"><span class="v">' + int(tokTotal) + '</span><br>' +
+    '<span class="k">tokens' +
+    (b.target_tokens_per_game != null ? ' · target ' + int(b.target_tokens_per_game) + '/game' : '') +
+    (b.drift_tokens_per_game != null ? ' · drift cap ' + int(b.drift_tokens_per_game) : '') +
+    '</span></span>';
+  h += '<span class="stat"><span class="v">' + int(d.calls) + '</span><br>' +
+    '<span class="k">model calls</span></span>';
+  h += '<span class="stat"><span class="v">' +
+    (d.cost_per_verified_task != null ? money(d.cost_per_verified_task) : '—') + '</span><br>' +
+    '<span class="k">cost / verified task (' + int(d.verified_tasks) + ')</span></span>';
+  h += '<p class="muted">source: state/events.jsonl · caps: ' + esc(b.source || 'docs/BUDGET.md missing') +
+    ' (per-role caps are per CALL, shown for reference)</p></div>';
+
+  h += '<div class="card"><h2>Per role</h2><table><thead><tr><th>Role</th>' +
+    '<th>Cost</th><th>Tokens in</th><th>Tokens out</th><th>Calls</th>' +
+    '<th>Cap in/call</th><th>Cap out/call</th></tr></thead><tbody>';
+  for (const r of d.by_role)
+    h += '<tr><td><b>' + esc(r.name) + '</b></td><td>' + money(r.cost_usd) + '</td>' +
+      '<td>' + int(r.tokens_in) + '</td><td>' + int(r.tokens_out) + '</td>' +
+      '<td>' + int(r.calls) + '</td>' +
+      '<td class="muted">' + (r.cap_in != null ? int(r.cap_in) : '—') + '</td>' +
+      '<td class="muted">' + (r.cap_out != null ? int(r.cap_out) : '—') + '</td></tr>';
+  if (!d.by_role.length) h += '<tr><td colspan="7" class="muted">no model calls yet</td></tr>';
+  h += '</tbody></table></div>';
+
+  h += '<div class="card"><h2>Per provider</h2><table><thead><tr><th>Provider</th>' +
+    '<th>Cost</th><th>Tokens in</th><th>Tokens out</th><th>Calls</th></tr></thead><tbody>';
+  for (const p of d.by_provider)
+    h += '<tr><td><b>' + esc(p.name) + '</b></td><td>' + money(p.cost_usd) + '</td>' +
+      '<td>' + int(p.tokens_in) + '</td><td>' + int(p.tokens_out) + '</td>' +
+      '<td>' + int(p.calls) + '</td></tr>';
+  if (!d.by_provider.length) h += '<tr><td colspan="5" class="muted">no model calls yet</td></tr>';
+  el.innerHTML = h + '</tbody></table></div>';
+}
+
+/* ----------------------------------------------------------- artifacts */
+function artifactItem(it) {
+  let body;
+  if (it.kind === 'image')
+    body = '<img loading="lazy" src="/files/' + esc(it.path) + '">';
+  else if (it.kind === 'audio')
+    body = '<audio controls src="/files/' + esc(it.path) + '" style="width:100%"></audio>';
+  else
+    body = '<p style="margin:4px 0"><a href="/files/' + esc(it.path) +
+      '" target="_blank">' + esc(it.name) + '</a></p>';
+  return '<div class="shot">' + body + '<div class="cap">' + esc(it.path) + ' · ' +
+    int(it.size) + ' B · ' + esc(ago(it.mtime)) + '</div></div>';
+}
+
+async function renderArtifacts() {
+  const d = await api('/api/console/artifacts');
+  const el = document.getElementById('tab-artifacts');
+  if (!d || d.error) { el.innerHTML = '<div class="card fail">artifact data unavailable</div>'; return; }
+  const groups = [
+    ['screenshots', 'Screenshots — artifacts/screenshots/'],
+    ['cert', 'Cert reports — reports/cert/'],
+    ['maps', 'Maps — game/maps/'],
+    ['audio', 'Audio — game/assets/audio/'],
+  ];
+  let h = '';
+  for (const [key, label] of groups) {
+    const items = d[key] || [];
+    h += '<div class="card"><h2>' + esc(label) + '</h2>';
+    if (!items.length) h += '<p class="muted">empty — nothing produced here yet.</p>';
+    else { h += '<div class="grid">'; for (const it of items) h += artifactItem(it); h += '</div>'; }
+    h += '</div>';
+  }
+  el.innerHTML = h;
+}
+
+/* ------------------------------------------------------------- backlog */
+async function renderBacklog() {
+  const d = await api('/api/console/backlog');
+  const el = document.getElementById('tab-backlog');
+  if (!d || d.error) { el.innerHTML = '<div class="card fail">backlog data unavailable</div>'; return; }
+  const c = d.baseline || {};
+  let h = '<div class="card"><h2>Commercial baseline — latest cert</h2>';
+  if (!c.exists) h += '<p class="warn">No cert report yet (reports/cert/latest.md missing).</p>';
+  else {
+    h += '<p><span class="chip ' + (c.overall === 'CERTIFIED' ? 'ok' : 'fail') + '">' +
+      esc(c.overall || '?') + '</span> <span class="muted">' + esc(c.date || '') + ' · ' +
+      esc(c.file) + ' · ACs ' + c.acs_met + '/' + c.acs_total + ' MET</span></p>';
+    if (c.baseline && c.baseline.length) {
+      h += '<table><thead><tr><th>Baseline check</th><th>Status</th><th>Detail</th>' +
+        '</tr></thead><tbody>';
+      for (const b of c.baseline)
+        h += '<tr><td><b>' + esc(b.name) + '</b></td>' +
+          '<td><span class="chip ' + (b.passed ? 'ok' : 'fail') + '">' +
+          (b.passed ? 'PASS' : 'FAIL') + '</span></td>' +
+          '<td class="muted">' + esc(b.detail) + '</td></tr>';
+      h += '</tbody></table>';
+    }
+  }
+  h += '</div><div class="card"><h2>Build queue — docs/BACKLOG.md' +
+    (d.queue_file ? ' (live status: ' + esc(d.queue_file) + ')' : '') + '</h2>';
+  if (!d.items.length) h += '<p class="muted">No backlog items parsed.</p>';
+  else {
+    h += '<table><thead><tr><th>Item</th><th>Title</th><th>Role</th><th>Status</th>' +
+      '<th>ACs</th><th>Milestone</th><th>Priority</th></tr></thead><tbody>';
+    for (const it of d.items) {
+      const st = it.live_status || it.status;
+      const cls = st === 'DONE' || st === 'VERIFIED' ? 'ok'
+        : (st === 'BLOCKED_HUMAN' || st === 'KICKED_BACK' ? 'fail' : 'warn');
+      h += '<tr><td><b>' + esc(it.id) + '</b></td><td>' + esc(it.title) + '</td>' +
+        '<td>' + esc(it.role) + '</td>' +
+        '<td><span class="chip ' + cls + '">' + esc(st) + '</span>' +
+        (it.live_status && it.live_status !== it.status ?
+          ' <span class="muted">(md: ' + esc(it.status) + ')</span>' : '') + '</td>' +
+        '<td class="muted">' + esc((it.acs || []).join(', ')) + '</td>' +
+        '<td class="muted">' + esc(it.milestone || '—') + '</td>' +
+        '<td class="muted">' + esc(it.priority || '—') + '</td></tr>';
+    }
+    h += '</tbody></table>';
+  }
+  el.innerHTML = h + '</div>';
+}
+
+/* ---------------------------------------------------------------- tabs */
+const LOADERS = {pipeline: renderPipeline, gates: renderGates, costs: renderCosts,
+                 artifacts: renderArtifacts, backlog: renderBacklog};
+
+function show(tab) {
+  ACTIVE = tab;
+  for (const b of document.querySelectorAll('nav.tabs button'))
+    b.classList.toggle('active', b.dataset.tab === tab);
+  for (const s of document.querySelectorAll('.tabpage'))
+    s.style.display = s.id === 'tab-' + tab ? 'block' : 'none';
+  if (TIMER) { clearInterval(TIMER); TIMER = null; }
+  if (LOADERS[tab]) {
+    LOADERS[tab]();
+    if (tab === 'pipeline') TIMER = setInterval(renderPipeline, 5000);
+  }
+}
+
+for (const b of document.querySelectorAll('nav.tabs button'))
+  b.addEventListener('click', () => show(b.dataset.tab));
+
+loadStack();
+show('pipeline');
+</script>
+</body>
+</html>
+"""
+
+
 def _state(root: Path) -> dict:
     """Full settings state. Presence/char-counts only — never values.
     Header values (which may be secret) are reduced to key NAMES."""
     import models
+
     from tools.keys import key_status
     from tools.routing import roles_using
 
@@ -479,13 +914,55 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
             except json.JSONDecodeError:
                 return {}
 
+        # -- console: evidence file serving (read-only) ------------------
+        def _serve_file(self, rel: str) -> None:
+            from urllib.parse import unquote
+
+            rel = unquote(rel).replace("\\", "/")
+            parts = [p for p in rel.split("/") if p not in ("", ".")]
+            ok = (
+                parts
+                and ".." not in parts
+                and not any(p.startswith(".") for p in parts)
+                and any(rel.startswith(prefix) for prefix in FILE_ROOTS)
+            )
+            target = (root / rel).resolve() if ok else None
+            if (
+                target is None
+                or not target.is_file()
+                or not target.is_relative_to(root.resolve())
+            ):
+                self._json({"ok": False, "error": "not found"}, 404)
+                return
+            ctype = FILE_TYPES.get(target.suffix.lower(), "text/plain; charset=utf-8")
+            try:
+                body = target.read_bytes()
+            except OSError:
+                self._json({"ok": False, "error": "unreadable"}, 404)
+                return
+            self.send_response(200)
+            self.send_header("Content-Type", ctype)
+            self.send_header(*NO_STORE)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
         # -- routes ------------------------------------------------------
         def do_GET(self) -> None:
             if not self._guard():
                 return
             if self.path == "/":
+                body = CONSOLE_PAGE.replace("__BUILD__", BUILD).encode("utf-8")
+                _log(root, "GET / (console loaded)")
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header(*NO_STORE)
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+            elif self.path == "/settings":
                 body = PAGE.replace("__BUILD__", BUILD).encode("utf-8")
-                _log(root, "GET / (page loaded)")
+                _log(root, "GET /settings (page loaded)")
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
                 self.send_header(*NO_STORE)
@@ -494,9 +971,34 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
                 self.wfile.write(body)
             elif self.path == "/api/state":
                 self._json(_state(root))
+            elif self.path.startswith("/api/console/"):
+                from tools import console_data
+
+                section = self.path.removeprefix("/api/console/")
+                handlers = {
+                    "pipeline": console_data.pipeline_state,
+                    "gates": console_data.gates_state,
+                    "costs": console_data.costs_state,
+                    "artifacts": console_data.artifacts_state,
+                    "backlog": console_data.backlog_state,
+                    "stack": console_data.stack_state,
+                }
+                fn = handlers.get(section)
+                if fn is None:
+                    self._json({"ok": False, "error": "not found"}, 404)
+                else:
+                    try:
+                        self._json(fn(root))
+                    except (OSError, ValueError, KeyError) as e:
+                        self._respond(
+                            {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
+                        )
+            elif self.path.startswith("/files/"):
+                self._serve_file(self.path.removeprefix("/files/"))
             elif self.path.startswith("/api/providers/preset"):
-                from tools import routing as routing_mod
                 from urllib.parse import parse_qs, urlparse
+
+                from tools import routing as routing_mod
 
                 q = parse_qs(urlparse(self.path).query)
                 pres = routing_mod.detect_preset(q.get("name", [""])[0])
@@ -518,11 +1020,28 @@ def make_server(root: Path, port: int = 0) -> ThreadingHTTPServer:
         def do_POST(self) -> None:
             if not self._guard():
                 return
-            from tools.keys import KeysError, remove_key, set_key
-            from tools import routing as routing_mod
             import models
 
+            from tools import console_data
+            from tools import routing as routing_mod
+            from tools.keys import KeysError, remove_key, set_key
+
             body = self._body()
+
+            # Console gate decision — kept out of the settings chain below
+            # so the existing dispatch (and its behavior) is untouched.
+            if self.path == "/api/console/gates/decide":
+                try:
+                    result = console_data.decide_gate(
+                        root,
+                        body.get("gate", ""),
+                        body.get("decision", ""),
+                    )
+                    self._respond({"ok": True, **result})
+                except console_data.ConsoleError as e:
+                    self._respond({"ok": False, "error": str(e)}, 400)
+                return
+
             try:
                 if self.path == "/api/keys/set":
                     n = set_key(root, body.get("name", ""), body.get("value", ""))
@@ -651,7 +1170,7 @@ def _probe_existing(port: int) -> bool:
 
 
 def serve(root: Path) -> None:
-    """Boot the settings panel and open the browser.
+    """Boot the JotBeat console and open the browser.
 
     Single-instance: if a JotBeat server already answers on DEFAULT_PORT,
     just open the browser at it and exit — no orphan servers, no dead tabs
@@ -675,12 +1194,12 @@ def serve(root: Path) -> None:
     _log(root, f"server start build={BUILD} root={Path(root).resolve()} url={url}")
     # pythonw (double-click launcher) may have no stdout at all
     with suppress(Exception):
-        print(f"JotBeat settings -> {url}  (loopback only; Ctrl+C to stop)")
+        print(f"JotBeat console -> {url}  (loopback only; Ctrl+C to stop)")
     webbrowser.open(url)
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         with suppress(Exception):
-            print("\nsettings UI stopped")
+            print("\nconsole stopped")
     finally:
         httpd.server_close()

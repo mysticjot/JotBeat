@@ -57,3 +57,11 @@ Rules:
 - `fallow health` is informational until Phase 4 (its CRAP estimate assumes 0% coverage).
 - CI runs this same gate; a failing quality gate blocks the build like any other gate.
 - Never lower `.aislop/config.yml` `ci.failBelow` to make CI pass — ratchet up only.
+
+## Current State (updated 2026-08-17)
+
+- SALTBOUND (Game 1) is in **vertical-slice construction** — work items are build tasks, never "patches" (that word is post-ship only). Full status lives in `docs/STUDIO_STATE.md`; product/pipeline rulings in `docs/DECISIONS.md` (D-0001–D-0008).
+- **Construction HOLD:** game-side building waits on Creative Director approval of `docs/GAME_DESIGN.md`. `jotbeat verify` now includes the COMMERCIAL_BASELINE gate (incl. Design match) and correctly reports NOT CERTIFIED on the mechanic-test build — that is the gate working, not a regression.
+- **JotBeat is the product; games are its output (D-0008).** Studio tools are departments — Animation (`jotbeat anim`), Level (map builder), Sound, Art — reusable, config-driven, genre-agnostic. A tool that only serves the current game is a defect in the tool.
+- Engine/stack of record: DECISIONS.md D-0005 (Phaser 4.0.0, TS, Vite 6, Playwright; Electron/Capacitor wrappers).
+- The JotBeat Console (`jotbeat ui`) is the studio's visible app; the Creative Director watches the studio there, not in chat reports.

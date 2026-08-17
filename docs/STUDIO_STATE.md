@@ -7,6 +7,8 @@ Living status doc — updated at every phase gate (AGENTS.md §1 continuous-loop
 - Phases 0–3: closed (gates demonstrated, see CHANGELOG).
 - **Phase 4 (QA & Cert): CLOSED / CERTIFIED.** Anti-slop enforcement chain live (guardrails + narrative role + auditor gate, zero API cost for mechanical checks).
 - **Phase 5 (Art & Audio): art pass COMPLETE, verify GREEN** — Kenney Tiny Dungeon (CC0) integrated with provenance manifest; Zelda-style multi-room map (46×40, 3 rooms + corridors, generator-built per D-0004); door-threshold fix (D-0003); all 10 ACs + oxygen timer green; baselines re-shot. Committed as `afcd486`.
+- **Studio layer (2026-08-17):** COMMERCIAL_BASELINE.md gate LIVE in `jotbeat verify` (incl. Design match vs GAME_DESIGN.md — the mechanic-test build correctly fails it); JotBeat Console live (`jotbeat ui`, 5 sections + Stack line + Settings); Deep Agents harness spike PASSED (auditor proof loop HARNESS-SPIKE-001, MET verdict, $0.001227, in events.jsonl; deepagents 0.7.6 MIT).
+- **Departments ruling (D-0008, locked):** JotBeat is the product; games are its output. Tools are permanent departments, never per-game props — Animation (`jotbeat anim`, spike queued), Level (map builder), Sound (audio pass), Art (art bible + conformance scan). Department heads = existing roles.
 
 ## Terminology (Creative Director ruling)
 

@@ -48,6 +48,57 @@ class AllProvidersExhausted(Exception):
     pass
 
 
+def chat_completions(provider: dict, body: dict) -> dict:
+    """POST /chat/completions to any OpenAI-compatible provider entry.
+
+    Additive hook for studio/harness/ (D-0006): the harness's LangChain
+    chat-model adapter builds full request bodies (tool schemas, multi-turn
+    history) and reuses this ONE client — base_url, env key, extra headers,
+    and extra body params all come from the providers.json entry, exactly as
+    ModelAdapter._call does. Family dispatch stays here: anything that is not
+    family "openai" is rejected, never name-matched.
+
+    Raises RateLimited on HTTP 429 and AllProvidersExhausted on a missing key
+    or non-OpenAI family so callers fall through the role's chain. Credentials
+    are read from the environment and never logged.
+    """
+    import httpx
+
+    if provider.get("family") != "openai":
+        raise AllProvidersExhausted(
+            f"{provider['name']}: family {provider.get('family')!r} "
+            "has no OpenAI-compatible /chat/completions path"
+        )
+    api_key = os.environ.get(provider["env_key"]) if provider.get("env_key") else None
+    if not api_key and not provider.get("free"):
+        raise AllProvidersExhausted(f"missing env key {provider['env_key']}")
+
+    # Provider-config body params override caller defaults (same semantics as
+    # _call_openai_compatible — e.g. disabling a reasoning model's thinking).
+    merged = dict(body)
+    for bk, bv in (provider.get("body") or {}).items():
+        merged[bk] = bv
+
+    headers = {"Content-Type": "application/json"}
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+    # Extra headers (providers.json "headers" object); a value starting with
+    # "$" names an env var so secret header values live in .env, never here.
+    for hk, hv in (provider.get("headers") or {}).items():
+        headers[hk] = os.environ.get(hv[1:], "") if hv.startswith("$") else hv
+
+    with httpx.Client(timeout=120) as client:
+        resp = client.post(
+            f"{provider['base_url']}/chat/completions",
+            headers=headers,
+            json=merged,
+        )
+    if resp.status_code == 429:
+        raise RateLimited(f"{provider['name']}: HTTP 429")
+    resp.raise_for_status()
+    return resp.json()
+
+
 class ModelAdapter:
     def __init__(
         self, role: str, cap_in: int | None = None, cap_out: int | None = None
@@ -153,17 +204,11 @@ class ModelAdapter:
     def _call_openai_compatible(
         self, provider, instructions, context, output_schema, images=None
     ) -> dict:
-        """One httpx client for every OpenAI-compatible endpoint —
-        base_url + env key swapped, nothing else. `images` (file paths) become
-        base64 data-URI content parts (OpenAI vision message shape)."""
+        """One client for every OpenAI-compatible endpoint —
+        base_url + env key swapped, nothing else (see chat_completions).
+        `images` (file paths) become base64 data-URI content parts
+        (OpenAI vision message shape)."""
         import base64
-        import httpx
-
-        api_key = (
-            os.environ.get(provider["env_key"]) if provider.get("env_key") else None
-        )
-        if not api_key and not provider.get("free"):
-            raise AllProvidersExhausted(f"missing env key {provider['env_key']}")
 
         user_content: object = "\n\n".join(context)
         if images:
@@ -188,33 +233,8 @@ class ModelAdapter:
         }
         if output_schema:
             body["response_format"] = {"type": "json_object"}
-        # Optional per-provider extra body params (providers.json "body" object)
-        # — e.g. disabling a reasoning model's thinking so the token budget
-        # goes to the answer, not to hidden reasoning_content. Config, not code.
-        for bk, bv in (provider.get("body") or {}).items():
-            body[bk] = bv
 
-        headers = {"Content-Type": "application/json"}
-        if api_key:
-            headers["Authorization"] = f"Bearer {api_key}"
-        # Optional per-provider extra headers (providers.json "headers" object)
-        # — covers api-key auth styles, referers, any quirk without code changes.
-        # A value starting with "$" names an env var (resolved at call time),
-        # so secret header values live in .env, never in the repo.
-        for hk, hv in (provider.get("headers") or {}).items():
-            headers[hk] = os.environ.get(hv[1:], "") if hv.startswith("$") else hv
-
-        with httpx.Client(timeout=120) as client:
-            resp = client.post(
-                f"{provider['base_url']}/chat/completions",
-                headers=headers,
-                json=body,
-            )
-
-        if resp.status_code == 429:
-            raise RateLimited(f"{provider['name']}: HTTP 429")
-        resp.raise_for_status()
-        data = resp.json()
+        data = chat_completions(provider, body)
 
         usage = data.get("usage", {})
         content = data["choices"][0]["message"].get("content")

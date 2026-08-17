@@ -1,43 +1,5 @@
 import { expect, test } from '@playwright/test';
-
-//  Drive the player to (tx, ty); reads position each step and presses
-//  toward the largest remaining axis. Corridor-safe: keeps the cross
-//  axis within tolerance before/while travelling the dominant axis.
-async function driveTo(page: any, tx: number, ty: number, budgetMs = 20000) {
-    const start = Date.now();
-    let last = { x: NaN, y: NaN };
-    let stuckStreak = 0;
-    const pressMs = (delta: number) => Math.min(200, Math.max(30, Math.abs(delta) / 160 * 900));
-    while (Date.now() - start < budgetMs) {
-        const pos = await page.evaluate(() => (window as any).__game.state.position);
-        const dx = tx - pos.x, dy = ty - pos.y;
-        if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
-        // Hysteresis: a single immobile sample can be a timing artifact —
-        // sidestep only after TWO consecutive immobile samples (a real wall).
-        const immobile = Math.abs(pos.x - last.x) < 0.5 && Math.abs(pos.y - last.y) < 0.5;
-        stuckStreak = immobile ? stuckStreak + 1 : 0;
-        last = pos;
-        let key: string;
-        let ms: number;
-        if (stuckStreak >= 2) {
-            key = Math.abs(dx) > Math.abs(dy)
-                ? (dy >= 0 ? 'ArrowDown' : 'ArrowUp')   // sidestep around the wall
-                : (dx >= 0 ? 'ArrowRight' : 'ArrowLeft');
-            ms = 120;
-            stuckStreak = 0;
-        } else if (Math.abs(dy) > 4) {
-            key = dy > 0 ? 'ArrowDown' : 'ArrowUp';
-            ms = pressMs(dy);
-        } else {
-            key = dx > 0 ? 'ArrowRight' : 'ArrowLeft';
-            ms = pressMs(dx);
-        }
-        await page.keyboard.down(key!);
-        await page.waitForTimeout(ms);
-        await page.keyboard.up(key!);
-    }
-    throw new Error(`driveTo(${tx},${ty}) timed out; ended at ${JSON.stringify(last)}`);
-}
+import { driveTo } from './drive';
 
 test.describe('BL-006: Exit Triggers Victory Scene', () => {
 
@@ -54,19 +16,19 @@ test.describe('BL-006: Exit Triggers Victory Scene', () => {
         //  Collect the key at tile (31, 8) — center (1008, 272). Route:
         //  east along corridor 1, north up the connector into Room B
         //  (map: game/maps/build_map.py). Player spawns at tile (7, 19).
-        await driveTo(page, 27 * 32 + 16, 19 * 32 + 16);
-        await driveTo(page, 27 * 32 + 16, 9 * 32 + 16);
-        await driveTo(page, 31 * 32 + 16, 8 * 32 + 16);
+        await driveTo(page, 27 * 32 + 16, 19 * 32 + 16, 20000);
+        await driveTo(page, 27 * 32 + 16, 9 * 32 + 16, 20000);
+        await driveTo(page, 31 * 32 + 16, 8 * 32 + 16, 20000);
         let inventory = await page.evaluate(() => ({ ...(window as any).__game.state.inventory }));
         expect(inventory.keys).toBe(1);
 
         //  Move to the tile squarely west of the vault door: door is at
         //  (34, 31) and blocks that tile; drive to (32, 31) via corridor 2
         //  and the vault west half — center (1040, 1008).
-        await driveTo(page, 25 * 32 + 16, 12 * 32 + 16);
-        await driveTo(page, 25 * 32 + 16, 27 * 32 + 16);
-        await driveTo(page, 28 * 32 + 16, 27 * 32 + 16);
-        await driveTo(page, 32 * 32 + 16, 31 * 32 + 16);
+        await driveTo(page, 25 * 32 + 16, 12 * 32 + 16, 20000);
+        await driveTo(page, 25 * 32 + 16, 27 * 32 + 16, 20000);
+        await driveTo(page, 28 * 32 + 16, 27 * 32 + 16, 20000);
+        await driveTo(page, 32 * 32 + 16, 31 * 32 + 16, 20000);
         //  The player is at (1040±, 1008±). Hold Right through the door tile to trigger the open.
         await page.keyboard.down('ArrowRight');
         await page.waitForTimeout(600);

@@ -12,7 +12,8 @@ Commands:
     provider  list / add / remove / test provider entries
     route     set a role's provider chain
     keys      set / list / remove .env keys (masked input, atomic, guarded)
-    ui        local settings panel (keys, providers, routing) at 127.0.0.1
+    ui        local console: pipeline, gates, costs, artifacts, backlog,
+              plus the settings panel (keys, providers, routing)
 
 Adding a provider (3 steps — never hand-edit JSON, never print key values):
     1. put the key in .env          (e.g. MYPROVIDER_API_KEY=...)
@@ -254,9 +255,13 @@ def cmd_run_next() -> int:
 
 def cmd_verify() -> int:
     """Deterministic verification only — no model calls.
-    Phase-end endpoint (AGENTS.md §1/§6): BVT + scripted QA + quality gate."""
+    Phase-end endpoint (AGENTS.md §1/§6): BVT + scripted QA + quality gate.
+    Commercial baseline (docs/COMMERCIAL_BASELINE.md): any baseline FAIL
+    blocks the gate."""
     import json
     from tools.browser import run_ac_suite
+    from tools.design_match import run_design_match
+    from tools.provenance import run_provenance
     from tools.quality import run_quality
     from tools.shell import run_bvt
 
@@ -277,17 +282,47 @@ def cmd_verify() -> int:
     print(
         f"QUALITY: {'PASS' if quality == 0 else 'FAIL'}  (aislop errors=0 + score floor, fallow dead-code/dupes)"
     )
+    # Commercial baseline §6: asset provenance (deterministic, fails hard).
+    provenance = run_provenance(ROOT)
+    print(
+        f"PROVENANCE: {'PASS' if provenance['passed'] else 'FAIL'}  "
+        f"checked={provenance['checked']} missing={len(provenance['missing'])}"
+    )
+    for rel in provenance["missing"] + provenance["incomplete"]:
+        print(f"  - {rel}")
+    # Commercial baseline §8: the build must match docs/GAME_DESIGN.md.
+    design = run_design_match(ROOT)
+    print(f"DESIGN MATCH: {'PASS' if design['passed'] else 'FAIL'}")
+    for c in design["checks"]:
+        if not c["passed"]:
+            print(f"  - {c['name']}: {c['detail']}")
     # Phase 4 §2.4: cert report — one section per AC, human-readable in 2 min.
-    from tools.cert import write_cert_report
+    # Always carries the Commercial Baseline section (auditor rule).
+    from tools.cert import baseline_items, write_cert_report
 
-    cert = write_cert_report(build, qa, quality, ROOT)
+    baseline = baseline_items(qa, provenance, quality, ROOT, design)
+    for item in baseline:
+        print(f"BASELINE {item['name']}: {'PASS' if item['passed'] else 'FAIL'}")
+    baseline_ok = all(item["passed"] for item in baseline)
+    cert = write_cert_report(build, qa, quality, ROOT, provenance, design)
     print(f"CERT:    {cert.relative_to(ROOT)}")
     print(
         json.dumps(
-            {"bvt": build["passed"], "qa": qa["passed"], "quality": quality == 0}
+            {
+                "bvt": build["passed"],
+                "qa": qa["passed"],
+                "quality": quality == 0,
+                "provenance": provenance["passed"],
+                "design_match": design["passed"],
+                "baseline": baseline_ok,
+            }
         )
     )
-    return 0 if build["passed"] and qa["passed"] and quality == 0 else 1
+    return (
+        0
+        if build["passed"] and qa["passed"] and quality == 0 and baseline_ok
+        else 1
+    )
 
 
 def cmd_report() -> int:
@@ -676,7 +711,10 @@ def main(argv: list[str] | None = None) -> int:
     p_krm = keys_sub.add_parser("remove", help="remove a key from .env")
     p_krm.add_argument("name")
 
-    sub.add_parser("ui", help="local settings UI (keys, providers, routing)")
+    sub.add_parser(
+        "ui",
+        help="JotBeat console (pipeline, gates, costs, artifacts, backlog, settings)",
+    )
     sub.add_parser(
         "quality",
         help="post-coding quality gate: aislop (errors=0) + fallow dead-code/dupes",
