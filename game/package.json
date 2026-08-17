@@ -1,6 +1,6 @@
 {
   "name": "template-vite-ts",
-  "description": "A Phaser 3 TypeScript template using Vite.",
+  "description": "SALTBOUND — a Phaser 4 TypeScript game built with Vite (see docs/DECISIONS.md D-0005).",
   "version": "1.4.0",
   "repository": {
     "type": "git",

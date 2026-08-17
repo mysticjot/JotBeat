@@ -2,6 +2,10 @@
 
 > Owned by Director + Producer. Backlog items are user stories with acceptance criteria;
 > items roll up into milestones, milestones into phases (roadmap §1.4).
+>
+> Terminology (Creative Director ruling): SALTBOUND is in vertical-slice construction.
+> Current work items are **build tasks** against `docs/COMMERCIAL_BASELINE.md`.
+> "Patch" is reserved for post-ship fixes only.
 
 ## Item format
 
@@ -117,6 +121,30 @@ Depends on: BL-006, BL-007
 Milestone: Vertical Slice
 Priority: P1
 Status: BACKLOG
+
+## Milestone: Commercial Baseline (vertical-slice construction)
+
+Build tasks against `docs/COMMERCIAL_BASELINE.md` — the gate-blocking checklist
+QA runs on every `jotbeat verify`. Statuses tracked in `docs/STUDIO_STATE.md`.
+
+- BT-1: Baseline checklist doc + gate wiring (QA runs it; Auditor blocks certs missing it).
+- BT-2: Camera stability under movement — no sub-pixel drift; verified by 10s movement capture.
+- BT-3: Animated character sprites — CC0 4-direction walk cycle, idle/walk animation states; no static-tile actors.
+- BT-4: Audio coverage — every player action and state change has a CC0 sound; volumes in config.
+- BT-5: Asset-quality upgrade — owned by the Phase 5 generated-art pass, not by churning the CC0 set.
+
+## Queued (held pending GAME_DESIGN.md approval)
+
+- **JotBeat Console** (Creative Director deliverable, held by construction hold): extend
+  `jotbeat ui` into the studio's visible console — stdlib local server on 127.0.0.1, no new
+  paid deps, presentation layer over `state/events.jsonl`, `game/assets/manifest.json`, and
+  `reports/cert/`. Sections: **Pipeline** (live role view: current task, model, status from
+  events.jsonl), **Gates** (pending approvals with evidence + approve/reject writing the gate
+  decision), **Costs** (per-game/per-role ledger vs budget), **Artifacts** (screenshots, cert
+  reports, maps, audio browser), **Backlog** (build queue vs COMMERCIAL_BASELINE.md),
+  **Settings** tab (existing Keys/Providers/Routing, unchanged). **Stack line on the main
+  screen: engine/version, key libs, build tooling** (Creative Director ruling — the stack is
+  never inferred from bug reports; source of truth: DECISIONS.md D-0005).
 
 ## Proposed (observer candidates — awaiting human approval)
 - [ ] PROPOSED: Add a short delay or wait for the physics system to complete its next update cycle before asserting the position after pausing.
